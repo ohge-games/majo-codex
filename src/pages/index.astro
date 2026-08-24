@@ -6,6 +6,9 @@ import fs from 'node:fs';
 
 const base = import.meta.env.BASE_URL;
 const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
+const ui = name => `${base}img/ui/${name}.png`;
+const hasUi = name => hasImg(`/img/ui/${name}.png`);
+const lc = s => (s ?? '').toLowerCase();
 const order = { SSR: 0, SR: 1, UR: -1 };
 const roster = [...witches].sort((a, b) =>
   (order[a.rarity] ?? 2) - (order[b.rarity] ?? 2) || a.witch_id.localeCompare(b.witch_id));
@@ -14,14 +17,16 @@ const classes = [...new Set(roster.map(w => w.class))].sort();
 const rarities = ['SSR', 'SR'];
 const types = ['mental', 'physical', 'magic'];
 const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+
+// Non-interactive "coming soon" tiles — name only, no data. Add entries as they're announced.
+const upcoming = [
+  { name: 'Isabelle' },
+];
 ---
-<Base title="MAJO Codex — Witch Compendium">
+<Base title="MAJO Codex — Witch Roster">
   <section class="hero">
     <div class="wrap">
-      <p class="eyebrow">Unofficial compendium</p>
-      <h1 class="display">Every witch, watched.</h1>
-      <p class="lede">Skills, combat frames, and stat curves for all
-        <span class="mono">{roster.length}</span> witches — pulled straight from the game files.</p>
+      <h1 class="display">Current Witch Roster</h1>
     </div>
   </section>
 
@@ -46,21 +51,22 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
     <div class="filters" id="filters">
       <div class="filter-row">
         <span class="filter-label">Class</span>
-        {classes.map(c => <button class="chip" data-facet="class" data-val={c}>{c}</button>)}
+        {classes.map(c => <button class="chip" data-facet="class" data-val={c}>{hasUi(`cclass_${lc(c)}`) && <img class="chip-ic" src={ui(`cclass_${lc(c)}`)} alt="" width="16" height="16" />}{c}</button>)}
       </div>
       <div class="filter-row">
         <span class="filter-label">Rarity</span>
-        {rarities.map(r => <button class={`chip is-${r}`} data-facet="rarity" data-val={r}>{r}</button>)}
+        {rarities.map(r => <button class={`chip is-${r}`} data-facet="rarity" data-val={r}>{hasUi(`rarity_${lc(r)}`) && <img class="chip-ic" src={ui(`rarity_${lc(r)}`)} alt="" height="15" />}{r}</button>)}
       </div>
       <div class="filter-row">
         <span class="filter-label">Damage</span>
-        {types.map(t => <button class={`chip type-${t}`} data-facet="type" data-val={t}>{cap(t)}</button>)}
+        {types.map(t => <button class={`chip type-${t}`} data-facet="type" data-val={t}>{hasUi(`type_${t}`) && <img class="chip-ic" src={ui(`type_${t}`)} alt="" width="16" height="16" />}{cap(t)}</button>)}
       </div>
       <div class="filter-row">
         <span class="filter-label">Weakness</span>
-        {types.map(t => <button class={`chip type-${t}`} data-facet="weakness" data-val={t}>{cap(t)}</button>)}
+        {types.map(t => <button class={`chip type-${t}`} data-facet="weakness" data-val={t}>{hasUi(`type_${t}`) && <img class="chip-ic" src={ui(`type_${t}`)} alt="" width="16" height="16" />}{cap(t)}</button>)}
       </div>
       <button id="clearall" class="clear-all" hidden>Clear all</button>
+      <p class="filter-hint">Click a filter to <b class="hint-inc">show only</b> · again to <b class="hint-exc">exclude</b> · again to clear</p>
     </div>
 
     <ul class="grid" id="grid">
@@ -74,8 +80,12 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
           <a class={`card rar-${w.rarity}`} href={`${base}witch/${w.witch_id.toLowerCase()}`}>
             <div class="card-bar"></div>
             <div class="card-top">
-              <span class={`rarity-chip is-${w.rarity}`}>{w.rarity}</span>
-              <span class="cls">{w.class}</span>
+              {hasUi(`cclass_${lc(w.class)}`)
+                ? <img class="cclass" src={ui(`cclass_${lc(w.class)}`)} alt={w.class} title={w.class} width="26" height="26" loading="lazy" />
+                : <span class="cls">{w.class}</span>}
+              {hasUi(`rarity_${lc(w.rarity)}`)
+                ? <img class="rarity-ic" src={ui(`rarity_${lc(w.rarity)}`)} alt={w.rarity} height="22" loading="lazy" />
+                : <span class={`rarity-chip is-${w.rarity}`}>{w.rarity}</span>}
             </div>
             <div class="portrait">
               {hasImg(`/img/card/${w.portrait_filename}`) ? (
@@ -96,14 +106,39 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
               </div>
               <div class="eyes">
                 <span class="eye-wrap" title={`${cap(w.damage_type)} damage`}>
-                  <EyeBadge type={w.damage_type} size={20} title={`${cap(w.damage_type)} damage`} />
+                  {hasUi(`type_${lc(w.damage_type)}`)
+                    ? <img class="type-ic" src={ui(`type_${lc(w.damage_type)}`)} alt={`${cap(w.damage_type)} damage`} width="20" height="20" loading="lazy" />
+                    : <EyeBadge type={w.damage_type} size={20} title={`${cap(w.damage_type)} damage`} />}
                 </span>
                 <span class="eye-wrap weak" title={`Weak to ${cap(w.weakness_type)} (−25%)`}>
-                  <EyeBadge type={w.weakness_type} size={20} title={`Weak to ${cap(w.weakness_type)}`} />
+                  {hasUi(`type_${lc(w.weakness_type)}`)
+                    ? <img class="type-ic" src={ui(`type_${lc(w.weakness_type)}`)} alt={`Weak to ${cap(w.weakness_type)}`} width="20" height="20" loading="lazy" />
+                    : <EyeBadge type={w.weakness_type} size={20} title={`Weak to ${cap(w.weakness_type)}`} />}
                 </span>
               </div>
             </div>
           </a>
+        </li>
+      ))}
+      {upcoming.map(u => (
+        <li class="card-cell soon" aria-label={`${u.name} — coming soon`}>
+          <div class="card soon-card">
+            <div class="card-bar"></div>
+            <div class="card-top"><span class="soon-badge mono">Coming soon</span></div>
+            <div class="portrait">
+              <svg viewBox="0 0 24 24" class="sigil" aria-hidden="true">
+                <path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width="1"/>
+                <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1"/>
+                <circle cx="12" cy="12" r="1.3" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="card-foot">
+              <div class="names">
+                <span class="wname display">{u.name}</span>
+                <span class="wtitle">Not yet released</span>
+              </div>
+            </div>
+          </div>
         </li>
       ))}
     </ul>
@@ -147,6 +182,14 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
   .chip:hover{border-color:var(--ink-faint);color:var(--ink)}
   .chip[aria-pressed="true"]{background:var(--veil-2);color:var(--ink);border-color:currentColor;
     box-shadow:0 0 0 1px currentColor inset}
+  .chip[data-state="include"]{color:var(--ink);border-color:#54d68a;
+    box-shadow:0 0 0 1px #54d68a inset, 0 0 12px -3px rgba(84,214,138,.6)}
+  .chip[data-state="exclude"]{color:var(--ink-dim);border-color:#e0574b;
+    box-shadow:0 0 0 1px #e0574b inset, 0 0 12px -3px rgba(224,87,75,.55);
+    text-decoration:line-through;text-decoration-color:rgba(224,87,75,.85)}
+  .filter-hint{margin:4px 0 0;font-size:.72rem;color:var(--ink-faint)}
+  .filter-hint b{font-weight:600}
+  .hint-inc{color:#54d68a} .hint-exc{color:#e0574b}
   .clear-all{align-self:flex-start;margin-top:2px;font:inherit;font-size:.74rem;cursor:pointer;
     color:var(--ink-dim);background:none;border:none;padding:2px 0;text-decoration:underline;
     text-underline-offset:3px}
@@ -162,7 +205,12 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
   .card:hover{transform:translateY(-4px);border-color:var(--ink-faint);box-shadow:var(--shadow)}
   .rar-SR{--rc:var(--sr)} .rar-SSR{--rc:var(--ssr)} .rar-UR{--rc:var(--ur)}
   .card-bar{height:4px;background:var(--rc)}
-  .card-top{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 6px}
+  .card-top{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 6px;min-height:34px}
+  .cclass{width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+  .rarity-ic{height:22px;width:auto;object-fit:contain}
+  .type-ic{width:20px;height:20px;object-fit:contain;display:block}
+  .chip-ic{width:16px;height:16px;object-fit:contain;margin-right:6px;vertical-align:-3px}
+  .chip{display:inline-flex;align-items:center}
   .cls{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.14em;
     text-transform:uppercase;color:var(--ink-faint)}
   .portrait{position:relative;aspect-ratio:1/1;margin:2px 12px;border-radius:8px;
@@ -182,6 +230,14 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
   .eye-wrap.weak::after{content:"";position:absolute;left:50%;top:50%;width:118%;height:1.4px;
     background:currentColor;transform:translate(-50%,-50%) rotate(-18deg);color:var(--ink-faint);opacity:.55}
 
+  .soon{pointer-events:none}
+  .soon-card{opacity:.42;filter:grayscale(.5);border-style:dashed}
+  .soon-card .card-bar{background:var(--ink-faint)}
+  .soon-card .portrait{color:var(--ink-faint)}
+  .soon-badge{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);
+    border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+  .soon-card .wtitle{color:var(--ink-faint)}
+
   .empty{color:var(--ink-dim);padding:40px 0}
   .empty button{background:none;border:1px solid var(--line);color:var(--ink);
     border-radius:6px;padding:4px 12px;cursor:pointer}
@@ -190,11 +246,19 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 
 <script>
   const RARITY = { SSR: 0, SR: 1, UR: -1 };
-  const state = { class: new Set(), rarity: new Set(), type: new Set(), weakness: new Set(), q: '', sort: 'rarity' };
+  const FACETS = ['class', 'rarity', 'type', 'weakness'];
+  const state = {
+    class:    { inc: new Set(), exc: new Set() },
+    rarity:   { inc: new Set(), exc: new Set() },
+    type:     { inc: new Set(), exc: new Set() },
+    weakness: { inc: new Set(), exc: new Set() },
+    q: '', sort: 'rarity',
+  };
 
   const grid = document.getElementById('grid');
   const chips = [...document.querySelectorAll('.chip')];
-  const cells = [...document.querySelectorAll('.card-cell')];
+  const cells = [...document.querySelectorAll('.card-cell:not(.soon)')];
+  const soonCells = [...document.querySelectorAll('.card-cell.soon')];
   const countEl = document.getElementById('count');
   const emptyEl = document.getElementById('empty');
   const searchEl = document.getElementById('search');
@@ -202,7 +266,6 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
   const clearAll = document.getElementById('clearall');
 
   const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : -Infinity; };
-
   const comparators = {
     rarity: (a, b) => (RARITY[a.dataset.rarity] ?? 2) - (RARITY[b.dataset.rarity] ?? 2)
                     || a.dataset.order.localeCompare(b.dataset.order),
@@ -214,39 +277,47 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
     release:(a, b) => a.dataset.order.localeCompare(b.dataset.order),
   };
 
-  function anyActive() {
-    return state.q || state.class.size || state.rarity.size || state.type.size || state.weakness.size;
+  const anyActive = () => state.q ||
+    FACETS.some(f => state[f].inc.size || state[f].exc.size);
+
+  function passesFacet(cell, facet) {
+    const v = cell.dataset[facet];
+    const { inc, exc } = state[facet];
+    if (exc.has(v)) return false;
+    if (inc.size && !inc.has(v)) return false;
+    return true;
   }
 
   function apply() {
-    // sort (reorder DOM)
-    const sorted = [...cells].sort(comparators[state.sort] || comparators.rarity);
-    sorted.forEach(c => grid.appendChild(c));
+    // sort visible witches (reorder DOM), keep soon tiles pinned to the end
+    [...cells].sort(comparators[state.sort] || comparators.rarity)
+              .forEach(c => grid.appendChild(c));
+    soonCells.forEach(c => grid.appendChild(c));
 
-    // filter
     let n = 0;
     for (const cell of cells) {
-      const ok =
-        (!state.class.size    || state.class.has(cell.dataset.class)) &&
-        (!state.rarity.size   || state.rarity.has(cell.dataset.rarity)) &&
-        (!state.type.size     || state.type.has(cell.dataset.type)) &&
-        (!state.weakness.size || state.weakness.has(cell.dataset.weakness)) &&
-        (!state.q             || cell.dataset.search.includes(state.q));
+      const ok = FACETS.every(f => passesFacet(cell, f)) &&
+                 (!state.q || cell.dataset.search.includes(state.q));
       cell.hidden = !ok;
       if (ok) n++;
     }
+    // coming-soon tiles only show in the unfiltered default view
+    soonCells.forEach(c => { c.hidden = anyActive(); });
+
     countEl.textContent = n;
     emptyEl.hidden = n !== 0;
     clearAll.hidden = !anyActive();
   }
 
+  // tri-state chips: neutral -> include -> exclude -> neutral
   chips.forEach(chip => {
-    chip.setAttribute('aria-pressed', 'false');
     chip.addEventListener('click', () => {
       const { facet, val } = chip.dataset;
-      const set = state[facet];
-      if (set.has(val)) { set.delete(val); chip.setAttribute('aria-pressed', 'false'); }
-      else { set.add(val); chip.setAttribute('aria-pressed', 'true'); }
+      const { inc, exc } = state[facet];
+      const cur = chip.dataset.state || '';
+      if (cur === '') { inc.add(val); chip.dataset.state = 'include'; chip.setAttribute('aria-pressed', 'true'); }
+      else if (cur === 'include') { inc.delete(val); exc.add(val); chip.dataset.state = 'exclude'; chip.setAttribute('aria-pressed', 'false'); }
+      else { exc.delete(val); chip.dataset.state = ''; chip.removeAttribute('aria-pressed'); }
       apply();
     });
   });
@@ -256,8 +327,8 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 
   function reset() {
     state.q = ''; searchEl.value = '';
-    ['class','rarity','type','weakness'].forEach(f => state[f].clear());
-    chips.forEach(c => c.setAttribute('aria-pressed', 'false'));
+    FACETS.forEach(f => { state[f].inc.clear(); state[f].exc.clear(); });
+    chips.forEach(c => { c.dataset.state = ''; c.removeAttribute('aria-pressed'); });
     apply();
   }
   clearAll.addEventListener('click', reset);
