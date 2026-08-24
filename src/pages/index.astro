@@ -26,7 +26,24 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
   </section>
 
   <section class="wrap">
-    <div class="controls" id="controls">
+    <div class="searchbar" id="searchbar">
+      <div class="search-wrap">
+        <svg class="search-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input id="search" class="search" type="search" placeholder="Search witches…" autocomplete="off" aria-label="Search witches" />
+      </div>
+      <label class="sortwrap">Sort
+        <select id="sort" class="sort" aria-label="Sort roster">
+          <option value="rarity">Rarity</option>
+          <option value="name">Name A–Z</option>
+          <option value="class">Class</option>
+          <option value="atkspd">Atk Speed</option>
+          <option value="release">Release</option>
+        </select>
+      </label>
+      <div class="count"><span id="count">{roster.length}</span> shown</div>
+    </div>
+
+    <div class="filters" id="filters">
       <div class="filter-row">
         <span class="filter-label">Class</span>
         {classes.map(c => <button class="chip" data-facet="class" data-val={c}>{c}</button>)}
@@ -39,12 +56,21 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
         <span class="filter-label">Damage</span>
         {types.map(t => <button class={`chip type-${t}`} data-facet="type" data-val={t}>{cap(t)}</button>)}
       </div>
-      <div class="count"><span id="count">{roster.length}</span> shown</div>
+      <div class="filter-row">
+        <span class="filter-label">Weakness</span>
+        {types.map(t => <button class={`chip type-${t}`} data-facet="weakness" data-val={t}>{cap(t)}</button>)}
+      </div>
+      <button id="clearall" class="clear-all" hidden>Clear all</button>
     </div>
 
     <ul class="grid" id="grid">
       {roster.map(w => (
-        <li class="card-cell" data-class={w.class} data-rarity={w.rarity} data-type={w.damage_type}>
+        <li class="card-cell"
+            data-class={w.class} data-rarity={w.rarity}
+            data-type={w.damage_type} data-weakness={w.weakness_type}
+            data-name={w.name.toLowerCase()}
+            data-search={`${w.name} ${w.title ?? ''} ${w.class}`.toLowerCase()}
+            data-atkspd={w.atk_spd ?? ''} data-order={w.witch_id}>
           <a class={`card rar-${w.rarity}`} href={`${base}witch/${w.witch_id.toLowerCase()}`}>
             <div class="card-bar"></div>
             <div class="card-top">
@@ -93,18 +119,39 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
   .lede{color:var(--ink-dim);max-width:52ch;font-size:1.05rem}
   .lede .mono{color:var(--sigil)}
 
-  .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;
-    padding:26px 0 22px;position:sticky;top:64px;background:rgba(12,10,21,.85);
+  .searchbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+    padding:24px 0 14px;position:sticky;top:64px;background:rgba(12,10,21,.9);
     backdrop-filter:blur(8px);z-index:20}
+  .search-wrap{position:relative;flex:1 1 240px;min-width:0}
+  .search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    width:16px;height:16px;color:var(--ink-faint);pointer-events:none}
+  .search{width:100%;font:inherit;font-size:.9rem;color:var(--ink);
+    background:var(--veil);border:1px solid var(--line);border-radius:999px;
+    padding:9px 14px 9px 36px;outline:none;transition:.15s}
+  .search::placeholder{color:var(--ink-faint)}
+  .search:focus{border-color:var(--sigil);box-shadow:0 0 0 3px color-mix(in srgb,var(--sigil) 22%,transparent)}
+  .search::-webkit-search-cancel-button{filter:invert(.6)}
+  .sortwrap{display:flex;align-items:center;gap:8px;font-family:"Space Mono",monospace;
+    font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+  .sort{font-family:"Inter",sans-serif;font-size:.82rem;letter-spacing:0;text-transform:none;
+    color:var(--ink);background:var(--veil);border:1px solid var(--line);border-radius:8px;
+    padding:7px 10px;cursor:pointer}
+  .sort:focus{outline:none;border-color:var(--sigil)}
+
+  .filters{display:flex;flex-direction:column;gap:9px;padding:2px 0 20px;position:relative}
   .filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .filter-label{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.2em;
-    text-transform:uppercase;color:var(--ink-faint);margin-right:2px}
+    text-transform:uppercase;color:var(--ink-faint);width:74px;flex-shrink:0}
   .chip{font:inherit;font-size:.8rem;cursor:pointer;padding:5px 13px;border-radius:999px;
     border:1px solid var(--line);background:var(--veil);color:var(--ink-dim);transition:.15s}
   .chip:hover{border-color:var(--ink-faint);color:var(--ink)}
   .chip[aria-pressed="true"]{background:var(--veil-2);color:var(--ink);border-color:currentColor;
     box-shadow:0 0 0 1px currentColor inset}
-  .count{margin-left:auto;font-family:"Space Mono",monospace;font-size:.78rem;color:var(--ink-faint)}
+  .clear-all{align-self:flex-start;margin-top:2px;font:inherit;font-size:.74rem;cursor:pointer;
+    color:var(--ink-dim);background:none;border:none;padding:2px 0;text-decoration:underline;
+    text-underline-offset:3px}
+  .clear-all:hover{color:var(--ink)}
+  .count{margin-left:auto;font-family:"Space Mono",monospace;font-size:.78rem;color:var(--ink-faint);white-space:nowrap}
   .count span{color:var(--ink)}
 
   .grid{list-style:none;margin:0;padding:8px 0 0;display:grid;gap:18px;
@@ -142,25 +189,57 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 </style>
 
 <script>
-  const state = { class: new Set(), rarity: new Set(), type: new Set() };
-  const chips = document.querySelectorAll('.chip');
+  const RARITY = { SSR: 0, SR: 1, UR: -1 };
+  const state = { class: new Set(), rarity: new Set(), type: new Set(), weakness: new Set(), q: '', sort: 'rarity' };
+
+  const grid = document.getElementById('grid');
+  const chips = [...document.querySelectorAll('.chip')];
   const cells = [...document.querySelectorAll('.card-cell')];
   const countEl = document.getElementById('count');
   const emptyEl = document.getElementById('empty');
+  const searchEl = document.getElementById('search');
+  const sortEl = document.getElementById('sort');
+  const clearAll = document.getElementById('clearall');
+
+  const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : -Infinity; };
+
+  const comparators = {
+    rarity: (a, b) => (RARITY[a.dataset.rarity] ?? 2) - (RARITY[b.dataset.rarity] ?? 2)
+                    || a.dataset.order.localeCompare(b.dataset.order),
+    name:   (a, b) => a.dataset.name.localeCompare(b.dataset.name),
+    class:  (a, b) => a.dataset.class.localeCompare(b.dataset.class)
+                    || (RARITY[a.dataset.rarity] ?? 2) - (RARITY[b.dataset.rarity] ?? 2),
+    atkspd: (a, b) => num(b.dataset.atkspd) - num(a.dataset.atkspd)
+                    || a.dataset.name.localeCompare(b.dataset.name),
+    release:(a, b) => a.dataset.order.localeCompare(b.dataset.order),
+  };
+
+  function anyActive() {
+    return state.q || state.class.size || state.rarity.size || state.type.size || state.weakness.size;
+  }
 
   function apply() {
+    // sort (reorder DOM)
+    const sorted = [...cells].sort(comparators[state.sort] || comparators.rarity);
+    sorted.forEach(c => grid.appendChild(c));
+
+    // filter
     let n = 0;
     for (const cell of cells) {
       const ok =
-        (!state.class.size || state.class.has(cell.dataset.class)) &&
-        (!state.rarity.size || state.rarity.has(cell.dataset.rarity)) &&
-        (!state.type.size  || state.type.has(cell.dataset.type));
+        (!state.class.size    || state.class.has(cell.dataset.class)) &&
+        (!state.rarity.size   || state.rarity.has(cell.dataset.rarity)) &&
+        (!state.type.size     || state.type.has(cell.dataset.type)) &&
+        (!state.weakness.size || state.weakness.has(cell.dataset.weakness)) &&
+        (!state.q             || cell.dataset.search.includes(state.q));
       cell.hidden = !ok;
       if (ok) n++;
     }
     countEl.textContent = n;
     emptyEl.hidden = n !== 0;
+    clearAll.hidden = !anyActive();
   }
+
   chips.forEach(chip => {
     chip.setAttribute('aria-pressed', 'false');
     chip.addEventListener('click', () => {
@@ -171,9 +250,18 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
       apply();
     });
   });
-  document.getElementById('clear2')?.addEventListener('click', () => {
-    Object.values(state).forEach(s => s.clear());
+
+  searchEl.addEventListener('input', () => { state.q = searchEl.value.trim().toLowerCase(); apply(); });
+  sortEl.addEventListener('change', () => { state.sort = sortEl.value; apply(); });
+
+  function reset() {
+    state.q = ''; searchEl.value = '';
+    ['class','rarity','type','weakness'].forEach(f => state[f].clear());
     chips.forEach(c => c.setAttribute('aria-pressed', 'false'));
     apply();
-  });
+  }
+  clearAll.addEventListener('click', reset);
+  document.getElementById('clear2')?.addEventListener('click', reset);
+
+  apply();
 </script>
