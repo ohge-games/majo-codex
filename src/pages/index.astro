@@ -87,30 +87,27 @@ const upcoming = [
                   <circle cx="12" cy="12" r="1.3" fill="currentColor"/>
                 </svg>
               )}
-              <span class="id mono">{w.witch_id}</span>
+              <div class="badge-strip">
+                <span class="bs-type" title={`${cap(w.damage_type)} damage`}>
+                  {hasUi(`type_${lc(w.damage_type)}`)
+                    ? <img class="type-ic" src={ui(`type_${lc(w.damage_type)}`)} alt={`${cap(w.damage_type)} damage`} width="24" height="24" loading="lazy" />
+                    : <EyeBadge type={w.damage_type} size={24} title={`${cap(w.damage_type)} damage`} />}
+                </span>
+                <span class="bs-rarity">
+                  {hasUi(`rarity_${lc(w.rarity)}`)
+                    ? <img class="rarity-ic" src={ui(`rarity_${lc(w.rarity)}`)} alt={w.rarity} title={w.rarity} height="30" loading="lazy" />
+                    : <span class={`rarity-chip is-${w.rarity}`}>{w.rarity}</span>}
+                </span>
+                <span class="bs-type weak" title={`Weak to ${cap(w.weakness_type)} (−25%)`}>
+                  {hasUi(`type_${lc(w.weakness_type)}`)
+                    ? <img class="type-ic" src={ui(`type_${lc(w.weakness_type)}`)} alt={`Weak to ${cap(w.weakness_type)}`} width="24" height="24" loading="lazy" />
+                    : <EyeBadge type={w.weakness_type} size={24} title={`Weak to ${cap(w.weakness_type)}`} />}
+                </span>
+              </div>
             </div>
             <div class="card-foot">
-              <div class="names">
-                <span class="name-line">
-                  {hasUi(`rarity_${lc(w.rarity)}`)
-                    ? <img class="rarity-ic" src={ui(`rarity_${lc(w.rarity)}`)} alt={w.rarity} title={w.rarity} height="18" loading="lazy" />
-                    : <span class={`rarity-chip is-${w.rarity}`}>{w.rarity}</span>}
-                  <span class="wname display">{w.name}</span>
-                </span>
-                {w.title && <span class="wtitle">{w.title}</span>}
-              </div>
-              <div class="eyes">
-                <span class="eye-wrap" title={`${cap(w.damage_type)} damage`}>
-                  {hasUi(`type_${lc(w.damage_type)}`)
-                    ? <img class="type-ic" src={ui(`type_${lc(w.damage_type)}`)} alt={`${cap(w.damage_type)} damage`} width="20" height="20" loading="lazy" />
-                    : <EyeBadge type={w.damage_type} size={20} title={`${cap(w.damage_type)} damage`} />}
-                </span>
-                <span class="eye-wrap weak" title={`Weak to ${cap(w.weakness_type)} (−25%)`}>
-                  {hasUi(`type_${lc(w.weakness_type)}`)
-                    ? <img class="type-ic" src={ui(`type_${lc(w.weakness_type)}`)} alt={`Weak to ${cap(w.weakness_type)}`} width="20" height="20" loading="lazy" />
-                    : <EyeBadge type={w.weakness_type} size={20} title={`Weak to ${cap(w.weakness_type)}`} />}
-                </span>
-              </div>
+              <span class="wname display">{w.name}</span>
+              {w.title && <span class="wtitle">{w.title}</span>}
             </div>
           </a>
         </li>
@@ -203,7 +200,7 @@ const upcoming = [
   .rar-SR{--rc:var(--sr)} .rar-SSR{--rc:var(--ssr)} .rar-UR{--rc:var(--ur)}
   .card-bar{height:4px;background:var(--rc)}
   .card-top{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 6px;min-height:34px}
-  .cclass{position:absolute;top:0;left:0;z-index:2;width:54px;height:54px;object-fit:contain;display:block}
+  .cclass{position:absolute;top:0;left:0;z-index:2;width:54px;height:54px;object-fit:contain;object-position:left top;display:block}
   .cls-badge{position:absolute;top:6px;left:6px;z-index:2;font-family:"Space Mono",monospace;
     font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
     background:rgba(12,10,21,.7);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
@@ -221,15 +218,20 @@ const upcoming = [
   .portrait .sigil{width:46%;opacity:.5}
   .portrait-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
   .portrait .id{position:absolute;bottom:7px;right:9px;font-size:.6rem;color:var(--ink-faint)}
-  .card-foot{display:flex;flex-direction:column;align-items:center;gap:7px;padding:11px 12px 13px;text-align:center}
-  .names{display:flex;flex-direction:column;align-items:center;min-width:0;max-width:100%}
-  .name-line{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;max-width:100%}
-  .wname{font-size:1.02rem;color:var(--ink);line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .wtitle{font-size:.7rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .eyes{display:flex;gap:9px;flex-shrink:0;align-items:center;justify-content:center}
-  .eye-wrap{display:flex}
-  .eye-wrap.weak .type-ic,.eye-wrap.weak :global(.eye-badge){border-radius:6px;
-    box-shadow:0 0 0 2px #e0574b, 0 0 7px -1px rgba(224,87,75,.7)}
+  .badge-strip{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:flex-end;
+    justify-content:space-between;padding:6px 9px 7px;gap:6px;
+    background:linear-gradient(180deg,transparent,rgba(10,8,18,.82))}
+  .bs-type{display:flex}
+  .bs-type .type-ic{width:24px;height:24px;object-fit:contain;display:block;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.7))}
+  .bs-type.weak .type-ic,.bs-type.weak :global(.eye-badge){border-radius:6px;
+    box-shadow:0 0 0 2px #e0574b, 0 0 7px -1px rgba(224,87,75,.75)}
+  .bs-rarity{display:flex;align-items:flex-end}
+  .bs-rarity .rarity-ic{height:30px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.8))}
+  .card-foot{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 12px 13px;text-align:center}
+  .wname{font-size:1.14rem;color:var(--ink);line-height:1.15;letter-spacing:.01em;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+  .wtitle{font-size:.7rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 
   .soon{pointer-events:none}
   .soon-card{opacity:.42;filter:grayscale(.5);border-style:dashed}
