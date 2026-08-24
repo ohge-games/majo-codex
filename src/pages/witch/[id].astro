@@ -6,6 +6,9 @@ import abilities from '../../data/abilities.json';
 import skills from '../../data/skills.json';
 import classBase from '../../data/class_base_stats.json';
 import constants from '../../data/constants.json';
+import fs from 'node:fs';
+
+const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
 
 export async function getStaticPaths() {
   const witches = (await import('../../data/witches.json')).default;
@@ -44,12 +47,16 @@ function frames(slot) {
 
   <header class={`whero rar-${witch.rarity}`}>
     <div class="wrap hero-grid">
-      <div class="portrait-lg">
-        <svg viewBox="0 0 24 24" class="sigil" aria-hidden="true">
-          <path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width=".8"/>
-          <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width=".8"/>
-          <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
-        </svg>
+      <div class={`portrait-lg${hasImg(`/img/hero/${witch.portrait_filename}`) ? ' has-art' : ''}`}>
+        {hasImg(`/img/hero/${witch.portrait_filename}`) ? (
+          <img class="hero-img" src={`${base}img/hero/${witch.portrait_filename}`} alt={witch.name} width="293" height="512" />
+        ) : (
+          <svg viewBox="0 0 24 24" class="sigil" aria-hidden="true">
+            <path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width=".8"/>
+            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width=".8"/>
+            <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+          </svg>
+        )}
         <span class="id mono">{witch.witch_id}</span>
       </div>
       <div class="hero-meta">
@@ -76,6 +83,9 @@ function frames(slot) {
         return (
         <article class="skill">
           <div class="skill-head">
+            {hasImg(`/img/skill/${witch.witch_id.toLowerCase()}_${s.slot.toLowerCase()}.png`) && (
+              <img class="skill-icon" src={`${base}img/skill/${witch.witch_id.toLowerCase()}_${s.slot.toLowerCase()}.png`} alt="" width="34" height="34" loading="lazy" />
+            )}
             <span class={`slot slot-${s.slot.toLowerCase()}`}>{s.slot}</span>
             <h3>{s.name}</h3>
             {s.has_plus === 'yes' && <span class="plus" title={`Plus unlocks at ${s.plus_unlocks_at_star ?? '?'}★`}>PLUS</span>}
@@ -115,6 +125,8 @@ function frames(slot) {
   .portrait-lg::after{content:"";position:absolute;inset:0;
     background:radial-gradient(180px 180px at 50% 32%, color-mix(in srgb,var(--rc) 24%,transparent), transparent 70%)}
   .portrait-lg .sigil{width:44%;opacity:.55}
+  .portrait-lg.has-art{aspect-ratio:293/512;background:#0e0b1a}
+  .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
   .portrait-lg .id{position:absolute;bottom:10px;right:12px;font-size:.68rem;color:var(--ink-faint)}
 
   .tags{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -133,6 +145,7 @@ function frames(slot) {
   .skills{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
   .skill{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
   .skill-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .skill-icon{border-radius:7px;background:var(--nightshade);border:1px solid var(--line);flex-shrink:0}
   .skill-head h3{font-size:1.05rem;margin:0;font-weight:600}
   .slot{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
     padding:3px 8px;border-radius:6px;border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap}
