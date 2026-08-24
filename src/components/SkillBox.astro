@@ -1,0 +1,92 @@
+---
+import abilities from '../data/abilities.json';
+import fs from 'node:fs';
+
+const { witch, skill, hero = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const ui = name => `${base}img/ui/${name}.png`;
+const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
+const hasUi = name => hasImg(`/img/ui/${name}.png`);
+
+const s = skill;
+const name = (s.name && s.name !== 'None' && s.name !== witch.name) ? s.name : `${s.slot} Skill`;
+
+const a = abilities.find(x => x.witch_id === witch.witch_id
+  && String(x.slot).toLowerCase() === s.slot.toLowerCase() && (x.variant ?? 'base') === 'base');
+let fr = null;
+if (a) {
+  const p = [];
+  if (a.hit_count) p.push(`${a.hit_count} hit${a.hit_count > 1 ? 's' : ''}`);
+  if (a.total_damage_pct) p.push(`${a.total_damage_pct}% dmg`);
+  if (a.cooldown_s) p.push(`${a.cooldown_s}s CD`);
+  if (a.charge_cost) p.push(`${a.charge_cost} charge`);
+  if (a.range) p.push(`range ${a.range}`);
+  if (a.total_stagger) p.push(`${a.total_stagger} stagger`);
+  fr = p.length ? p : null;
+}
+const iconPath = `/img/skill/${witch.witch_id.toLowerCase()}_${s.slot.toLowerCase()}.png`;
+const hasIcon = hasImg(iconPath);
+const unlockStar = s.has_plus === 'yes' ? (s.plus_unlocks_at_star ?? 6) : null;
+---
+<article class={`skill-box ${hero ? 'is-hero' : ''} slotc-${s.slot.toLowerCase()}`}>
+  <div class="sk-left">
+    {hasIcon
+      ? <img class="sk-icon" src={`${base}${iconPath.slice(1)}`} alt="" width={hero ? 72 : 46} height={hero ? 72 : 46} loading="lazy" />
+      : <span class="sk-icon ph" aria-hidden="true"></span>}
+    <div class="sk-titles">
+      <span class={`slot slot-${s.slot.toLowerCase()}`}>{s.slot}</span>
+      <h3 class="sk-name">{name}</h3>
+    </div>
+  </div>
+  <div class="sk-right">
+    {s.description && <p class="desc">{s.description}</p>}
+    {fr && <p class="frames mono">{fr.join('  ·  ')}</p>}
+    {!fr && s.mechanics && <p class="frames mono">{s.mechanics}</p>}
+    {s.has_plus === 'yes' && s.plus_description && (
+      <div class="plus-block" data-unlock={unlockStar}>
+        <span class="plus-tag mono">
+          {hasUi('skill_plus')
+            ? <img class="plus-ic" src={ui('skill_plus')} alt="+" height="16" />
+            : '+'} {s.plus_unlocks_at_star ?? ''}★
+        </span>
+        <span class="plus-text">{s.plus_description}</span>
+        <span class="lock-note mono">Unlocks at {s.plus_unlocks_at_star ?? '?'}★</span>
+      </div>
+    )}
+  </div>
+</article>
+
+<style>
+  .skill-box{display:grid;grid-template-columns:210px 1fr;gap:18px;background:var(--veil);
+    border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;align-items:start}
+  .skill-box.is-hero{grid-template-columns:280px 1fr;padding:22px 24px;
+    border-color:color-mix(in srgb,var(--ssr) 40%,var(--line));
+    background:linear-gradient(180deg,color-mix(in srgb,var(--ssr) 7%,var(--veil)),var(--veil))}
+  .sk-left{display:flex;align-items:center;gap:14px;min-width:0}
+  .sk-icon{border-radius:10px;background:var(--nightshade);border:1px solid var(--line);flex-shrink:0;object-fit:contain}
+  .is-hero .sk-icon{border-radius:12px}
+  .sk-icon.ph{width:46px;height:46px}.is-hero .sk-icon.ph{width:72px;height:72px}
+  .sk-titles{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .slot{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
+    padding:3px 8px;border-radius:6px;border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap;align-self:flex-start}
+  .slot-extreme{color:var(--ssr);border-color:color-mix(in srgb,var(--ssr) 45%,var(--line))}
+  .slot-special{color:var(--sigil);border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
+  .slot-interference{color:var(--magic);border-color:color-mix(in srgb,var(--magic) 40%,var(--line))}
+  .sk-name{margin:0;font-weight:600;font-size:1.05rem;line-height:1.15}
+  .is-hero .sk-name{font-size:1.5rem}
+  .desc{color:var(--ink-dim);font-size:.9rem;margin:0 0 10px}
+  .is-hero .desc{font-size:.98rem}
+  .frames{font-size:.76rem;color:var(--ink-faint);background:var(--nightshade);border:1px solid var(--line);
+    border-radius:7px;padding:7px 10px;margin:0;word-break:break-word}
+  .plus-block{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;font-size:.85rem;color:var(--ink-dim)}
+  .plus-tag{color:var(--ssr);font-size:.7rem;display:inline-flex;align-items:center;gap:3px}
+  .plus-ic{height:16px;width:auto;vertical-align:middle}
+  .lock-note{display:none;color:var(--ink-faint);font-size:.72rem}
+  .plus-block.locked .plus-text{display:none}
+  .plus-block.locked .lock-note{display:inline}
+  .plus-block.locked{opacity:.7}
+  @media(max-width:640px){
+    .skill-box,.skill-box.is-hero{grid-template-columns:1fr;gap:12px}
+  }
+</style>
