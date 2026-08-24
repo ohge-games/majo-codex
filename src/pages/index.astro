@@ -36,34 +36,29 @@ const upcoming = [
         <svg class="search-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         <input id="search" class="search" type="search" placeholder="Search witches…" autocomplete="off" aria-label="Search witches" />
       </div>
-      <label class="sortwrap">Sort
-        <select id="sort" class="sort" aria-label="Sort roster">
-          <option value="rarity">Rarity</option>
-          <option value="name">Name A–Z</option>
-          <option value="class">Class</option>
-          <option value="atkspd">Atk Speed</option>
-          <option value="release">Release</option>
-        </select>
-      </label>
       <div class="count"><span id="count">{roster.length}</span> shown</div>
     </div>
 
     <div class="filters" id="filters">
-      <div class="filter-row">
-        <span class="filter-label">Class</span>
-        {classes.map(c => <button class="chip" data-facet="class" data-val={c}>{hasUi(`cclass_${lc(c)}`) && <img class="chip-ic" src={ui(`cclass_${lc(c)}`)} alt="" width="16" height="16" />}{c}</button>)}
+      <div class="filter-line">
+        <div class="filter-group">
+          <span class="filter-label">Class</span>
+          {classes.map(c => <button class="chip" data-facet="class" data-val={c}>{c}</button>)}
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Rarity</span>
+          {rarities.map(r => <button class={`chip rarity-btn is-${r}`} data-facet="rarity" data-val={r} title={r} aria-label={r}>{hasUi(`rarity_${lc(r)}`) ? <img class="chip-ic-lg" src={ui(`rarity_${lc(r)}`)} alt={r} height="26" /> : r}</button>)}
+        </div>
       </div>
-      <div class="filter-row">
-        <span class="filter-label">Rarity</span>
-        {rarities.map(r => <button class={`chip is-${r}`} data-facet="rarity" data-val={r}>{hasUi(`rarity_${lc(r)}`) && <img class="chip-ic" src={ui(`rarity_${lc(r)}`)} alt="" height="15" />}{r}</button>)}
-      </div>
-      <div class="filter-row">
-        <span class="filter-label">Damage</span>
-        {types.map(t => <button class={`chip type-${t}`} data-facet="type" data-val={t}>{hasUi(`type_${t}`) && <img class="chip-ic" src={ui(`type_${t}`)} alt="" width="16" height="16" />}{cap(t)}</button>)}
-      </div>
-      <div class="filter-row">
-        <span class="filter-label">Weakness</span>
-        {types.map(t => <button class={`chip type-${t}`} data-facet="weakness" data-val={t}>{hasUi(`type_${t}`) && <img class="chip-ic" src={ui(`type_${t}`)} alt="" width="16" height="16" />}{cap(t)}</button>)}
+      <div class="filter-line">
+        <div class="filter-group">
+          <span class="filter-label">Damage</span>
+          {types.map(t => <button class={`chip type-${t}`} data-facet="type" data-val={t}>{hasUi(`type_${t}`) && <img class="chip-ic" src={ui(`type_${t}`)} alt="" width="16" height="16" />}{cap(t)}</button>)}
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Weakness</span>
+          {types.map(t => <button class={`chip type-${t}`} data-facet="weakness" data-val={t}>{hasUi(`type_${t}`) && <img class="chip-ic" src={ui(`type_${t}`)} alt="" width="16" height="16" />}{cap(t)}</button>)}
+        </div>
       </div>
       <button id="clearall" class="clear-all" hidden>Clear all</button>
       <p class="filter-hint">Click a filter to <b class="hint-inc">show only</b> · again to <b class="hint-exc">exclude</b> · again to clear</p>
@@ -79,15 +74,10 @@ const upcoming = [
             data-atkspd={w.atk_spd ?? ''} data-order={w.witch_id}>
           <a class={`card rar-${w.rarity}`} href={`${base}witch/${w.witch_id.toLowerCase()}`}>
             <div class="card-bar"></div>
-            <div class="card-top">
-              {hasUi(`cclass_${lc(w.class)}`)
-                ? <img class="cclass" src={ui(`cclass_${lc(w.class)}`)} alt={w.class} title={w.class} width="26" height="26" loading="lazy" />
-                : <span class="cls">{w.class}</span>}
-              {hasUi(`rarity_${lc(w.rarity)}`)
-                ? <img class="rarity-ic" src={ui(`rarity_${lc(w.rarity)}`)} alt={w.rarity} height="22" loading="lazy" />
-                : <span class={`rarity-chip is-${w.rarity}`}>{w.rarity}</span>}
-            </div>
             <div class="portrait">
+              {hasUi(`cclass_${lc(w.class)}`)
+                ? <img class="cclass" src={ui(`cclass_${lc(w.class)}`)} alt={w.class} title={w.class} width="34" height="34" loading="lazy" />
+                : <span class="cls-badge">{w.class}</span>}
               {hasImg(`/img/card/${w.portrait_filename}`) ? (
                 <img class="portrait-img" src={`${base}img/card/${w.portrait_filename}`} alt={w.name} loading="lazy" width="256" height="256" />
               ) : (
@@ -101,7 +91,12 @@ const upcoming = [
             </div>
             <div class="card-foot">
               <div class="names">
-                <span class="wname display">{w.name}</span>
+                <span class="name-line">
+                  {hasUi(`rarity_${lc(w.rarity)}`)
+                    ? <img class="rarity-ic" src={ui(`rarity_${lc(w.rarity)}`)} alt={w.rarity} title={w.rarity} height="18" loading="lazy" />
+                    : <span class={`rarity-chip is-${w.rarity}`}>{w.rarity}</span>}
+                  <span class="wname display">{w.name}</span>
+                </span>
                 {w.title && <span class="wtitle">{w.title}</span>}
               </div>
               <div class="eyes">
@@ -173,8 +168,9 @@ const upcoming = [
     padding:7px 10px;cursor:pointer}
   .sort:focus{outline:none;border-color:var(--sigil)}
 
-  .filters{display:flex;flex-direction:column;gap:9px;padding:2px 0 20px;position:relative}
-  .filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .filters{display:flex;flex-direction:column;gap:12px;padding:2px 0 20px;position:relative}
+  .filter-line{display:flex;flex-wrap:wrap;gap:10px 40px}
+  .filter-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .filter-label{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.2em;
     text-transform:uppercase;color:var(--ink-faint);width:74px;flex-shrink:0}
   .chip{font:inherit;font-size:.8rem;cursor:pointer;padding:5px 13px;border-radius:999px;
@@ -185,8 +181,9 @@ const upcoming = [
   .chip[data-state="include"]{color:var(--ink);border-color:#54d68a;
     box-shadow:0 0 0 1px #54d68a inset, 0 0 12px -3px rgba(84,214,138,.6)}
   .chip[data-state="exclude"]{color:var(--ink-dim);border-color:#e0574b;
-    box-shadow:0 0 0 1px #e0574b inset, 0 0 12px -3px rgba(224,87,75,.55);
-    text-decoration:line-through;text-decoration-color:rgba(224,87,75,.85)}
+    box-shadow:0 0 0 1px #e0574b inset, 0 0 12px -3px rgba(224,87,75,.55)}
+  .rarity-btn{padding:4px 12px}
+  .chip-ic-lg{height:26px;width:auto;object-fit:contain;display:block}
   .filter-hint{margin:4px 0 0;font-size:.72rem;color:var(--ink-faint)}
   .filter-hint b{font-weight:600}
   .hint-inc{color:#54d68a} .hint-exc{color:#e0574b}
@@ -206,14 +203,18 @@ const upcoming = [
   .rar-SR{--rc:var(--sr)} .rar-SSR{--rc:var(--ssr)} .rar-UR{--rc:var(--ur)}
   .card-bar{height:4px;background:var(--rc)}
   .card-top{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 6px;min-height:34px}
-  .cclass{width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
-  .rarity-ic{height:22px;width:auto;object-fit:contain}
+  .cclass{position:absolute;top:8px;left:8px;z-index:2;width:34px;height:34px;object-fit:contain;
+    filter:drop-shadow(0 1px 3px rgba(0,0,0,.85))}
+  .cls-badge{position:absolute;top:8px;left:8px;z-index:2;font-family:"Space Mono",monospace;
+    font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
+    background:rgba(12,10,21,.7);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+  .rarity-ic{height:18px;width:auto;object-fit:contain;flex-shrink:0}
   .type-ic{width:20px;height:20px;object-fit:contain;display:block}
   .chip-ic{width:16px;height:16px;object-fit:contain;margin-right:6px;vertical-align:-3px}
   .chip{display:inline-flex;align-items:center}
   .cls{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.14em;
     text-transform:uppercase;color:var(--ink-faint)}
-  .portrait{position:relative;aspect-ratio:1/1;margin:2px 12px;border-radius:8px;
+  .portrait{position:relative;aspect-ratio:1/1;margin:8px 12px 0;border-radius:8px;
     background:linear-gradient(160deg,var(--veil-2),#0f0c1c);
     display:grid;place-items:center;color:var(--rc);overflow:hidden}
   .portrait::after{content:"";position:absolute;inset:0;
@@ -223,12 +224,13 @@ const upcoming = [
   .portrait .id{position:absolute;bottom:7px;right:9px;font-size:.6rem;color:var(--ink-faint)}
   .card-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:11px 12px 13px}
   .names{display:flex;flex-direction:column;min-width:0}
-  .wname{font-size:1.02rem;color:var(--ink);line-height:1.15}
+  .name-line{display:flex;align-items:center;gap:7px;min-width:0}
+  .wname{font-size:1.02rem;color:var(--ink);line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .wtitle{font-size:.7rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .eyes{display:flex;gap:5px;flex-shrink:0}
-  .eye-wrap.weak{opacity:.72;position:relative}
-  .eye-wrap.weak::after{content:"";position:absolute;left:50%;top:50%;width:118%;height:1.4px;
-    background:currentColor;transform:translate(-50%,-50%) rotate(-18deg);color:var(--ink-faint);opacity:.55}
+  .eyes{display:flex;gap:6px;flex-shrink:0;align-items:center}
+  .eye-wrap{display:flex}
+  .eye-wrap.weak{border:1.5px solid #e0574b;border-radius:6px;padding:1px;
+    box-shadow:0 0 6px -2px rgba(224,87,75,.6)}
 
   .soon{pointer-events:none}
   .soon-card{opacity:.42;filter:grayscale(.5);border-style:dashed}
@@ -245,37 +247,22 @@ const upcoming = [
 </style>
 
 <script>
-  const RARITY = { SSR: 0, SR: 1, UR: -1 };
   const FACETS = ['class', 'rarity', 'type', 'weakness'];
   const state = {
     class:    { inc: new Set(), exc: new Set() },
     rarity:   { inc: new Set(), exc: new Set() },
     type:     { inc: new Set(), exc: new Set() },
     weakness: { inc: new Set(), exc: new Set() },
-    q: '', sort: 'rarity',
+    q: '',
   };
 
-  const grid = document.getElementById('grid');
   const chips = [...document.querySelectorAll('.chip')];
   const cells = [...document.querySelectorAll('.card-cell:not(.soon)')];
   const soonCells = [...document.querySelectorAll('.card-cell.soon')];
   const countEl = document.getElementById('count');
   const emptyEl = document.getElementById('empty');
   const searchEl = document.getElementById('search');
-  const sortEl = document.getElementById('sort');
   const clearAll = document.getElementById('clearall');
-
-  const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : -Infinity; };
-  const comparators = {
-    rarity: (a, b) => (RARITY[a.dataset.rarity] ?? 2) - (RARITY[b.dataset.rarity] ?? 2)
-                    || a.dataset.order.localeCompare(b.dataset.order),
-    name:   (a, b) => a.dataset.name.localeCompare(b.dataset.name),
-    class:  (a, b) => a.dataset.class.localeCompare(b.dataset.class)
-                    || (RARITY[a.dataset.rarity] ?? 2) - (RARITY[b.dataset.rarity] ?? 2),
-    atkspd: (a, b) => num(b.dataset.atkspd) - num(a.dataset.atkspd)
-                    || a.dataset.name.localeCompare(b.dataset.name),
-    release:(a, b) => a.dataset.order.localeCompare(b.dataset.order),
-  };
 
   const anyActive = () => state.q ||
     FACETS.some(f => state[f].inc.size || state[f].exc.size);
@@ -289,11 +276,6 @@ const upcoming = [
   }
 
   function apply() {
-    // sort visible witches (reorder DOM), keep soon tiles pinned to the end
-    [...cells].sort(comparators[state.sort] || comparators.rarity)
-              .forEach(c => grid.appendChild(c));
-    soonCells.forEach(c => grid.appendChild(c));
-
     let n = 0;
     for (const cell of cells) {
       const ok = FACETS.every(f => passesFacet(cell, f)) &&
@@ -323,7 +305,6 @@ const upcoming = [
   });
 
   searchEl.addEventListener('input', () => { state.q = searchEl.value.trim().toLowerCase(); apply(); });
-  sortEl.addEventListener('change', () => { state.sort = sortEl.value; apply(); });
 
   function reset() {
     state.q = ''; searchEl.value = '';
