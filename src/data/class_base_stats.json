@@ -1,0 +1,296 @@
+[
+ {
+  "class": "Arcanist",
+  "attribute_id": "posture",
+  "base_value": 35,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "rigid_res",
+  "base_value": 2.5,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "stagger_value",
+  "base_value": 0.5,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "comeback_spd",
+  "base_value": 10,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "dodge_val",
+  "base_value": 40,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "dodge_dur",
+  "base_value": 0.5,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "dodge_cd",
+  "base_value": 4,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "block_rate",
+  "base_value": 0,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "block_dmg_reduction",
+  "base_value": 50,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "block_dur",
+  "base_value": 0.4,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "block_cd",
+  "base_value": 4,
+  "notes": null
+ },
+ {
+  "class": "Arcanist",
+  "attribute_id": "knockback_res",
+  "base_value": 1,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "posture",
+  "base_value": 35,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "rigid_res",
+  "base_value": 2.5,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "stagger_value",
+  "base_value": 0.5,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "comeback_spd",
+  "base_value": 10,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "dodge_val",
+  "base_value": 50,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "dodge_dur",
+  "base_value": 1,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "dodge_cd",
+  "base_value": 3,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "block_rate",
+  "base_value": 0,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "block_dmg_reduction",
+  "base_value": 50,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "block_dur",
+  "base_value": 0.4,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "block_cd",
+  "base_value": 4,
+  "notes": null
+ },
+ {
+  "class": "Vanguard",
+  "attribute_id": "knockback_res",
+  "base_value": 1,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "posture",
+  "base_value": 35,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "rigid_res",
+  "base_value": 2.5,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "stagger_value",
+  "base_value": 0.5,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "comeback_spd",
+  "base_value": 10,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "dodge_val",
+  "base_value": 30,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "dodge_dur",
+  "base_value": 0.5,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "dodge_cd",
+  "base_value": 3,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "block_rate",
+  "base_value": 0,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "block_dmg_reduction",
+  "base_value": 50,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "block_dur",
+  "base_value": 0.4,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "block_cd",
+  "base_value": 4,
+  "notes": null
+ },
+ {
+  "class": "Supporter",
+  "attribute_id": "knockback_res",
+  "base_value": 1,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "posture",
+  "base_value": 185,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "rigid_res",
+  "base_value": 5,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "stagger_value",
+  "base_value": 0.5,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "comeback_spd",
+  "base_value": 60,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "dodge_val",
+  "base_value": 0,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "dodge_dur",
+  "base_value": 0.5,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "dodge_cd",
+  "base_value": 5,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "block_rate",
+  "base_value": 40,
+  "notes": "config=40; in-game Yun showed 60 — recheck (override vs base)"
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "block_dmg_reduction",
+  "base_value": 75,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "block_dur",
+  "base_value": 1,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "block_cd",
+  "base_value": 3,
+  "notes": null
+ },
+ {
+  "class": "Defender",
+  "attribute_id": "knockback_res",
+  "base_value": 1,
+  "notes": null
+ },
+ {
+  "class": "ALL",
+  "attribute_id": "extreme_charge_speed",
+  "base_value": 10,
+  "notes": "global constant across all witches/classes"
+ }
+]

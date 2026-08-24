@@ -1,0 +1,7 @@
+[
+ {
+  "key": "weakness_penalty",
+  "value": -25,
+  "notes": "Constant for capturing witch weakness by damage type"
+ }
+]

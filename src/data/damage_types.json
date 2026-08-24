@@ -1,0 +1,20 @@
+[
+ {
+  "type_id": "physical",
+  "name": "Physical",
+  "description": null,
+  "icon_filename": "dmg_physical.png"
+ },
+ {
+  "type_id": "mental",
+  "name": "Mental",
+  "description": null,
+  "icon_filename": "dmg_mental.png"
+ },
+ {
+  "type_id": "magic",
+  "name": "Magic",
+  "description": null,
+  "icon_filename": "dmg_magic.png"
+ }
+]

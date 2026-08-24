@@ -1,0 +1,14 @@
+---
+// The signature motif: a gazing eye. Iris color encodes damage type.
+const { type = 'none', size = 22, title = '' } = Astro.props;
+const map = { mental:'var(--mental)', physical:'var(--physical)', magic:'var(--magic)', none:'var(--ink-faint)' };
+const c = map[type] ?? map.none;
+---
+<svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label={title} class="eye-badge">
+  <title>{title}</title>
+  <path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z"
+        fill="none" stroke={c} stroke-width="1.4" opacity="0.9"/>
+  <circle cx="12" cy="12" r="4.4" fill={c} opacity="0.16"/>
+  <circle cx="12" cy="12" r="4.4" fill="none" stroke={c} stroke-width="1.4"/>
+  <circle cx="12" cy="12" r="1.5" fill={c}/>
+</svg>

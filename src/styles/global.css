@@ -1,0 +1,66 @@
+/* ============ MAJO Codex — design tokens ============ */
+:root{
+  --nightshade:#0c0a15;      /* base bg */
+  --veil:#141020;            /* panel */
+  --veil-2:#1c1730;          /* raised panel */
+  --line:#2a2340;            /* hairline */
+  --ink:#ece7f7;             /* primary text */
+  --ink-dim:#a49cc0;         /* secondary text */
+  --ink-faint:#6f6790;       /* tertiary */
+
+  --sr:#e0619a;              /* SR rose */
+  --ssr:#e7bd6a;             /* SSR gold */
+  --ur:#7ad0c8;              /* reserved */
+
+  --mental:#a877ff;
+  --physical:#e0574b;
+  --magic:#33b7c9;
+
+  --sigil:#8b6cff;           /* arcane accent / eye glow */
+
+  --r:10px;
+  --shadow:0 10px 40px -12px rgba(0,0,0,.7);
+  --maxw:1180px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--nightshade);color:var(--ink);
+  font-family:"Inter",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(1200px 600px at 80% -10%, rgba(139,108,255,.10), transparent 60%),
+                   radial-gradient(900px 500px at 0% 0%, rgba(224,97,154,.06), transparent 55%);
+  background-attachment:fixed;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* type */
+.display{font-family:"Cinzel",serif;font-weight:600;letter-spacing:.02em;line-height:1.1}
+.mono{font-family:"Space Mono","JetBrains Mono",ui-monospace,monospace}
+.eyebrow{font-family:"Space Mono",monospace;font-size:.72rem;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--ink-faint)}
+
+/* header */
+.masthead{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+  background:rgba(12,10,21,.72);border-bottom:1px solid var(--line)}
+.masthead .wrap{display:flex;align-items:center;gap:14px;height:64px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .name{font-family:"Cinzel",serif;font-weight:700;font-size:1.15rem;letter-spacing:.16em}
+.brand .name b{color:var(--sigil)}
+.masthead nav{margin-left:auto;display:flex;gap:22px;font-size:.82rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);font-family:"Space Mono",monospace}
+.masthead nav a:hover{color:var(--ink)}
+
+footer.site{border-top:1px solid var(--line);margin-top:80px;padding:40px 0;color:var(--ink-faint);font-size:.8rem}
+footer.site .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+/* utility badges */
+.rarity-chip{font-family:"Space Mono",monospace;font-size:.68rem;font-weight:700;letter-spacing:.12em;
+  padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.is-SR{color:var(--sr)} .is-SSR{color:var(--ssr)} .is-UR{color:var(--ur)}
+.type-mental{color:var(--mental)} .type-physical{color:var(--physical)} .type-magic{color:var(--magic)}
+.type-none{color:var(--ink-faint)}

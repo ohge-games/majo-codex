@@ -1,0 +1,26 @@
+[
+ {
+  "class_id": "vanguard",
+  "name": "Vanguard",
+  "description": "Excel at close-quarters combat",
+  "icon_filename": "cls_vanguard.png"
+ },
+ {
+  "class_id": "arcanist",
+  "name": "Arcanist",
+  "description": "Excel at dealing high damage",
+  "icon_filename": "cls_arcanist.png"
+ },
+ {
+  "class_id": "defender",
+  "name": "Defender",
+  "description": "Excel at blocking attacks",
+  "icon_filename": "cls_defender.png"
+ },
+ {
+  "class_id": "supporter",
+  "name": "Supporter",
+  "description": "Excel at healing and providing buffs",
+  "icon_filename": "cls_support.png"
+ }
+]

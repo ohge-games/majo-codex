@@ -1,0 +1,272 @@
+[
+ {
+  "rarity": "SR",
+  "class": "Arcanist",
+  "attribute_id": "hp",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 4110,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Arcanist",
+  "attribute_id": "atk",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 583,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Arcanist",
+  "attribute_id": "def",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 469,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Arcanist",
+  "attribute_id": "hp",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 5141,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Arcanist",
+  "attribute_id": "atk",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 732,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Arcanist",
+  "attribute_id": "def",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 583,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Defender",
+  "attribute_id": "hp",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 5341,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Defender",
+  "attribute_id": "atk",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 243,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Defender",
+  "attribute_id": "def",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 574,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Defender",
+  "attribute_id": "hp",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 6674,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Defender",
+  "attribute_id": "atk",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 301,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Defender",
+  "attribute_id": "def",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 710,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Supporter",
+  "attribute_id": "hp",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 4106,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Supporter",
+  "attribute_id": "atk",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 340,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Supporter",
+  "attribute_id": "def",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 574,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Supporter",
+  "attribute_id": "hp",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 5137,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Supporter",
+  "attribute_id": "atk",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 428,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Supporter",
+  "attribute_id": "def",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 710,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Vanguard",
+  "attribute_id": "hp",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 4106,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Vanguard",
+  "attribute_id": "atk",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 447,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SR",
+  "class": "Vanguard",
+  "attribute_id": "def",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 398,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Vanguard",
+  "attribute_id": "hp",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 5137,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Vanguard",
+  "attribute_id": "atk",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 554,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "SSR",
+  "class": "Vanguard",
+  "attribute_id": "def",
+  "level_from": 1,
+  "level_to": 240,
+  "value_at_from": 496,
+  "growth_per_level": null,
+  "notes": "Base migrated from ClassBaseStats; fill growth_per_level"
+ },
+ {
+  "rarity": "Piecewise: one row per segment; a single 1-240 row = linear growth. Split into multiple rows at any breakpoint.",
+  "class": null,
+  "attribute_id": null,
+  "level_from": null,
+  "level_to": null,
+  "value_at_from": null,
+  "growth_per_level": null,
+  "notes": null
+ },
+ {
+  "rarity": "value_at_from is the stat value at the START of the segment (level 1 base already filled from your ClassBaseStats entries).",
+  "class": null,
+  "attribute_id": null,
+  "level_from": null,
+  "level_to": null,
+  "value_at_from": null,
+  "growth_per_level": null,
+  "notes": null
+ },
+ {
+  "rarity": "Only hp/atk/def scale here (scales_with_level=yes). Fill the yellow growth_per_level for each.",
+  "class": null,
+  "attribute_id": null,
+  "level_from": null,
+  "level_to": null,
+  "value_at_from": null,
+  "growth_per_level": null,
+  "notes": null
+ }
+]

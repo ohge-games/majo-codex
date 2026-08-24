@@ -1,0 +1,52 @@
+[
+ {
+  "ability_id": "W001_extreme",
+  "hit_ref": "hit1",
+  "scale_key": "damageAdjust",
+  "base_pct": 130,
+  "increment_per_level": 7,
+  "max_level": 7,
+  "measured": "yes",
+  "notes": "Dusan Extreme, measured Lv1-7"
+ },
+ {
+  "ability_id": "W001_extreme",
+  "hit_ref": "hit2",
+  "scale_key": "damageAdjust2",
+  "base_pct": 865,
+  "increment_per_level": 17,
+  "max_level": 7,
+  "measured": "yes",
+  "notes": "+50 stagger flat (does not scale)"
+ },
+ {
+  "ability_id": "W001_normal",
+  "hit_ref": "hit1",
+  "scale_key": "damageAdjust",
+  "base_pct": 60,
+  "increment_per_level": 2,
+  "max_level": 7,
+  "measured": "yes",
+  "notes": "Dusan Normal combo"
+ },
+ {
+  "ability_id": "W001_normal",
+  "hit_ref": "hit2",
+  "scale_key": "damageAdjust",
+  "base_pct": 60,
+  "increment_per_level": 2,
+  "max_level": 7,
+  "measured": "yes",
+  "notes": null
+ },
+ {
+  "ability_id": "W001_normal",
+  "hit_ref": "hit3",
+  "scale_key": "damageAdjust2",
+  "base_pct": 80,
+  "increment_per_level": 2,
+  "max_level": 7,
+  "measured": "yes",
+  "notes": "2 hits @ this value"
+ }
+]

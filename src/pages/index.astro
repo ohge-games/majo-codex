@@ -1,0 +1,172 @@
+---
+import Base from '../layouts/Base.astro';
+import EyeBadge from '../components/EyeBadge.astro';
+import witches from '../data/witches.json';
+
+const base = import.meta.env.BASE_URL;
+const order = { SSR: 0, SR: 1, UR: -1 };
+const roster = [...witches].sort((a, b) =>
+  (order[a.rarity] ?? 2) - (order[b.rarity] ?? 2) || a.witch_id.localeCompare(b.witch_id));
+
+const classes = [...new Set(roster.map(w => w.class))].sort();
+const rarities = ['SSR', 'SR'];
+const types = ['mental', 'physical', 'magic'];
+const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+---
+<Base title="MAJO Codex — Witch Compendium">
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Unofficial compendium</p>
+      <h1 class="display">Every witch, watched.</h1>
+      <p class="lede">Skills, combat frames, and stat curves for all
+        <span class="mono">{roster.length}</span> witches — pulled straight from the game files.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="controls" id="controls">
+      <div class="filter-row">
+        <span class="filter-label">Class</span>
+        {classes.map(c => <button class="chip" data-facet="class" data-val={c}>{c}</button>)}
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">Rarity</span>
+        {rarities.map(r => <button class={`chip is-${r}`} data-facet="rarity" data-val={r}>{r}</button>)}
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">Damage</span>
+        {types.map(t => <button class={`chip type-${t}`} data-facet="type" data-val={t}>{cap(t)}</button>)}
+      </div>
+      <div class="count"><span id="count">{roster.length}</span> shown</div>
+    </div>
+
+    <ul class="grid" id="grid">
+      {roster.map(w => (
+        <li class="card-cell" data-class={w.class} data-rarity={w.rarity} data-type={w.damage_type}>
+          <a class={`card rar-${w.rarity}`} href={`${base}witch/${w.witch_id.toLowerCase()}`}>
+            <div class="card-bar"></div>
+            <div class="card-top">
+              <span class={`rarity-chip is-${w.rarity}`}>{w.rarity}</span>
+              <span class="cls">{w.class}</span>
+            </div>
+            <div class="portrait">
+              <svg viewBox="0 0 24 24" class="sigil" aria-hidden="true">
+                <path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width="1"/>
+                <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1"/>
+                <circle cx="12" cy="12" r="1.3" fill="currentColor"/>
+              </svg>
+              <span class="id mono">{w.witch_id}</span>
+            </div>
+            <div class="card-foot">
+              <div class="names">
+                <span class="wname display">{w.name}</span>
+                {w.title && <span class="wtitle">{w.title}</span>}
+              </div>
+              <div class="eyes">
+                <span class="eye-wrap" title={`${cap(w.damage_type)} damage`}>
+                  <EyeBadge type={w.damage_type} size={20} title={`${cap(w.damage_type)} damage`} />
+                </span>
+                <span class="eye-wrap weak" title={`Weak to ${cap(w.weakness_type)} (−25%)`}>
+                  <EyeBadge type={w.weakness_type} size={20} title={`Weak to ${cap(w.weakness_type)}`} />
+                </span>
+              </div>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="empty" id="empty" hidden>No witches match those filters. <button id="clear2">Clear</button></p>
+  </section>
+</Base>
+
+<style>
+  .hero{padding:64px 0 34px;border-bottom:1px solid var(--line);
+    background:radial-gradient(700px 340px at 50% -40%, rgba(139,108,255,.16), transparent 70%)}
+  .hero h1{font-size:clamp(2.4rem,6vw,4.1rem);margin:.15em 0 .25em;
+    background:linear-gradient(180deg,var(--ink),#c3b8ea);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--ink-dim);max-width:52ch;font-size:1.05rem}
+  .lede .mono{color:var(--sigil)}
+
+  .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;
+    padding:26px 0 22px;position:sticky;top:64px;background:rgba(12,10,21,.85);
+    backdrop-filter:blur(8px);z-index:20}
+  .filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .filter-label{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--ink-faint);margin-right:2px}
+  .chip{font:inherit;font-size:.8rem;cursor:pointer;padding:5px 13px;border-radius:999px;
+    border:1px solid var(--line);background:var(--veil);color:var(--ink-dim);transition:.15s}
+  .chip:hover{border-color:var(--ink-faint);color:var(--ink)}
+  .chip[aria-pressed="true"]{background:var(--veil-2);color:var(--ink);border-color:currentColor;
+    box-shadow:0 0 0 1px currentColor inset}
+  .count{margin-left:auto;font-family:"Space Mono",monospace;font-size:.78rem;color:var(--ink-faint)}
+  .count span{color:var(--ink)}
+
+  .grid{list-style:none;margin:0;padding:8px 0 0;display:grid;gap:18px;
+    grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+  .card-cell[hidden]{display:none}
+  .card{position:relative;display:flex;flex-direction:column;background:var(--veil);
+    border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:.18s;height:100%}
+  .card:hover{transform:translateY(-4px);border-color:var(--ink-faint);box-shadow:var(--shadow)}
+  .rar-SR{--rc:var(--sr)} .rar-SSR{--rc:var(--ssr)} .rar-UR{--rc:var(--ur)}
+  .card-bar{height:4px;background:var(--rc)}
+  .card-top{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 6px}
+  .cls{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-faint)}
+  .portrait{position:relative;aspect-ratio:1/1;margin:2px 12px;border-radius:8px;
+    background:linear-gradient(160deg,var(--veil-2),#0f0c1c);
+    display:grid;place-items:center;color:var(--rc);overflow:hidden}
+  .portrait::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(120px 120px at 50% 30%, color-mix(in srgb,var(--rc) 22%,transparent), transparent 70%)}
+  .portrait .sigil{width:46%;opacity:.5}
+  .portrait .id{position:absolute;bottom:7px;right:9px;font-size:.6rem;color:var(--ink-faint)}
+  .card-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:11px 12px 13px}
+  .names{display:flex;flex-direction:column;min-width:0}
+  .wname{font-size:1.02rem;color:var(--ink);line-height:1.15}
+  .wtitle{font-size:.7rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .eyes{display:flex;gap:5px;flex-shrink:0}
+  .eye-wrap.weak{opacity:.72;position:relative}
+  .eye-wrap.weak::after{content:"";position:absolute;left:50%;top:50%;width:118%;height:1.4px;
+    background:currentColor;transform:translate(-50%,-50%) rotate(-18deg);color:var(--ink-faint);opacity:.55}
+
+  .empty{color:var(--ink-dim);padding:40px 0}
+  .empty button{background:none;border:1px solid var(--line);color:var(--ink);
+    border-radius:6px;padding:4px 12px;cursor:pointer}
+  @media (prefers-reduced-motion:reduce){.card:hover{transform:none}}
+</style>
+
+<script>
+  const state = { class: new Set(), rarity: new Set(), type: new Set() };
+  const chips = document.querySelectorAll('.chip');
+  const cells = [...document.querySelectorAll('.card-cell')];
+  const countEl = document.getElementById('count');
+  const emptyEl = document.getElementById('empty');
+
+  function apply() {
+    let n = 0;
+    for (const cell of cells) {
+      const ok =
+        (!state.class.size || state.class.has(cell.dataset.class)) &&
+        (!state.rarity.size || state.rarity.has(cell.dataset.rarity)) &&
+        (!state.type.size  || state.type.has(cell.dataset.type));
+      cell.hidden = !ok;
+      if (ok) n++;
+    }
+    countEl.textContent = n;
+    emptyEl.hidden = n !== 0;
+  }
+  chips.forEach(chip => {
+    chip.setAttribute('aria-pressed', 'false');
+    chip.addEventListener('click', () => {
+      const { facet, val } = chip.dataset;
+      const set = state[facet];
+      if (set.has(val)) { set.delete(val); chip.setAttribute('aria-pressed', 'false'); }
+      else { set.add(val); chip.setAttribute('aria-pressed', 'true'); }
+      apply();
+    });
+  });
+  document.getElementById('clear2')?.addEventListener('click', () => {
+    Object.values(state).forEach(s => s.clear());
+    chips.forEach(c => c.setAttribute('aria-pressed', 'false'));
+    apply();
+  });
+</script>

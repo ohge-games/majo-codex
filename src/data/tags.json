@@ -1,0 +1,128 @@
+[
+ {
+  "tag_id": "execution",
+  "label": "Execution",
+  "tag_type": "trigger",
+  "description": "Only activates on knocked-down targets",
+  "icon_filename": "tag_execution.png"
+ },
+ {
+  "tag_id": "dodge",
+  "label": "Dodge",
+  "tag_type": "trigger",
+  "description": "Triggers after the witch dodges an attack",
+  "icon_filename": "tag_dodge.png"
+ },
+ {
+  "tag_id": "block",
+  "label": "Block",
+  "tag_type": "trigger",
+  "description": "Triggers after the witch blocks an attack",
+  "icon_filename": "tag_block.png"
+ },
+ {
+  "tag_id": "salvo",
+  "label": "Salvo",
+  "tag_type": "trigger",
+  "description": "Triggers after a normal attack combo",
+  "icon_filename": "tag_salvo.png"
+ },
+ {
+  "tag_id": "extreme_salvo",
+  "label": "Extreme Salvo",
+  "tag_type": "trigger",
+  "description": "Triggers after using the Extreme",
+  "icon_filename": "tag_exsalvo.png"
+ },
+ {
+  "tag_id": "class_salvo",
+  "label": "Class Salvo",
+  "tag_type": "trigger",
+  "description": "Triggers after using the Class skill",
+  "icon_filename": "tag_clsalvo.png"
+ },
+ {
+  "tag_id": "heal",
+  "label": "Heal",
+  "tag_type": "effect",
+  "description": "Restores HP",
+  "icon_filename": "tag_heal.png"
+ },
+ {
+  "tag_id": "buff",
+  "label": "Buff",
+  "tag_type": "effect",
+  "description": "Grants a positive effect to allies",
+  "icon_filename": "tag_buff.png"
+ },
+ {
+  "tag_id": "debuff",
+  "label": "Debuff",
+  "tag_type": "effect",
+  "description": "Applies a negative effect to enemies",
+  "icon_filename": "tag_debuff.png"
+ },
+ {
+  "tag_id": "taunt",
+  "label": "Taunt",
+  "tag_type": "effect",
+  "description": "Forces enemies to target the caster",
+  "icon_filename": "tag_taunt.png"
+ },
+ {
+  "tag_id": "dot",
+  "label": "Damage Over Time",
+  "tag_type": "effect",
+  "description": "Deals repeating damage over a duration",
+  "icon_filename": "tag_dot.png"
+ },
+ {
+  "tag_id": "shield",
+  "label": "Shield",
+  "tag_type": "effect",
+  "description": "Grants a damage-absorbing shield",
+  "icon_filename": "tag_shield.png"
+ },
+ {
+  "tag_id": "single_target",
+  "label": "Single Target",
+  "tag_type": "targeting",
+  "description": "Affects one target",
+  "icon_filename": "tag_st.png"
+ },
+ {
+  "tag_id": "aoe",
+  "label": "AoE",
+  "tag_type": "targeting",
+  "description": "Affects an area / multiple targets",
+  "icon_filename": "tag_aoe.png"
+ },
+ {
+  "tag_id": "counter",
+  "label": "Counter",
+  "tag_type": "trigger",
+  "description": "Triggers after the witch dodges or blocks an attack",
+  "icon_filename": "tag_counter.png"
+ },
+ {
+  "tag_id": "The controlled vocabulary of skill tags. tag_type = trigger / effect / targeting.",
+  "label": null,
+  "tag_type": null,
+  "description": null,
+  "icon_filename": null
+ },
+ {
+  "tag_id": "Add rows freely; keep one concept = one tag_id, spelled identically wherever it's used.",
+  "label": null,
+  "tag_type": null,
+  "description": null,
+  "icon_filename": null
+ },
+ {
+  "tag_id": "Effect/targeting tags seeded from your descriptions + common types - prune or extend.",
+  "label": null,
+  "tag_type": null,
+  "description": null,
+  "icon_filename": null
+ }
+]

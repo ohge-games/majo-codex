@@ -1,0 +1,38 @@
+[
+ {
+  "topic": "Core team",
+  "rule": "4 deployed witches, mixed classes."
+ },
+ {
+  "topic": "Interference slot",
+  "rule": "Each core witch has 1 interference slot holding TWO interference witches. Unlocked after clearing Story 2-3."
+ },
+ {
+  "topic": "Class gate",
+  "rule": "The two interference witches MUST be the same class as the core witch they support (Arcanist core -> 2 Arcanist interference, etc.)."
+ },
+ {
+  "topic": "Off-field",
+  "rule": "Interference witches are NOT deployed; they 'activate Interference Skills from outside the battlefield', buffing the core witch."
+ },
+ {
+  "topic": "Self-exclusion",
+  "rule": "A witch's Interference skill does NOT benefit her when she is a core member. It only applies when she occupies another core unit's support slot."
+ },
+ {
+  "topic": "Fit matters",
+  "rule": "Class gate is necessary but not sufficient - the interference buff should match the core unit's needs (e.g. don't put a Physical-damage interference on a Magic core)."
+ },
+ {
+  "topic": "Tier implication",
+  "rule": "Every witch has TWO grades: CORE value (deployed kit) and INTERFERENCE value (off-field buff quality). Tier list must show both."
+ },
+ {
+  "topic": "Builder implication",
+  "rule": "Team builder = 4 core slots + 2 class-locked interference sub-slots each. Class DEPTH matters (need same-class benchwarmers for interference)."
+ },
+ {
+  "topic": "Observed UI",
+  "rule": "Interference entries show a class-letter+number tag (A1/A2/A3 for Arcanist) - likely interference tier tied to the support witch's star/rank. To confirm."
+ }
+]

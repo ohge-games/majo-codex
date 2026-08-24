@@ -1,0 +1,65 @@
+[
+ {
+  "rarity": "SR",
+  "slot": "Interference",
+  "starts_locked": "yes",
+  "unlocks_at_star": "2*",
+  "notes": "SR starts at 1*"
+ },
+ {
+  "rarity": "SR",
+  "slot": "Special",
+  "starts_locked": "yes",
+  "unlocks_at_star": "3*",
+  "notes": null
+ },
+ {
+  "rarity": "SR",
+  "slot": "Passive",
+  "starts_locked": "yes",
+  "unlocks_at_star": "4*",
+  "notes": null
+ },
+ {
+  "rarity": "SSR",
+  "slot": "Special",
+  "starts_locked": "yes",
+  "unlocks_at_star": "3*",
+  "notes": "SSR starts at 2*"
+ },
+ {
+  "rarity": "SSR",
+  "slot": "Passive",
+  "starts_locked": "yes",
+  "unlocks_at_star": "4*",
+  "notes": null
+ },
+ {
+  "rarity": "Per-rarity unlock schedule (not per-witch).",
+  "slot": null,
+  "starts_locked": null,
+  "unlocks_at_star": null,
+  "notes": null
+ },
+ {
+  "rarity": "SR (start 1*): Interference 2*, Special 3*, Passive 4*. Normal/Extreme/Class open from 1*.",
+  "slot": null,
+  "starts_locked": null,
+  "unlocks_at_star": null,
+  "notes": null
+ },
+ {
+  "rarity": "SSR (start 2*): Special 3*, Passive 4*. Normal/Extreme/Class/Interference open from 2*.",
+  "slot": null,
+  "starts_locked": null,
+  "unlocks_at_star": null,
+  "notes": null
+ },
+ {
+  "rarity": "Add UR rows when known.",
+  "slot": null,
+  "starts_locked": null,
+  "unlocks_at_star": null,
+  "notes": null
+ }
+]

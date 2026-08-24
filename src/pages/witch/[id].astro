@@ -1,0 +1,158 @@
+---
+import Base from '../../layouts/Base.astro';
+import EyeBadge from '../../components/EyeBadge.astro';
+import witches from '../../data/witches.json';
+import abilities from '../../data/abilities.json';
+import skills from '../../data/skills.json';
+import classBase from '../../data/class_base_stats.json';
+import constants from '../../data/constants.json';
+
+export async function getStaticPaths() {
+  const witches = (await import('../../data/witches.json')).default;
+  return witches.map(w => ({ params: { id: w.witch_id.toLowerCase() }, props: { witch: w } }));
+}
+
+const { witch } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+
+const SLOT_ORDER = ['Extreme', 'Special', 'Normal', 'Class', 'Passive', 'Interference'];
+const wSkills = skills.filter(s => s.witch_id === witch.witch_id)
+  .sort((a, b) => SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot));
+const wAbil = abilities.filter(a => a.witch_id === witch.witch_id && (a.variant ?? 'base') === 'base');
+const abilBySlot = Object.fromEntries(wAbil.map(a => [String(a.slot).toLowerCase(), a]));
+
+const stats = classBase.filter(r => r.class === witch.class);
+const penalty = constants.find(c => c.key === 'weakness_penalty')?.value ?? -25;
+
+const num = v => (v === null || v === undefined) ? '—' : v;
+function frames(slot) {
+  const a = abilBySlot[slot.toLowerCase()];
+  if (!a) return null;
+  const p = [];
+  if (a.hit_count) p.push(`${a.hit_count} hit${a.hit_count > 1 ? 's' : ''}`);
+  if (a.total_damage_pct) p.push(`${a.total_damage_pct}% dmg`);
+  if (a.cooldown_s) p.push(`${a.cooldown_s}s CD`);
+  if (a.charge_cost) p.push(`${a.charge_cost} charge`);
+  if (a.range) p.push(`range ${a.range}`);
+  if (a.total_stagger) p.push(`${a.total_stagger} stagger`);
+  return p.length ? p : null;
+}
+---
+<Base title={`${witch.name} — MAJO Codex`} desc={witch.title || `${witch.rarity} ${witch.class}`}>
+  <a class="back mono" href={base}>&larr; All witches</a>
+
+  <header class={`whero rar-${witch.rarity}`}>
+    <div class="wrap hero-grid">
+      <div class="portrait-lg">
+        <svg viewBox="0 0 24 24" class="sigil" aria-hidden="true">
+          <path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width=".8"/>
+          <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width=".8"/>
+          <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+        </svg>
+        <span class="id mono">{witch.witch_id}</span>
+      </div>
+      <div class="hero-meta">
+        <div class="tags">
+          <span class={`rarity-chip is-${witch.rarity}`}>{witch.rarity}</span>
+          <span class="cls mono">{witch.class}</span>
+        </div>
+        {witch.title && <p class="eyebrow wtitle">{witch.title}</p>}
+        <h1 class="display">{witch.name}</h1>
+        <div class="type-line">
+          <span class="tl"><EyeBadge type={witch.damage_type} size={22} title="" /> <b class={`type-${witch.damage_type}`}>{cap(witch.damage_type)}</b> damage</span>
+          <span class="tl weak"><EyeBadge type={witch.weakness_type} size={22} title="" /> Weak to <b class={`type-${witch.weakness_type}`}>{cap(witch.weakness_type)}</b> <span class="pen mono">{penalty}%</span></span>
+          {witch.atk_spd ? <span class="tl mono atkspd">ATK SPD {witch.atk_spd}</span> : null}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="wrap">
+    <h2 class="sec display">Skills</h2>
+    <div class="skills">
+      {wSkills.map(s => {
+        const fr = frames(s.slot);
+        return (
+        <article class="skill">
+          <div class="skill-head">
+            <span class={`slot slot-${s.slot.toLowerCase()}`}>{s.slot}</span>
+            <h3>{s.name}</h3>
+            {s.has_plus === 'yes' && <span class="plus" title={`Plus unlocks at ${s.plus_unlocks_at_star ?? '?'}★`}>PLUS</span>}
+          </div>
+          {s.description && <p class="desc">{s.description}</p>}
+          {fr && <p class="frames mono">{fr.join('  ·  ')}</p>}
+          {!fr && s.mechanics && <p class="frames mono">{s.mechanics}</p>}
+          {s.has_plus === 'yes' && s.plus_description &&
+            <p class="plus-desc"><span class="plus-tag mono">+ {s.plus_unlocks_at_star ?? ''}★</span> {s.plus_description}</p>}
+        </article>
+      )})}
+    </div>
+
+    <h2 class="sec display">Base stats <span class="sec-note mono">shared by {witch.class} class</span></h2>
+    <div class="stats">
+      {stats.map(r => (
+        <div class="stat">
+          <span class="k mono">{r.attribute_id}</span>
+          <span class="v">{num(r.base_value)}</span>
+        </div>
+      ))}
+    </div>
+    <p class="note mono">HP / ATK / DEF scale by class &amp; rarity — growth curves land with the level-scaling pass. Resistances are flat; the only per-witch deviation is the {penalty}% {cap(witch.weakness_type)} weakness above.</p>
+  </section>
+</Base>
+
+<style>
+  .back{display:inline-block;color:var(--ink-dim);font-size:.8rem;padding:20px 24px 0;max-width:var(--maxw);margin:0 auto;width:100%}
+  .back:hover{color:var(--ink)}
+  .rar-SR{--rc:var(--sr)} .rar-SSR{--rc:var(--ssr)} .rar-UR{--rc:var(--ur)}
+
+  .whero{border-bottom:1px solid var(--line);margin-top:8px;
+    background:radial-gradient(600px 300px at 18% -30%, color-mix(in srgb,var(--rc) 20%,transparent), transparent 70%)}
+  .hero-grid{display:grid;grid-template-columns:200px 1fr;gap:34px;padding:34px 24px 40px;align-items:center}
+  .portrait-lg{position:relative;aspect-ratio:1/1;border-radius:14px;border:1px solid var(--line);
+    background:linear-gradient(160deg,var(--veil-2),#0e0b1a);color:var(--rc);display:grid;place-items:center;overflow:hidden}
+  .portrait-lg::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(180px 180px at 50% 32%, color-mix(in srgb,var(--rc) 24%,transparent), transparent 70%)}
+  .portrait-lg .sigil{width:44%;opacity:.55}
+  .portrait-lg .id{position:absolute;bottom:10px;right:12px;font-size:.68rem;color:var(--ink-faint)}
+
+  .tags{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .cls{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+  .wtitle{margin:0}
+  .hero-meta h1{font-size:clamp(2.2rem,5vw,3.4rem);margin:.05em 0 .35em}
+  .type-line{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;color:var(--ink-dim);font-size:.95rem}
+  .tl{display:inline-flex;align-items:center;gap:8px}
+  .tl b{color:var(--ink)}
+  .pen{color:var(--physical);font-size:.8rem}
+  .atkspd{color:var(--ink-faint);font-size:.8rem;letter-spacing:.1em}
+
+  .sec{font-size:1.5rem;margin:52px 0 18px;display:flex;align-items:baseline;gap:12px}
+  .sec-note,.sec .sec-note{font-size:.72rem;color:var(--ink-faint);font-weight:400;letter-spacing:.08em}
+
+  .skills{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+  .skill{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+  .skill-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .skill-head h3{font-size:1.05rem;margin:0;font-weight:600}
+  .slot{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+    padding:3px 8px;border-radius:6px;border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap}
+  .slot-extreme{color:var(--ssr);border-color:color-mix(in srgb,var(--ssr) 45%,var(--line))}
+  .slot-special{color:var(--sigil);border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
+  .slot-interference{color:var(--magic);border-color:color-mix(in srgb,var(--magic) 40%,var(--line))}
+  .plus{margin-left:auto;font-family:"Space Mono",monospace;font-size:.58rem;font-weight:700;letter-spacing:.14em;
+    color:var(--ssr);border:1px solid color-mix(in srgb,var(--ssr) 50%,var(--line));border-radius:6px;padding:2px 7px}
+  .desc{color:var(--ink-dim);font-size:.9rem;margin:0 0 10px}
+  .frames{font-size:.76rem;color:var(--ink-faint);background:var(--nightshade);border:1px solid var(--line);
+    border-radius:7px;padding:7px 10px;margin:0;word-break:break-word}
+  .plus-desc{font-size:.85rem;color:var(--ink-dim);margin:10px 0 0;padding-top:10px;border-top:1px dashed var(--line)}
+  .plus-tag{color:var(--ssr);font-size:.7rem;margin-right:4px}
+
+  .stats{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .stat{display:flex;justify-content:space-between;gap:10px;background:var(--veil);
+    border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+  .stat .k{font-size:.72rem;color:var(--ink-faint)}
+  .stat .v{font-weight:600}
+  .note{color:var(--ink-faint);font-size:.76rem;margin-top:16px;max-width:70ch;line-height:1.6}
+
+  @media(max-width:640px){.hero-grid{grid-template-columns:1fr;justify-items:start}.portrait-lg{width:150px}}
+</style>
