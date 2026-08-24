@@ -1,0 +1,35 @@
+{
+  "boss_training": {
+    "name": "Boss Training",
+    "blurb": "A world boss fought for score — deal as much damage as you can before you fall or the timer expires. Higher damage means higher placement.",
+    "current": {
+      "boss": "Abyssal Slime",
+      "art": "abyssal_slime.png",
+      "damage_type": "mental",
+      "weakness_type": "mental",
+      "summary": "Abyssal Slime both deals and is weak to Mental damage — so Mental-damage witches score highest here.",
+      "mechanics": [
+        {
+          "name": "Wake-up Kickback",
+          "text": "When he comes out of knockdown, he unleashes a huge kickback that hits for very high damage.",
+          "counter": "Stun him just as the knockdown is ending and the kickback is skipped entirely. Carmen's Extreme lands the timing perfectly.",
+          "witches": ["W012"]
+        }
+      ],
+      "tips": [],
+      "comps": [
+        {
+          "name": "Mental burst + timed stun",
+          "witches": ["W012"],
+          "note": "Stack Mental-damage dealers to exploit the weakness, with a reliable stunner (Carmen) to cancel the wake-up kick. Add your best Mental DPS here — tell me who and I'll fill the slots."
+        }
+      ]
+    }
+  },
+  "tower": {
+    "name": "Tower of Anomalies",
+    "blurb": "A static 50-floor climb of rising difficulty. Most floors are routine, but a handful gate hard on specific bosses. This section flags those walls and how to beat them.",
+    "floors_total": 50,
+    "notable": []
+  }
+}

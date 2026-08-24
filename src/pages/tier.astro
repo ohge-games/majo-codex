@@ -1,0 +1,237 @@
+---
+import Base from '../layouts/Base.astro';
+import EyeBadge from '../components/EyeBadge.astro';
+import guides from '../data/guides.json';
+import witches from '../data/witches.json';
+import fs from 'node:fs';
+
+const base = import.meta.env.BASE_URL;
+const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+const lc = s => (s ?? '').toLowerCase();
+const ui = name => `${base}img/ui/${name}.png`;
+const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
+const hasUi = name => hasImg(`/img/ui/${name}.png`);
+
+const wById = Object.fromEntries(witches.map(w => [w.witch_id, w]));
+const bt = guides.boss_training;
+const boss = bt.current;
+const tower = guides.tower;
+const bossArt = boss.art && hasImg(`/img/boss/${boss.art}`) ? `${base}img/boss/${boss.art}` : null;
+
+const typeIcon = (t) => hasUi(`type_${lc(t)}`)
+  ? `<img class="tic" src="${ui(`type_${lc(t)}`)}" alt="" width="20" height="20" />` : null;
+---
+<Base title="MAJO Codex — Current Content & Strategy" desc="Boss Training and Tower of Anomalies guides: mechanics, counters, and team comps.">
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">Current content · strategy</p>
+      <h1 class="display">Beat the wall</h1>
+      <p class="lede">Not a generic tier list — targeted guides for what's live right now: the Boss Training world boss and the Tower of Anomalies roadblocks.</p>
+    </div>
+  </section>
+
+  <!-- BOSS TRAINING -->
+  <section class="wrap block">
+    <div class="block-head">
+      <h2 class="sec display">{bt.name}</h2>
+      <p class="sec-blurb">{bt.blurb}</p>
+    </div>
+
+    <article class="boss">
+      <div class="boss-portrait">
+        {bossArt
+          ? <img src={bossArt} alt={boss.boss} />
+          : <div class="boss-ph"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width=".9"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width=".9"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg><span class="mono">art soon</span></div>}
+      </div>
+      <div class="boss-info">
+        <span class="tagline mono">Current world boss</span>
+        <h3 class="boss-name display">{boss.boss}</h3>
+        <div class="boss-types">
+          <span class="btype" title={`Deals ${cap(boss.damage_type)}`}>
+            {hasUi(`type_${lc(boss.damage_type)}`) ? <img class="tic" src={ui(`type_${lc(boss.damage_type)}`)} alt="" width="20" height="20" /> : <EyeBadge type={boss.damage_type} size={20} />}
+            <span>Deals <b>{cap(boss.damage_type)}</b></span>
+          </span>
+          <span class="btype weak" title={`Weak to ${cap(boss.weakness_type)}`}>
+            {hasUi(`type_${lc(boss.weakness_type)}`) ? <img class="tic" src={ui(`type_${lc(boss.weakness_type)}`)} alt="" width="20" height="20" /> : <EyeBadge type={boss.weakness_type} size={20} />}
+            <span>Weak to <b>{cap(boss.weakness_type)}</b></span>
+          </span>
+        </div>
+        {boss.summary && <p class="boss-summary">{boss.summary}</p>}
+      </div>
+    </article>
+
+    {boss.mechanics?.length > 0 && (
+      <div class="sub">
+        <h4 class="sub-h">Mechanics &amp; counters</h4>
+        <div class="mech-list">
+          {boss.mechanics.map(m => (
+            <div class="mech">
+              <div class="mech-top"><span class="mech-name">{m.name}</span></div>
+              <p class="mech-text">{m.text}</p>
+              {m.counter && (
+                <div class="counter">
+                  <span class="counter-tag mono">Counter</span>
+                  <p>{m.counter}</p>
+                  {m.witches?.length > 0 && (
+                    <div class="wchips">
+                      {m.witches.map(id => wById[id] && (
+                        <a class="wchip" href={`${base}witch/${id.toLowerCase()}`}>
+                          {hasImg(`/img/card/${wById[id].portrait_filename}`)
+                            ? <img src={`${base}img/card/${wById[id].portrait_filename}`} alt="" width="26" height="26" />
+                            : <span class="wchip-ph"></span>}
+                          <span>{wById[id].name}</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {boss.comps?.length > 0 && (
+      <div class="sub">
+        <h4 class="sub-h">Recommended comps</h4>
+        <div class="comp-list">
+          {boss.comps.map(c => (
+            <div class="comp">
+              <div class="comp-head">
+                <span class="comp-name">{c.name}</span>
+                <div class="wchips">
+                  {c.witches?.map(id => wById[id] && (
+                    <a class="wchip" href={`${base}witch/${id.toLowerCase()}`}>
+                      {hasImg(`/img/card/${wById[id].portrait_filename}`)
+                        ? <img src={`${base}img/card/${wById[id].portrait_filename}`} alt="" width="26" height="26" />
+                        : <span class="wchip-ph"></span>}
+                      <span>{wById[id].name}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+              {c.note && <p class="comp-note">{c.note}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {boss.tips?.length > 0 && (
+      <div class="sub">
+        <h4 class="sub-h">Pro tips</h4>
+        <ul class="tips">{boss.tips.map(t => <li>{t.text}</li>)}</ul>
+      </div>
+    )}
+  </section>
+
+  <!-- TOWER -->
+  <section class="wrap block">
+    <div class="block-head">
+      <h2 class="sec display">{tower.name} <span class="floors mono">{tower.floors_total} floors</span></h2>
+      <p class="sec-blurb">{tower.blurb}</p>
+    </div>
+    {tower.notable?.length > 0 ? (
+      <div class="floor-list">
+        {tower.notable.map(f => (
+          <div class="floor">
+            <div class="floor-tag mono">Floor {f.floor}</div>
+            <div class="floor-body">
+              <span class="floor-boss">{f.boss}</span>
+              {f.difficulty && <span class={`diff diff-${lc(f.difficulty)}`}>{f.difficulty}</span>}
+              {f.tips?.map(t => <p class="floor-tip">{t}</p>)}
+              {f.witches?.length > 0 && (
+                <div class="wchips">
+                  {f.witches.map(id => wById[id] && (
+                    <a class="wchip" href={`${base}witch/${id.toLowerCase()}`}>
+                      {hasImg(`/img/card/${wById[id].portrait_filename}`)
+                        ? <img src={`${base}img/card/${wById[id].portrait_filename}`} alt="" width="26" height="26" />
+                        : <span class="wchip-ph"></span>}
+                      <span>{wById[id].name}</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div class="empty-note">
+        <p>Notable-floor breakdowns are coming. Tell me which floors wall you and the bosses on them, and this fills in with counters and comps.</p>
+      </div>
+    )}
+    <p class="future mono">Planned: once roster tracking lands, these guides will re-rank around the witches you actually own.</p>
+  </section>
+</Base>
+
+<style>
+  .page-hero{padding:56px 0 30px;border-bottom:1px solid var(--line);
+    background:radial-gradient(700px 340px at 50% -40%, rgba(224,87,75,.14), transparent 70%)}
+  .page-hero h1{font-size:clamp(2.2rem,5.5vw,3.6rem);margin:.15em 0 .3em;
+    background:linear-gradient(180deg,var(--ink),#c3b8ea);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--ink-dim);max-width:60ch;font-size:1.02rem}
+
+  .block{padding-top:8px}
+  .block-head{margin:44px 0 18px}
+  .sec{font-size:1.6rem;margin:0 0 6px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .floors{font-size:.72rem;color:var(--ink-faint);letter-spacing:.08em}
+  .sec-blurb{color:var(--ink-dim);max-width:70ch;margin:0;font-size:.95rem}
+
+  .boss{display:grid;grid-template-columns:220px 1fr;gap:26px;background:var(--veil);
+    border:1px solid var(--line);border-radius:14px;padding:22px;align-items:center;
+    box-shadow:0 0 40px -24px var(--physical)}
+  .boss-portrait img{width:100%;border-radius:12px;display:block}
+  .boss-ph{aspect-ratio:1/1;border:1px dashed var(--line);border-radius:12px;display:grid;place-items:center;
+    color:var(--physical);gap:8px;opacity:.6}
+  .boss-ph svg{width:40%}
+  .boss-ph span{font-size:.66rem;color:var(--ink-faint)}
+  .tagline{font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--physical)}
+  .boss-name{font-size:2rem;margin:.1em 0 .4em}
+  .boss-types{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+  .btype{display:inline-flex;align-items:center;gap:8px;background:var(--nightshade);
+    border:1px solid var(--line);border-radius:9px;padding:6px 11px;font-size:.88rem;color:var(--ink-dim)}
+  .btype b{color:var(--ink)}
+  .btype .tic{border-radius:5px}
+  .btype.weak .tic{box-shadow:0 0 0 2px #e0574b, 0 0 7px -1px rgba(224,87,75,.7)}
+  .boss-summary{color:var(--ink-dim);font-size:.95rem;margin:0;max-width:66ch}
+
+  .sub{margin-top:26px}
+  .sub-h{font-family:"Space Mono",monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-faint);margin:0 0 12px}
+  .mech-list,.comp-list,.floor-list{display:flex;flex-direction:column;gap:12px}
+  .mech,.comp,.floor{background:var(--veil);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .mech-name,.comp-name,.floor-boss{font-weight:600;color:var(--ink);font-size:1.02rem}
+  .mech-text{color:var(--ink-dim);font-size:.92rem;margin:8px 0 0}
+  .counter{margin-top:12px;padding:12px 14px;border-radius:9px;background:rgba(84,214,138,.06);
+    border:1px solid color-mix(in srgb,#54d68a 34%,var(--line))}
+  .counter-tag{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:#54d68a}
+  .counter p{margin:5px 0 0;color:var(--ink-dim);font-size:.92rem}
+
+  .wchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .wchip{display:inline-flex;align-items:center;gap:7px;background:var(--nightshade);
+    border:1px solid var(--line);border-radius:999px;padding:3px 11px 3px 3px;font-size:.82rem;color:var(--ink);transition:.15s}
+  .wchip:hover{border-color:var(--sigil)}
+  .wchip img,.wchip-ph{width:26px;height:26px;border-radius:50%;object-fit:cover;object-position:top center}
+  .wchip-ph{background:var(--veil-2)}
+
+  .comp-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
+  .comp-note{color:var(--ink-dim);font-size:.9rem;margin:10px 0 0}
+  .tips{margin:0;padding-left:18px;color:var(--ink-dim);font-size:.92rem;display:flex;flex-direction:column;gap:6px}
+
+  .floor{display:grid;grid-template-columns:90px 1fr;gap:16px;align-items:start}
+  .floor-tag{font-size:.72rem;color:var(--physical);border:1px solid color-mix(in srgb,var(--physical) 40%,var(--line));
+    border-radius:7px;padding:4px 8px;text-align:center}
+  .diff{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;border-radius:5px;padding:2px 7px;margin-left:8px}
+  .diff-hard{color:var(--physical);border:1px solid color-mix(in srgb,var(--physical) 45%,var(--line))}
+  .floor-tip{color:var(--ink-dim);font-size:.92rem;margin:8px 0 0}
+
+  .empty-note{background:var(--veil);border:1px dashed var(--line);border-radius:10px;padding:22px;color:var(--ink-dim);font-size:.95rem}
+  .future{margin-top:16px;font-size:.74rem;color:var(--ink-faint)}
+
+  @media(max-width:640px){
+    .boss{grid-template-columns:1fr}
+    .floor{grid-template-columns:1fr}
+  }
+</style>
