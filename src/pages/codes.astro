@@ -1,0 +1,84 @@
+---
+import Base from '../layouts/Base.astro';
+import data from '../data/codes.json';
+const base = import.meta.env.BASE_URL;
+const codes = Array.isArray(data.codes) ? data.codes : [];
+const active = codes.filter(c => c.status !== 'expired');
+const expired = codes.filter(c => c.status === 'expired');
+---
+<Base title="Codes — MAJO Codex" desc="Active redemption codes and their rewards.">
+  <div class="wrap codes">
+    <header class="chead">
+      <h1 class="display">Codes</h1>
+      <p class="sub">Tap a code to copy it, then redeem in-game.{data.updated ? ` Last updated ${data.updated}.` : ''} Rewards are being confirmed with the community.</p>
+    </header>
+
+    {codes.length === 0 ? (
+      <div class="empty"><p class="big">Codes coming soon.</p></div>
+    ) : (
+      <>
+        <ul class="clist">
+          {active.map(c => (
+            <li class="code">
+              <button class="ccode" data-code={c.code} type="button" aria-label={`Copy code ${c.code}`}>
+                <span class="ctext">{c.code}</span>
+                <span class="cact mono">copy</span>
+              </button>
+              <span class="creward">{c.reward ?? 'Reward TBD'}</span>
+              {c.expires && <span class="cmeta mono">expires {c.expires}</span>}
+            </li>
+          ))}
+        </ul>
+        {expired.length > 0 && (
+          <details class="exp">
+            <summary class="mono">Expired ({expired.length})</summary>
+            <ul class="clist dim">
+              {expired.map(c => (
+                <li class="code"><button class="ccode" data-code={c.code} type="button"><span class="ctext">{c.code}</span><span class="cact mono">copy</span></button><span class="creward">{c.reward ?? '—'}</span></li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </>
+    )}
+  </div>
+</Base>
+
+<style>
+  .codes{padding:28px 20px 64px;max-width:760px}
+  .chead h1{font-size:clamp(2rem,5vw,3rem);margin:0 0 6px}
+  .chead .sub{color:var(--ink-dim);margin:0 0 18px;max-width:56ch}
+  .empty{background:var(--veil);border:1px dashed var(--line);border-radius:var(--r);padding:28px;color:var(--ink-dim)}
+  .empty .big{font-size:1.2rem;color:var(--ink);margin:0}
+  .clist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+  .code{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;
+    background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+  .ccode{display:inline-flex;align-items:center;gap:10px;cursor:pointer;
+    font-family:"Space Mono",monospace;font-weight:700;color:var(--sigil);background:var(--nightshade);
+    border:1px solid color-mix(in srgb,var(--sigil) 30%,var(--line));border-radius:9px;padding:9px 13px;
+    letter-spacing:.04em;font-size:1rem;-webkit-tap-highlight-color:transparent}
+  .ccode:hover{border-color:color-mix(in srgb,var(--sigil) 55%,var(--line))}
+  .ccode:active{transform:scale(.98)}
+  .cact{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+  .ccode.copied{border-color:var(--sigil);color:var(--ink)}
+  .ccode.copied .cact{color:var(--sigil)}
+  .creward{color:var(--ink-dim);font-size:.9rem}
+  .cmeta{color:var(--ink-faint);font-size:.72rem;margin-left:auto;white-space:nowrap}
+  .exp{margin-top:18px}
+  .exp summary{cursor:pointer;color:var(--ink-faint);font-size:.78rem}
+  .clist.dim{margin-top:10px;opacity:.6}
+  @media(max-width:480px){ .ccode{flex:1 1 100%;justify-content:space-between} }
+</style>
+
+<script>
+  document.querySelectorAll('.ccode').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const code = btn.dataset.code || btn.querySelector('.ctext')?.textContent || '';
+      try { await navigator.clipboard.writeText(code); }
+      catch { const t = document.createElement('textarea'); t.value = code; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (e) {} t.remove(); }
+      const act = btn.querySelector('.cact'); const prev = act ? act.textContent : '';
+      btn.classList.add('copied'); if (act) act.textContent = 'copied!';
+      setTimeout(() => { btn.classList.remove('copied'); if (act) act.textContent = prev; }, 1400);
+    });
+  });
+</script>

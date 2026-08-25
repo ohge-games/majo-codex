@@ -1,35 +1,64 @@
 {
-  "boss_training": {
-    "name": "Boss Training",
-    "blurb": "A world boss fought for score — deal as much damage as you can before you fall or the timer expires. Higher damage means higher placement.",
-    "current": {
-      "boss": "Abyssal Slime",
-      "art": "abyssal_slime.png",
-      "damage_type": "mental",
-      "weakness_type": "mental",
-      "summary": "Abyssal Slime both deals and is weak to Mental damage — so Mental-damage witches score highest here.",
+  "bosses": [
+    {
+      "id": "abyssal-slime",
+      "name": "Abyssal Slime",
+      "mode": "Boss Training",
+      "blurb": "World boss — compete for the highest score, measured by total damage dealt before you die or the timer runs out.",
+      "deals": "mental",
+      "weak": "mental",
       "mechanics": [
         {
           "name": "Wake-up Kickback",
-          "text": "When he comes out of knockdown, he unleashes a huge kickback that hits for very high damage.",
-          "counter": "Stun him just as the knockdown is ending and the kickback is skipped entirely. Carmen's Extreme lands the timing perfectly.",
-          "witches": ["W012"]
+          "text": "When he exits knockdown he unleashes a huge, high-damage kickback. Stun him exactly as the knockdown is ending to cancel it entirely — Carmen's Extreme nails the timing."
         }
       ],
-      "tips": [],
-      "comps": [
+      "tips": [
+        "He is weak to Mental, so Mental dealers post the highest scores.",
+        "Bring one reliable stun to neutralize the Wake-up Kickback and protect your run.",
+        "Score is cumulative damage-before-death — survivability and uptime matter as much as raw burst."
+      ],
+      "recommended": [
         {
-          "name": "Mental burst + timed stun",
-          "witches": ["W012"],
-          "note": "Stack Mental-damage dealers to exploit the weakness, with a reliable stunner (Carmen) to cancel the wake-up kick. Add your best Mental DPS here — tell me who and I'll fill the slots."
+          "witch_id": "W001",
+          "note": "Mental DoT + execute — strong sustained score."
+        },
+        {
+          "witch_id": "W019",
+          "note": "Mental executioner; self-downs then executes."
+        },
+        {
+          "witch_id": "W017",
+          "note": "Mental burst — her Extreme also stuns, but it does big bonus damage to knocked-down targets, so land it DURING a knockdown rather than spending it to cancel the wake-up."
+        },
+        {
+          "witch_id": "W002",
+          "note": "Mental stagger engine + executioner."
+        },
+        {
+          "witch_id": "W012",
+          "note": "Carmen — Extreme stun times the Wake-up Kickback; peels/heals."
+        }
+      ],
+      "control": [
+        {
+          "witch_id": "W012",
+          "note": "Carmen — Extreme stun; time it to the knockdown ending to cancel the kickback."
+        },
+        {
+          "witch_id": "W001",
+          "note": "Dusan — very readable timing between the hits and the CC, making the interrupt easy to land."
+        },
+        {
+          "witch_id": "W004",
+          "note": "Xini — Extreme applies a knockdown (surfaced from her skill text); useful control, confirm timing in-run."
         }
       ]
     }
-  },
+  ],
   "tower": {
     "name": "Tower of Anomalies",
-    "blurb": "A static 50-floor climb of rising difficulty. Most floors are routine, but a handful gate hard on specific bosses. This section flags those walls and how to beat them.",
-    "floors_total": 50,
-    "notable": []
+    "blurb": "Static 50-floor tower of increasing difficulty. Notable-floor breakdowns coming as we chart the hard walls.",
+    "floors": []
   }
 }

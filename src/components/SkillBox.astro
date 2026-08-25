@@ -2,7 +2,7 @@
 import abilities from '../data/abilities.json';
 import fs from 'node:fs';
 
-const { witch, skill, hero = false } = Astro.props;
+const { witch, skill, hero = false, rarity = witch.rarity, baseLevel } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const ui = name => `${base}img/ui/${name}.png`;
 const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
@@ -13,25 +13,39 @@ const name = (s.name && s.name !== 'None' && s.name !== witch.name) ? s.name : `
 
 const a = abilities.find(x => x.witch_id === witch.witch_id
   && String(x.slot).toLowerCase() === s.slot.toLowerCase() && (x.variant ?? 'base') === 'base');
-let fr = null;
+let meta = [];
 if (a) {
-  const p = [];
-  if (a.hit_count) p.push(`${a.hit_count} hit${a.hit_count > 1 ? 's' : ''}`);
-  if (a.total_damage_pct) p.push(`${a.total_damage_pct}% dmg`);
-  if (a.cooldown_s) p.push(`${a.cooldown_s}s CD`);
-  if (a.charge_cost) p.push(`${a.charge_cost} charge`);
-  if (a.range) p.push(`range ${a.range}`);
-  if (a.total_stagger) p.push(`${a.total_stagger} stagger`);
-  fr = p.length ? p : null;
+  if (a.hit_count) meta.push(`${a.hit_count} hit${a.hit_count > 1 ? 's' : ''}`);
+  if (a.cooldown_s) meta.push(`${a.cooldown_s}s CD`);
+  if (a.charge_cost) meta.push(`${a.charge_cost} charge`);
+  if (a.range) meta.push(`range ${a.range}`);
+  if (a.total_stagger) meta.push(`${a.total_stagger} stagger`);
 }
+if (s.plus_range != null) meta.push(`plus range ${s.plus_range}`);
+
+const maxLevel = rarity === 'SSR' ? 10 : 7;  // 6star=L7, EX1-3=L8-10 (SSR); SR caps at L7
+const startStar = baseLevel ?? (rarity === 'SSR' ? 2 : 1);
+const startLevel = Math.min(startStar + 1, maxLevel);  // each star = +1 skill level
+const coefB = Array.isArray(s.coefficients) ? s.coefficients : [];
+const coefP = Array.isArray(s.plus_coefficients) ? s.plus_coefficients : null;
+const plusAt = s.plus_unlocks_at_star ? (parseInt(s.plus_unlocks_at_star) || 99) : 99;
+
+const countOf = l => { const m = /[x\u00d7](\d+)/i.exec(l); return m ? `\u00d7${m[1]}` : ''; };
+const humLabel = l => l.replace(/\(.*?\)/g, '').replace(/[x\u00d7]\d+/i, '').replace(/_pct$|_s$/, '').replace(/_/g, ' ').trim();
+const unitOf = l => (/pct/i.test(l) ? '%' : (/(_s$|dur|second)/i.test(l) ? 's' : ''));
+const valAt = (c, lv) => { const v = c.val_low + (c.per_level || 0) * (lv - 1); return Math.round(v * 100) / 100; };
+const fmtCoef = (c, lv) => `${humLabel(c.label)}${countOf(c.label) ? ' ' + countOf(c.label) : ''} ${valAt(c, lv)}${unitOf(c.label)}`;
+const curLine = (coef, lv) => coef.map(c => fmtCoef(c, lv)).join(' \u00b7 ');
+
+const hasScale = coefB.length > 0;
+const levels = Array.from({ length: maxLevel }, (_, i) => i + 1);
 const iconPath = `/img/skill/${witch.witch_id.toLowerCase()}_${s.slot.toLowerCase()}.png`;
 const hasIcon = hasImg(iconPath);
-const unlockStar = s.has_plus === 'yes' ? (s.plus_unlocks_at_star ?? 6) : null;
 ---
 <article class={`skill-box ${hero ? 'is-hero' : ''} slotc-${s.slot.toLowerCase()}`}>
   <div class="sk-left">
     {hasIcon
-      ? <img class="sk-icon" src={`${base}${iconPath.slice(1)}`} alt="" width={hero ? 72 : 46} height={hero ? 72 : 46} loading="lazy" />
+      ? <img class="sk-icon" src={`${base}${iconPath.slice(1)}`} alt="" width={52} height={52} loading="lazy" />
       : <span class="sk-icon ph" aria-hidden="true"></span>}
     <div class="sk-titles">
       <span class={`slot slot-${s.slot.toLowerCase()}`}>{s.slot}</span>
@@ -40,17 +54,53 @@ const unlockStar = s.has_plus === 'yes' ? (s.plus_unlocks_at_star ?? 6) : null;
   </div>
   <div class="sk-right">
     {s.description && <p class="desc">{s.description}</p>}
-    {fr && <p class="frames mono">{fr.join('  ·  ')}</p>}
-    {!fr && s.mechanics && <p class="frames mono">{s.mechanics}</p>}
+    {meta.length > 0 && <p class="frames mono">{meta.join('  \u00b7  ')}</p>}
+
+    {hasScale && (
+      <div class="sk-scale"
+        data-coef={JSON.stringify(coefB)}
+        data-pluscoef={coefP ? JSON.stringify(coefP) : 'null'}
+        data-plusat={plusAt}
+        data-maxlevel={maxLevel}>
+        <p class="sk-scale-cur mono">
+          <span class="lv-tag">Lv {startLevel}</span> <span class="cur-vals">{curLine(coefB, startLevel)}</span>
+        </p>
+        <details class="sk-scale-all">
+          <summary class="mono">All levels</summary>
+          <div class="scale-wrap">
+            <table class="scale-tbl">
+              <thead><tr><th>Lv</th>{coefB.map(c => <th>{humLabel(c.label)}{countOf(c.label) ? ' ' + countOf(c.label) : ''}</th>)}</tr></thead>
+              <tbody>
+                {levels.map(lv => (
+                  <tr data-lv={lv}><td>{lv}</td>{coefB.map(c => <td>{valAt(c, lv)}{unitOf(c.label)}</td>)}</tr>
+                ))}
+              </tbody>
+            </table>
+            {coefP && (
+              <table class="scale-tbl plus">
+                <caption class="mono">Plus \u00b7 from {plusAt}\u2605</caption>
+                <thead><tr><th>Lv</th>{coefP.map(c => <th>{humLabel(c.label)}{countOf(c.label) ? ' ' + countOf(c.label) : ''}</th>)}</tr></thead>
+                <tbody>
+                  {levels.map(lv => (
+                    <tr data-lv={lv}><td>{lv}</td>{coefP.map(c => <td>{valAt(c, lv)}{unitOf(c.label)}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </details>
+      </div>
+    )}
+
     {s.has_plus === 'yes' && s.plus_description && (
-      <div class="plus-block" data-unlock={unlockStar}>
+      <div class="plus-block" data-unlock={s.plus_unlocks_at_star ?? '6*'}>
         <span class="plus-tag mono">
           {hasUi('skill_plus')
             ? <img class="plus-ic" src={ui('skill_plus')} alt="+" height="16" />
-            : '+'} {s.plus_unlocks_at_star ?? ''}★
+            : '+'} {(s.plus_unlocks_at_star ?? '').toString().replace('*', '')}\u2605
         </span>
         <span class="plus-text">{s.plus_description}</span>
-        <span class="lock-note mono">Unlocks at {s.plus_unlocks_at_star ?? '?'}★</span>
+        <span class="lock-note mono">Unlocks at {(s.plus_unlocks_at_star ?? '?').toString().replace('*', '')}\u2605</span>
       </div>
     )}
   </div>
@@ -59,13 +109,12 @@ const unlockStar = s.has_plus === 'yes' ? (s.plus_unlocks_at_star ?? 6) : null;
 <style>
   .skill-box{display:grid;grid-template-columns:210px 1fr;gap:18px;background:var(--veil);
     border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;align-items:start}
-  .skill-box.is-hero{grid-template-columns:280px 1fr;padding:22px 24px;
-    border-color:color-mix(in srgb,var(--ssr) 40%,var(--line));
+  .skill-box.is-hero{grid-template-columns:230px 1fr;padding:20px 22px;
+    border-color:color-mix(in srgb,var(--ssr) 42%,var(--line));
     background:linear-gradient(180deg,color-mix(in srgb,var(--ssr) 7%,var(--veil)),var(--veil))}
   .sk-left{display:flex;align-items:center;gap:14px;min-width:0}
-  .sk-icon{border-radius:10px;background:var(--nightshade);border:1px solid var(--line);flex-shrink:0;object-fit:contain}
-  .is-hero .sk-icon{border-radius:12px}
-  .sk-icon.ph{width:46px;height:46px}.is-hero .sk-icon.ph{width:72px;height:72px}
+  .sk-icon{width:52px;height:52px;border-radius:10px;background:var(--nightshade);border:1px solid var(--line);flex-shrink:0;object-fit:contain}
+  .sk-icon.ph{width:52px;height:52px}
   .sk-titles{display:flex;flex-direction:column;gap:6px;min-width:0}
   .slot{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
     padding:3px 8px;border-radius:6px;border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap;align-self:flex-start}
@@ -73,11 +122,25 @@ const unlockStar = s.has_plus === 'yes' ? (s.plus_unlocks_at_star ?? 6) : null;
   .slot-special{color:var(--sigil);border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
   .slot-interference{color:var(--magic);border-color:color-mix(in srgb,var(--magic) 40%,var(--line))}
   .sk-name{margin:0;font-weight:600;font-size:1.05rem;line-height:1.15}
-  .is-hero .sk-name{font-size:1.5rem}
+  .is-hero .sk-name{font-size:1.25rem}
   .desc{color:var(--ink-dim);font-size:.9rem;margin:0 0 10px}
-  .is-hero .desc{font-size:.98rem}
-  .frames{font-size:.76rem;color:var(--ink-faint);background:var(--nightshade);border:1px solid var(--line);
-    border-radius:7px;padding:7px 10px;margin:0;word-break:break-word}
+  .is-hero .desc{font-size:.96rem}
+  .frames{font-size:.74rem;color:var(--ink-faint);background:var(--nightshade);border:1px solid var(--line);
+    border-radius:7px;padding:6px 10px;margin:0;word-break:break-word;display:inline-block}
+  .sk-scale{margin-top:10px}
+  .sk-scale-cur{margin:0;font-size:.82rem;color:var(--ink);background:color-mix(in srgb,var(--sigil) 8%,var(--nightshade));
+    border:1px solid color-mix(in srgb,var(--sigil) 30%,var(--line));border-radius:8px;padding:8px 11px}
+  .lv-tag{color:var(--sigil);font-weight:700;margin-right:6px}
+  .sk-scale-all{margin-top:7px}
+  .sk-scale-all summary{cursor:pointer;font-size:.72rem;color:var(--ink-faint);letter-spacing:.06em}
+  .sk-scale-all summary:hover{color:var(--ink-dim)}
+  .scale-wrap{margin-top:8px;overflow-x:auto;display:flex;gap:16px;flex-wrap:wrap}
+  .scale-tbl{border-collapse:collapse;font-family:"Space Mono",monospace;font-size:.68rem}
+  .scale-tbl caption{text-align:left;color:var(--ssr);font-size:.66rem;padding-bottom:4px}
+  .scale-tbl th,.scale-tbl td{border:1px solid var(--line);padding:3px 8px;text-align:right;color:var(--ink-dim);white-space:nowrap}
+  .scale-tbl th{color:var(--ink-faint);font-weight:400}
+  .scale-tbl td:first-child,.scale-tbl th:first-child{text-align:center;color:var(--ink-faint)}
+  .scale-tbl tr.active td{background:color-mix(in srgb,var(--sigil) 16%,transparent);color:var(--ink)}
   .plus-block{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);
     display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;font-size:.85rem;color:var(--ink-dim)}
   .plus-tag{color:var(--ssr);font-size:.7rem;display:inline-flex;align-items:center;gap:3px}

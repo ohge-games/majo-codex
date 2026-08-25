@@ -1,0 +1,90 @@
+{
+  "_note": "reward TBD -> confirm with community. status: active|expired. expires: null if unknown.",
+  "updated": null,
+  "codes": [
+    {
+      "code": "MAJORUWEN",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJOCREEP",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJOSTART",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJOPOWER",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJOAWAKE",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJOUZRA",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJOLANCAT",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJOMID",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJONL",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJOHAD",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "MAJOCHO",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "9JRTD3M",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "D95YS3W",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    },
+    {
+      "code": "H9V3PN3",
+      "reward": null,
+      "expires": null,
+      "status": "active"
+    }
+  ]
+}

@@ -19,3 +19,20 @@ Each skill's `coefficients[]` give **linear per-level scaling**: `value_at_level
 
 ## Source of truth
 The authoritative capture is `majo_skill_data_captured.json` (+ `.md`), maintained separately: all 23 witches, 46/46 plus-unlocks confirmed, with a `_meta.canonical_discrepancies` list. Two repo corrections are already applied here (Xini Special-plus 355 not 395; Patra Class = [Charge Amp], not a Physical damage skill).
+
+## Update 2026-08-24 (evening)
+- **Detail page now uses the coefficients**: `SkillBox.astro` renders a live per-level readout (`.sk-scale-cur`) + an "All levels" caret table; the star selector script in `src/pages/witch/[id].astro` recomputes values on rank change (`value = val_low + per_level*(level-1)`), swaps to plus coefficients once `rank >= plus_unlocks_at`, and highlights the active level row.
+- **Star selector fixed**: min rank enforced (SSR 2 / SR 1), EX1-3 buttons only render for SSR (SR caps at 6). `data-min`/`data-max` on `#rank`.
+- **Icons uniform** (52px); the Extreme card keeps its emphasis via border/background only.
+- **"How to deploy" section** on each detail page, fed by `tier_synergy.json` (How she plays / Interference fit / Team-synergy clusters).
+- **New pages**: `src/pages/tier.astro` (+ `src/data/guides.json`) and `src/pages/codes.astro` (+ `src/data/codes.json`). Nav in `Base.astro` points to `/tier` and `/codes`.
+- **Boss art**: drop files at `public/img/boss/<id>.png` (e.g., `abyssal-slime.png`).
+- **OPEN DECISION**: rank→skill-level mapping. `stars.json` says 6★ = skill level 6 (SR max) and SSR EX1-3 = levels 7-9; the calculator uses that. If in-game 6★ is actually level 7, change the mapping in `SkillBox.astro` (`maxLevel`) and the page script.
+
+## Update 2026-08-24 (late)
+- **Skill-level mapping**: `SkillBox.astro` maxLevel = SSR 10 / SR 7; the page script computes `level = rank + 1` (so 6★ shows Lv7, SSR EX1-3 show Lv8-10). All-levels caret lists 1..max. *(Floor labeling — whether a fresh 1★ reads Lv1 or Lv2 — is the one open question.)*
+- **Star selector**: min rank enforced (SR 1 / SSR 2); EX only for SSR; character-page stars all turn **yellow at rank ≥ 4** (matches in-game character screen; roster tiles keep the red/red+yellow mix).
+- **Detail page**: added a **quick-verdict** callout (archetype from the synergy note + rarity/class/element) and moved **How to deploy** above Skills (BLUF).
+- **Codes** (`/codes`, `codes.json`): 14 live codes populated (rewards TBD), tap-to-copy with mobile-friendly layout.
+- **Tier** (`/tier`, `guides.json`): Abyssal Slime now lists **Control for the Wake-up Kickback** (Carmen, Dusan, Xini) and an **auto-generated "all {weakness} dealers"** list derived from `witches.json` (the boss-weakness → dealers auto-suggestion).
+- **Roster tiles** (`index.astro`): damage/weakness icons enlarged and corner-anchored (bottom-left / bottom-right); rarity icon enlarged and lowered so its centerline sits on the portrait's bottom border. `.portrait` clipping moved to the image so icons can straddle the edge.

@@ -6,6 +6,7 @@ import witches from '../../data/witches.json';
 import abilities from '../../data/abilities.json';
 import skills from '../../data/skills.json';
 import constants from '../../data/constants.json';
+import tiers from '../../data/tier_synergy.json';
 import fs from 'node:fs';
 
 export async function getStaticPaths() {
@@ -29,6 +30,10 @@ const bySlot = Object.fromEntries(wSkills.map(s => [s.slot, s]));
 const extreme = bySlot['Extreme'];
 const mains = ['Special', 'Normal', 'Class', 'Passive'].map(sl => bySlot[sl]).filter(Boolean);
 const interference = bySlot['Interference'];
+const tip = (tiers.witches || []).find(t => t.witch_id === witch.witch_id) || null;
+const archetype = (tip && tip.synergy_note && tip.synergy_note.includes(':'))
+  ? tip.synergy_note.split(':')[0].trim() : null;
+const verdict = archetype ? `${archetype} \u2014 ${witch.rarity} ${witch.class}, ${cap(witch.damage_type)} damage` : null;
 
 // tags from ability data
 const wAbil = abilities.filter(a => a.witch_id === witch.witch_id && (a.variant ?? 'base') === 'base');
@@ -38,6 +43,9 @@ const tags = [...new Set(wAbil.flatMap(a => (a.tags ? String(a.tags).split(';') 
 // rank stars
 const START = { SSR: 2, SR: 3, R: 1, UR: 2 };
 const baseStars = START[witch.rarity] ?? 2;
+const minRank = witch.rarity === 'SSR' ? 2 : 1;
+const maxRank = witch.rarity === 'SSR' ? 9 : 6;
+const showEx = witch.rarity === 'SSR';
 const hasStars = hasUi('star_red') && hasUi('star_yellow') && hasUi('star_grey');
 
 // art
@@ -63,16 +71,16 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
               </svg>
             )}
           </div>
-          <div class="rank" id="rank" data-base={baseStars} data-uibase={`${base}img/ui/`}>
+          <div class="rank" id="rank" data-base={baseStars} data-min={minRank} data-max={maxRank} data-uibase={`${base}img/ui/`}>
             {[1, 2, 3, 4, 5, 6].map(i => (
               <button class="star" data-pos={i} type="button" aria-label={`Rank ${i}`}>
                 {hasStars
-                  ? <img class="star-img" src={ui(i <= baseStars ? (i <= 3 ? 'star_red' : 'star_yellow') : 'star_grey')} alt="" width="20" height="20" />
-                  : <span class="star-glyph" data-kind={i <= baseStars ? (i <= 3 ? 'red' : 'yellow') : 'grey'}>★</span>}
+                  ? <img class="star-img" src={ui(i <= baseStars ? (baseStars >= 4 ? 'star_yellow' : 'star_red') : 'star_grey')} alt="" width="20" height="20" />
+                  : <span class="star-glyph" data-kind={i <= baseStars ? (baseStars >= 4 ? 'yellow' : 'red') : 'grey'}>★</span>}
               </button>
             ))}
-            <span class="ex-sep"></span>
-            {[1, 2, 3].map(n => (
+            {showEx && <span class="ex-sep"></span>}
+            {showEx && [1, 2, 3].map(n => (
               <button class="exstar" data-pos={6 + n} type="button" aria-label={`EX${n}`}>
                 {hasUi(`star_ex${n}`) ? <img class="ex-img" src={ui(`star_ex${n}`)} alt={`EX${n}`} width="22" height="22" /> : <span class="ex-txt mono">EX{n}</span>}
               </button>
@@ -125,20 +133,49 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
     </section>
 
     <div class="wrap body">
+      {verdict && <p class="verdict">{verdict}</p>}
+
+      {tip && (
+        <section class="deploy">
+          <h2 class="sec display">How to deploy</h2>
+          <div class="deploy-grid">
+            <div class="deploy-card">
+              <span class="dl mono">How she plays</span>
+              <p>{tip.synergy_note}</p>
+            </div>
+            {tip.interference && tip.interference.name && (
+              <div class="deploy-card">
+                <span class="dl mono">Interference — who to slot her behind</span>
+                <p><b>{tip.interference.name}.</b> {tip.interference.effect}</p>
+                {tip.interference.role_match && <p class="fit">Best behind: <b>{tip.interference.role_match}</b></p>}
+              </div>
+            )}
+            {tip.clusters && tip.clusters.length > 0 && (
+              <div class="deploy-card">
+                <span class="dl mono">Team synergy</span>
+                <div class="dchips">{tip.clusters.map(c => <span class="dchip">{c}</span>)}</div>
+                <p class="hint">Synergy clusters she belongs to — pair with members that complete the loop. Matchups vs. specific bosses live on the <a href={base + 'tier'}>Tier List</a>.</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       <section>
         <h2 class="sec display">Skills</h2>
-        {extreme && <SkillBox witch={witch} skill={extreme} hero={true} />}
+        {extreme && <SkillBox witch={witch} skill={extreme} hero={true} rarity={witch.rarity} baseLevel={baseStars} />}
         <div class="skill-list">
-          {mains.map(s => <SkillBox witch={witch} skill={s} />)}
+          {mains.map(s => <SkillBox witch={witch} skill={s} rarity={witch.rarity} baseLevel={baseStars} />)}
         </div>
       </section>
 
       {interference && (
         <section class="interference">
           <h2 class="sec display">Interference <span class="sec-note mono">support only — active when this witch backs another unit</span></h2>
-          <SkillBox witch={witch} skill={interference} />
+          <SkillBox witch={witch} skill={interference} rarity={witch.rarity} baseLevel={baseStars} />
         </section>
       )}
+
     </div>
   </article>
 </Base>
@@ -210,32 +247,70 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
     .info-col{width:100%}
     .rarity-row,.class-row,.type-row,.tags{justify-content:center}
   }
+  .verdict{margin:0 0 20px;font-size:1.05rem;line-height:1.4;color:var(--ink);
+    background:linear-gradient(180deg,color-mix(in srgb,var(--sigil) 12%,var(--veil)),var(--veil));
+    border:1px solid color-mix(in srgb,var(--sigil) 34%,var(--line));border-left:3px solid var(--sigil);
+    border-radius:var(--r);padding:14px 18px}
+  .deploy .sec{margin-top:8px}
+  .deploy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .deploy-card{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+  .deploy-card .dl{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--sigil);margin-bottom:8px}
+  .deploy-card p{margin:0 0 8px;font-size:.9rem;color:var(--ink-dim);line-height:1.5}
+  .deploy-card p:last-child{margin-bottom:0}
+  .deploy-card .fit{color:var(--ink)}
+  .deploy-card .hint{font-size:.78rem;color:var(--ink-faint)}
+  .deploy-card a{color:var(--sigil)}
+  .dchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  .dchip{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.04em;color:var(--ink-dim);
+    background:var(--nightshade);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
 </style>
 
 <script>
   const rankEl = document.getElementById('rank');
   if (rankEl) {
     const uibase = rankEl.dataset.uibase;
-    let rank = parseInt(rankEl.dataset.base) || 2;
+    const minRank = parseInt(rankEl.dataset.min) || 1;
+    const maxRank = parseInt(rankEl.dataset.max) || 6;
+    let rank = parseInt(rankEl.dataset.base) || minRank;
+    if (rank < minRank) rank = minRank;
+    if (rank > maxRank) rank = maxRank;
     const stars = [...rankEl.querySelectorAll('.star')];
     const exs = [...rankEl.querySelectorAll('.exstar')];
     const plusBlocks = [...document.querySelectorAll('.plus-block')];
+    const scales = [...document.querySelectorAll('.sk-scale')];
+    const round2 = v => Math.round(v * 100) / 100;
+    const countOf = l => { const m = /[x\u00d7](\d+)/i.exec(l); return m ? '\u00d7' + m[1] : ''; };
+    const humLabel = l => l.replace(/\(.*?\)/g, '').replace(/[x\u00d7]\d+/i, '').replace(/_pct$|_s$/, '').replace(/_/g, ' ').trim();
+    const unitOf = l => (/pct/i.test(l) ? '%' : (/(_s$|dur|second)/i.test(l) ? 's' : ''));
+    const fmt = (c, lv) => { const v = round2(c.val_low + (c.per_level || 0) * (lv - 1)); const cnt = countOf(c.label); return humLabel(c.label) + (cnt ? ' ' + cnt : '') + ' ' + v + unitOf(c.label); };
     function paint() {
       stars.forEach(btn => {
         const pos = +btn.dataset.pos;
-        const kind = pos > rank ? 'grey' : (pos <= 3 ? 'red' : 'yellow');
-        const img = btn.querySelector('.star-img');
-        if (img) img.src = uibase + `star_${kind}.png`;
-        const g = btn.querySelector('.star-glyph');
-        if (g) g.dataset.kind = kind;
+        const kind = pos > rank ? 'grey' : (rank >= 4 ? 'yellow' : 'red');
+        const img = btn.querySelector('.star-img'); if (img) img.src = uibase + `star_${kind}.png`;
+        const g = btn.querySelector('.star-glyph'); if (g) g.dataset.kind = kind;
       });
       exs.forEach(btn => btn.classList.toggle('on', rank >= +btn.dataset.pos));
-      plusBlocks.forEach(pb => {
-        const need = parseInt(pb.dataset.unlock) || 6;
-        pb.classList.toggle('locked', rank < need);
+      plusBlocks.forEach(pb => { const need = parseInt(pb.dataset.unlock) || 6; pb.classList.toggle('locked', rank < need); });
+      scales.forEach(sc => {
+        const base = JSON.parse(sc.dataset.coef || '[]');
+        const plus = (sc.dataset.pluscoef && sc.dataset.pluscoef !== 'null') ? JSON.parse(sc.dataset.pluscoef) : null;
+        const plusAt = parseInt(sc.dataset.plusat) || 99;
+        const maxLv = parseInt(sc.dataset.maxlevel) || 6;
+        const lv = Math.min(rank + 1, maxLv);
+        const usePlus = plus && rank >= plusAt;
+        const active = usePlus ? plus : base;
+        const cur = sc.querySelector('.cur-vals'); if (cur) cur.textContent = active.map(c => fmt(c, lv)).join(' \u00b7 ');
+        const lvTag = sc.querySelector('.lv-tag'); if (lvTag) lvTag.textContent = 'Lv ' + lv + (usePlus ? ' +' : '');
+        const tbls = [...sc.querySelectorAll('.scale-tbl')];
+        tbls.forEach(t => t.querySelectorAll('tr').forEach(tr => tr.classList.remove('active')));
+        const tgt = (usePlus && tbls.length > 1) ? tbls[1] : tbls[0];
+        if (tgt) { const row = tgt.querySelector(`tr[data-lv="${lv}"]`); if (row) row.classList.add('active'); }
       });
     }
-    [...stars, ...exs].forEach(btn => btn.addEventListener('click', () => { rank = +btn.dataset.pos; paint(); }));
+    [...stars, ...exs].forEach(btn => btn.addEventListener('click', () => {
+      let p = +btn.dataset.pos; if (p < minRank) p = minRank; if (p > maxRank) p = maxRank; rank = p; paint();
+    }));
     paint();
   }
 </script>
