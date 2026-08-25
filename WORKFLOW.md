@@ -44,3 +44,11 @@ The authoritative capture is `majo_skill_data_captured.json` (+ `.md`), maintain
 - Corrected all synergy notes that implied a witch's own interference buffs herself — interference only ever buffs the carry she's slotted behind (fixed in site + outputs `tier_synergy.json` and the source record).
 - Detail page: art + star selector now a **sticky left rail** (`position:sticky`) so the star control stays in view while scrolling skills; collapses to inline (non-sticky, ~280px art) under 860px so it doesn't dominate mobile.
 - NEXT: skill-up priority + weighting formula (max unit ATK × max skill coefficient × over-stat/per-witch modifiers).
+
+## Update 2026-08-25 (b)
+- **Provisional DPS scoring** (`src/data/skill_scores.json`): per-skill `by_rank` weights + witch `overall_by_rank`, scaled so the strongest single skill ≈ 100. Formula: `ATK × Σcoef(level) × (1 + cr·cd) × (1 + extraDmg) ÷ resource` (resource = charge/10 Extreme, modeled combo-time Normal, cooldown active, ~5s reactive / Yun 2s). Class stats + resource model live in the generator script; regenerate after skill-data changes. **Marked provisional until community DPS calibration lands.**
+  - Detail page shows an **overall "Est. DPS score"** in the rail (updates live on the star slider — only counts skills/plus unlocked at that rank) and a **per-skill "DPS wt" chip**; the highest-weight skill is flagged **"level first"** (skill-up priority).
+- **Animated art (video preferred, GIF fallback, then static):**
+  - Boss (tier page): set `media` stem on the boss in `guides.json` (e.g. `"boss_slime"`); drop `public/img/boss/boss_slime.mp4` (and/or `.webm`, or `.gif`) + optional static poster `public/img/boss/<boss-id>.png`. Naming: `boss_[name]`.
+  - Character (detail page): drop `public/img/hero/<portrait_stem>.mp4` (or `.webm`) alongside the static `<portrait_stem>.png`; the static image is the poster/fallback. Roster tiles stay static (grid perf).
+  - **Convert big GIFs to MP4** (a 50 MB GIF → ~1-3 MB): `ffmpeg -i boss_slime.gif -movflags +faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" boss_slime.mp4`. Videos autoplay muted+loop+playsinline.

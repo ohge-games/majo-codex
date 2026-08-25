@@ -14,9 +14,14 @@ const hasUi = name => hasImg(`/img/ui/${name}.png`);
 const wById = Object.fromEntries(witches.map(w => [w.witch_id, w]));
 const dealersByType = t => witches.filter(w => w.damage_type === t)
   .sort((a, b) => (a.rarity === 'SSR' ? 0 : 1) - (b.rarity === 'SSR' ? 0 : 1) || a.name.localeCompare(b.name));
-const bossArt = id => {
-  for (const p of [`/img/boss/${id}.png`, `/img/boss/${id}.jpg`]) if (hasImg(p)) return `${base}${p.slice(1)}`;
-  return null;
+const bossMedia = (b) => {
+  const stems = [b.media, b.id].filter(Boolean);
+  const poster = [`/img/boss/${b.id}.png`, `/img/boss/${b.id}.jpg`].map(x => hasImg(x) ? `${base}${x.slice(1)}` : null).find(Boolean) || null;
+  for (const stem of stems) {
+    for (const ext of ['mp4', 'webm']) { const p = `/img/boss/${stem}.${ext}`; if (hasImg(p)) return { type: 'video', ext, src: `${base}${p.slice(1)}`, poster }; }
+    const gp = `/img/boss/${stem}.gif`; if (hasImg(gp)) return { type: 'gif', src: `${base}${gp.slice(1)}` };
+  }
+  return poster ? { type: 'img', src: poster } : null;
 };
 ---
 <Base title="Tier List — MAJO Codex" desc="Content-specific team guidance: Boss Training and the Tower of Anomalies.">
@@ -32,9 +37,11 @@ const bossArt = id => {
         <article class="boss">
           <div class="boss-head">
             <div class="boss-art">
-              {bossArt(b.id)
-                ? <img src={bossArt(b.id)} alt={b.name} />
-                : <span class="boss-ph" aria-hidden="true"></span>}
+              {(() => { const m = bossMedia(b); return m
+                ? (m.type === 'video'
+                    ? <video class="boss-media" autoplay loop muted playsinline poster={m.poster || undefined}><source src={m.src} type={`video/${m.ext}`} /></video>
+                    : <img class="boss-media" src={m.src} alt={b.name} />)
+                : <span class="boss-ph" aria-hidden="true"></span>; })()}
             </div>
             <div class="boss-meta">
               <span class="mode-tag mono">{b.mode}</span>
@@ -117,7 +124,7 @@ const bossArt = id => {
   .boss-head{display:flex;gap:20px;padding:20px 22px;align-items:center;
     background:radial-gradient(600px 200px at 0% 0%, color-mix(in srgb,var(--mental,#d9c34a) 16%,transparent), transparent 70%)}
   .boss-art{width:120px;height:120px;flex-shrink:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--nightshade);display:grid;place-items:center}
-  .boss-art img{width:100%;height:100%;object-fit:cover}
+  .boss-art img,.boss-art .boss-media{width:100%;height:100%;object-fit:cover;display:block}
   .boss-ph{width:56%;height:56%;border-radius:50%;background:radial-gradient(circle at 40% 35%, #5f6a3a, #23261a);opacity:.7}
   .boss-name{font-size:1.6rem;margin:4px 0 6px}
   .boss-blurb{color:var(--ink-dim);margin:0 0 10px;font-size:.92rem;max-width:56ch}

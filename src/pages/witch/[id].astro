@@ -7,6 +7,7 @@ import abilities from '../../data/abilities.json';
 import skills from '../../data/skills.json';
 import constants from '../../data/constants.json';
 import tiers from '../../data/tier_synergy.json';
+import scores from '../../data/skill_scores.json';
 import fs from 'node:fs';
 
 export async function getStaticPaths() {
@@ -31,6 +32,8 @@ const extreme = bySlot['Extreme'];
 const mains = ['Special', 'Normal', 'Class', 'Passive'].map(sl => bySlot[sl]).filter(Boolean);
 const interference = bySlot['Interference'];
 const tip = (tiers.witches || []).find(t => t.witch_id === witch.witch_id) || null;
+const ws = (scores.witches || {})[witch.witch_id] || { overall_by_rank: {}, skills: {} };
+const scoreFor = sk => ((ws.skills || {})[`${witch.witch_id}_${sk.slot.toLowerCase()}`] || {}).by_rank || null;
 const archetype = (tip && tip.synergy_note && tip.synergy_note.includes(':'))
   ? tip.synergy_note.split(':')[0].trim() : null;
 const verdict = archetype ? `${archetype} — ${witch.rarity} ${witch.class}, ${cap(witch.damage_type)} damage` : null;
@@ -51,6 +54,8 @@ const hasStars = hasUi('star_red') && hasUi('star_yellow') && hasUi('star_grey')
 // art
 const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/hero/${witch.portrait_filename}`
              : hasImg(`/img/card/${witch.portrait_filename}`) ? `${base}img/card/${witch.portrait_filename}` : null;
+const heroStem = witch.portrait_filename ? witch.portrait_filename.replace(/\.[^.]+$/, '') : null;
+const heroVideo = heroStem ? (['mp4','webm'].map(e => hasImg(`/img/hero/${heroStem}.${e}`) ? { ext: e, src: `${base}img/hero/${heroStem}.${e}` } : null).find(Boolean) || null) : null;
 ---
 <Base title={`${witch.name} — MAJO Codex`} desc={witch.title || `${witch.rarity} ${witch.class}`}>
   <a class="back mono" href={base}>&larr; All witches</a>
@@ -60,7 +65,9 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
     <div class="witch-layout wrap">
       <aside class="rail">
           <div class="portrait-frame">
-            {heroSrc ? (
+            {heroVideo ? (
+              <video class="hero-img" autoplay loop muted playsinline poster={heroSrc || undefined} width="293" height="512"><source src={heroVideo.src} type={`video/${heroVideo.ext}`} /></video>
+            ) : heroSrc ? (
               <img class="hero-img" src={heroSrc} alt={witch.name} width="293" height="512" />
             ) : (
               <svg viewBox="0 0 24 24" class="sigil" aria-hidden="true">
@@ -86,6 +93,11 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
             ))}
           </div>
           <p class="rank-hint mono">Click stars to set rank · plus skills unlock as you promote</p>
+          <div class="dps-overall" data-overall={JSON.stringify(ws.overall_by_rank || {})}>
+            <span class="dps-label mono">Est. DPS score</span>
+            <span class="dps-val">{(ws.overall_by_rank || {})[String(baseStars)] ?? '—'}</span>
+            <span class="dps-note mono">provisional · damage only</span>
+          </div>
       </aside>
 
       <div class="main">
@@ -150,7 +162,7 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
             {tip.clusters && tip.clusters.length > 0 && (
               <div class="deploy-card">
                 <span class="dl mono">Team synergy</span>
-                <div class="dchips">{tip.clusters.map(c => <span class="dchip">{c}</span>)}</div>
+                <div class="dchips">{tip.clusters.map(c => <span class="dchip">{c === 'downer' ? 'stagger' : c === 'hard-taunt' ? 'taunt' : c}</span>)}</div>
                 <p class="hint">Synergy clusters she belongs to — pair with members that complete the loop. Matchups vs. specific bosses live on the <a href={base + 'tier'}>Tier List</a>.</p>
               </div>
             )}
@@ -160,16 +172,16 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
 
       <section>
         <h2 class="sec display">Skills</h2>
-        {extreme && <SkillBox witch={witch} skill={extreme} hero={true} rarity={witch.rarity} baseLevel={baseStars} />}
+        {extreme && <SkillBox witch={witch} skill={extreme} hero={true} rarity={witch.rarity} baseLevel={baseStars} score={scoreFor(extreme)} />}
         <div class="skill-list">
-          {mains.map(s => <SkillBox witch={witch} skill={s} rarity={witch.rarity} baseLevel={baseStars} />)}
+          {mains.map(s => <SkillBox witch={witch} skill={s} rarity={witch.rarity} baseLevel={baseStars} score={scoreFor(s)} />)}
         </div>
       </section>
 
       {interference && (
         <section class="interference">
           <h2 class="sec display">Interference <span class="sec-note mono">support only — active when this witch backs another unit</span></h2>
-          <SkillBox witch={witch} skill={interference} rarity={witch.rarity} baseLevel={baseStars} />
+          <SkillBox witch={witch} skill={interference} rarity={witch.rarity} baseLevel={baseStars} score={scoreFor(interference)} />
         </section>
       )}
 
@@ -189,7 +201,13 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
     background:linear-gradient(180deg,rgba(12,10,21,.12),var(--bg) 94%),
                radial-gradient(720px 340px at 15% -10%, color-mix(in srgb,var(--rc) 22%,transparent), transparent 70%)}
   .witch-layout{position:relative;z-index:1;display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:start;padding-top:24px;padding-bottom:56px}
-  .rail{position:sticky;top:14px;align-self:start;display:flex;flex-direction:column;gap:12px}
+  .rail{position:sticky;top:76px;align-self:start;display:flex;flex-direction:column;gap:12px}
+  .dps-overall{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 12px;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--ssr) 10%,var(--veil)),var(--veil));
+    border:1px solid color-mix(in srgb,var(--ssr) 34%,var(--line));border-radius:var(--r)}
+  .dps-overall .dps-label{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+  .dps-overall .dps-val{font-size:1.8rem;font-weight:800;color:var(--ssr);line-height:1}
+  .dps-overall .dps-note{font-size:.56rem;color:var(--ink-faint);letter-spacing:.04em}
   .main{min-width:0}
   .portrait-frame{position:relative;aspect-ratio:293/512;height:min(58vh,520px);width:auto;margin:0 auto;border-radius:16px;overflow:hidden;
     border:1px solid color-mix(in srgb,var(--rc) 50%,var(--line));background:linear-gradient(160deg,var(--veil-2),#0e0b1a);
@@ -263,7 +281,11 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
   @media(max-width:860px){
     .witch-layout{grid-template-columns:1fr;gap:18px;padding-top:16px}
     .rail{position:static;top:auto}
-    .portrait-frame{height:auto;width:min(280px,72%)}
+    .portrait-frame{height:auto;width:min(280px,72%);order:0}
+    .rank{position:sticky;top:64px;z-index:40;order:1;
+      background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);
+      padding:9px 6px;border-radius:10px;border:1px solid var(--line)}
+    .rank-hint{order:2}
     .hero-bg,.witch::before{height:300px}
   }
 </style>
@@ -296,7 +318,18 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
       });
       exs.forEach(btn => btn.classList.toggle('on', rank >= +btn.dataset.pos));
       plusBlocks.forEach(pb => { const need = parseInt(pb.dataset.unlock) || 6; pb.classList.toggle('locked', rank < need); });
-      evoBadges.forEach(b => { const need = parseInt(b.dataset.unlock) || 6; b.classList.toggle('locked', rank < need); });
+      evoBadges.forEach(b => { const need = parseInt(b.dataset.unlock) || 6; const on = rank >= need; b.classList.toggle('locked', !on); const box = b.closest('.skill-box'); if (box) box.classList.toggle('evolved', on); });
+      const dpsEl = document.querySelector('.dps-overall');
+      if (dpsEl) { const m = JSON.parse(dpsEl.dataset.overall || '{}'); const v = m[String(rank)]; const t = dpsEl.querySelector('.dps-val'); if (t) t.textContent = (v == null ? '—' : v); }
+      let topBox = null, topVal = -1;
+      document.querySelectorAll('.sk-score').forEach(sc => {
+        const m = JSON.parse(sc.dataset.scores || '{}'); const v = m[String(rank)];
+        const t = sc.querySelector('.sc-val'); if (t) t.textContent = (v == null ? '—' : v);
+        const box = sc.closest('.skill-box'); if (box) box.classList.remove('top-skill');
+        sc.querySelector('.sc-first').hidden = true;
+        if (v != null && v > topVal) { topVal = v; topBox = sc; }
+      });
+      if (topBox && topVal > 0) { const box = topBox.closest('.skill-box'); if (box) box.classList.add('top-skill'); topBox.querySelector('.sc-first').hidden = false; }
       scales.forEach(sc => {
         const base = JSON.parse(sc.dataset.coef || '[]');
         const plus = (sc.dataset.pluscoef && sc.dataset.pluscoef !== 'null') ? JSON.parse(sc.dataset.pluscoef) : null;

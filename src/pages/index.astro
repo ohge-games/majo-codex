@@ -24,11 +24,13 @@ const tagsById = {};
 for (const t of (tiers.witches || [])) {
   const set = new Set([...(t.clusters || []), ...(t.role_tags || [])]);
   const norm = new Set();
-  for (let x of set) { if (x.startsWith('salvo')) x = 'salvo'; if (x === 'hard-taunt') x = 'taunt'; norm.add(x); }
+  for (let x of set) { if (x.startsWith('salvo')) x = 'salvo'; if (x === 'hard-taunt') x = 'taunt'; if (x === 'downer') x = 'stagger'; norm.add(x); }
   tagsById[t.witch_id] = [...norm];
 }
 const TAG_DEFS = [['executioner','Executioner'],['healer','Healer'],['taunt','Taunt'],['block-counter','Block Counter'],['dodge-counter','Dodge Counter'],['team-buff-aura','Buffer'],['debuff-shred','Debuffer'],['extreme-battery','Extreme Battery'],['downer','Downer'],['charge-amp','Charge Amp'],['salvo','Salvo'],['stagger','Stagger'],['tank','Tank']];
 const TAGS = TAG_DEFS.filter(([k]) => Object.values(tagsById).some(arr => arr.includes(k)));
+const searchById = {};
+for (const w of witches) searchById[w.witch_id] = `${w.name} ${w.title ?? ''} ${w.class} ${(tagsById[w.witch_id] || []).join(' ')}`.toLowerCase();
 
 // Non-interactive "coming soon" tiles — name only, no data. Add entries as they're announced.
 const upcoming = [
@@ -72,12 +74,6 @@ const upcoming = [
           {types.map(t => <button class={`chip type-${t}`} data-facet="weakness" data-val={t}>{hasUi(`type_${t}`) && <img class="chip-ic" src={ui(`type_${t}`)} alt="" width="16" height="16" />}{cap(t)}</button>)}
         </div>
       </div>
-      <div class="filter-line">
-        <div class="filter-group">
-          <span class="filter-label">Traits</span>
-          {TAGS.map(([k, label]) => <button class="chip" data-facet="tag" data-val={k}>{label}</button>)}
-        </div>
-      </div>
       <button id="clearall" class="clear-all" hidden>Clear all</button>
       <p class="filter-hint">Click a filter to <b class="hint-inc">show only</b> · again to <b class="hint-exc">exclude</b> · again to clear</p>
     </div>
@@ -88,8 +84,7 @@ const upcoming = [
             data-class={w.class} data-rarity={w.rarity}
             data-type={w.damage_type} data-weakness={w.weakness_type}
             data-name={w.name.toLowerCase()}
-            data-tags={(tagsById[w.witch_id] || []).join(" ")}
-            data-search={`${w.name} ${w.title ?? ''} ${w.class}`.toLowerCase()}
+            data-search={searchById[w.witch_id]}
             data-atkspd={w.atk_spd ?? ''} data-order={w.witch_id}>
           <a class={`card rar-${w.rarity}`} href={`${base}witch/${w.witch_id.toLowerCase()}`}>
             <div class="card-bar"></div>
@@ -269,13 +264,12 @@ const upcoming = [
 </style>
 
 <script>
-  const FACETS = ['class', 'rarity', 'type', 'weakness', 'tag'];
+  const FACETS = ['class', 'rarity', 'type', 'weakness'];
   const state = {
     class:    { inc: new Set(), exc: new Set() },
     rarity:   { inc: new Set(), exc: new Set() },
     type:     { inc: new Set(), exc: new Set() },
     weakness: { inc: new Set(), exc: new Set() },
-    tag:      { inc: new Set(), exc: new Set() },
     q: '',
   };
 
@@ -291,14 +285,8 @@ const upcoming = [
     FACETS.some(f => state[f].inc.size || state[f].exc.size);
 
   function passesFacet(cell, facet) {
-    const { inc, exc } = state[facet];
-    if (facet === 'tag') {
-      const tags = (cell.dataset.tags || '').split(' ').filter(Boolean);
-      if ([...exc].some(e => tags.includes(e))) return false;
-      if (inc.size && ![...inc].some(i => tags.includes(i))) return false;
-      return true;
-    }
     const v = cell.dataset[facet];
+    const { inc, exc } = state[facet];
     if (exc.has(v)) return false;
     if (inc.size && !inc.has(v)) return false;
     return true;

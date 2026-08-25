@@ -2,7 +2,7 @@
 import abilities from '../data/abilities.json';
 import fs from 'node:fs';
 
-const { witch, skill, hero = false, rarity = witch.rarity, baseLevel } = Astro.props;
+const { witch, skill, hero = false, rarity = witch.rarity, baseLevel, score = null } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
 
@@ -61,6 +61,12 @@ const hasPlus = s.has_plus === 'yes';
   <div class="sk-right">
     {s.description && <p class="desc">{s.description}</p>}
     {meta.length > 0 && <p class="frames mono">{meta.join('  ·  ')}</p>}
+    {score && (
+      <p class="sk-score mono" data-scores={JSON.stringify(score)}>
+        DPS wt <b class="sc-val">{score[String(baseLevel)] ?? '—'}</b>
+        <span class="sc-first" hidden>· level first</span>
+      </p>
+    )}
 
     {hasScale && (
       <div class="sk-scale"
@@ -111,6 +117,7 @@ const hasPlus = s.has_plus === 'yes';
 <style>
   .skill-box{display:grid;grid-template-columns:210px 1fr;gap:18px;background:var(--veil);
     border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;align-items:start}
+  .skill-box.evolved{border-color:color-mix(in srgb,var(--ssr) 62%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--ssr) 34%,transparent),0 0 20px -9px var(--ssr)}
   .skill-box.is-hero{border-color:color-mix(in srgb,var(--ssr) 42%,var(--line));
     background:linear-gradient(180deg,color-mix(in srgb,var(--ssr) 7%,var(--veil)),var(--veil))}
   .sk-left{display:flex;align-items:center;gap:14px;min-width:0}
@@ -121,7 +128,7 @@ const hasPlus = s.has_plus === 'yes';
     font-size:.56rem;font-weight:700;letter-spacing:.02em;color:#1c1406;
     background:linear-gradient(180deg,#ffe08a,var(--ssr));border:1px solid rgba(0,0,0,.35);
     border-radius:7px;padding:2px 5px;box-shadow:0 1px 4px rgba(0,0,0,.55)}
-  .evo-badge.locked{filter:grayscale(1) brightness(.8);opacity:.55}
+  .evo-badge.locked{filter:grayscale(1) brightness(.92);opacity:1}
   .sk-titles{display:flex;flex-direction:column;gap:6px;min-width:0}
   .slot{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
     padding:3px 8px;border-radius:6px;border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap;align-self:flex-start}
@@ -134,6 +141,12 @@ const hasPlus = s.has_plus === 'yes';
   .is-hero .desc{font-size:.94rem}
   .frames{font-size:.74rem;color:var(--ink-faint);background:var(--nightshade);border:1px solid var(--line);
     border-radius:7px;padding:6px 10px;margin:0;word-break:break-word;display:inline-block}
+  .sk-score{display:inline-flex;align-items:center;gap:6px;margin:8px 0 0;font-size:.72rem;color:var(--ink-faint);
+    background:var(--nightshade);border:1px solid var(--line);border-radius:7px;padding:5px 10px}
+  .sk-score .sc-val{color:var(--sigil);font-size:.86rem}
+  .sk-score .sc-first{color:var(--ssr);font-weight:700}
+  .skill-box.top-skill{position:relative}
+  .skill-box.top-skill .sk-score{border-color:color-mix(in srgb,var(--ssr) 45%,var(--line))}
   .sk-scale{margin-top:10px}
   .sk-scale-cur{margin:0;font-size:.82rem;color:var(--ink);background:color-mix(in srgb,var(--sigil) 8%,var(--nightshade));
     border:1px solid color-mix(in srgb,var(--sigil) 30%,var(--line));border-radius:8px;padding:8px 11px}
