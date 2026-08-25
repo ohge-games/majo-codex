@@ -412,7 +412,7 @@
         "Extreme",
         "Special"
       ],
-      "synergy_note": "Dodge-engine crit assassin: Extreme fixes Dodge CD to 2s (plus: Specials +200% while active); Calm Shot is a Dodge-Counter usable during the Extreme; Class and Interference pour crit/atk-speed off dodges; Tactical Comms even feeds off allies' dodges.",
+      "synergy_note": "Dodge-engine crit assassin: Extreme fixes Dodge CD to 2s (plus: Specials +200% while active); Calm Shot is a Dodge-Counter usable during the Extreme; Class pours crit/atk-speed off dodges (her Interference passes the same to a carry she's slotted behind, never to herself); Tactical Comms even feeds off allies' dodges.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -516,7 +516,7 @@
         "Class",
         "Passive"
       ],
-      "synergy_note": "Normal-attack Arcanist: Class stacks normal-attack bonus damage 3x (plus tops off with evasion), Passive turns dodges into big attack-speed windows (plus also shaves Special CD), Interference stacks crit rate off Class casts. Loop: dodge -> attack speed -> more normals -> Class amp.",
+      "synergy_note": "Normal-attack Arcanist: Class stacks normal-attack bonus damage 3x (plus tops off with evasion), Passive turns dodges into big attack-speed windows (plus also shaves Special CD), in a support slot her Interference stacks crit rate on the carry off Class casts. Loop: dodge -> attack speed -> more normals -> Class amp.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -586,7 +586,7 @@
         "Special",
         "Class"
       ],
-      "synergy_note": "Block-tank anchor: Roaring Howl (Extreme) taunts + dizzies while shielding allies' Defense; Class 'Sonic Blast' is a Block Counter that dizzies; Special 'Sound-Breaking Noise' auto-fires off her Extreme/Class casts to nuke + apply a damage-taken debuff; Passive shields allies off her normal-attack finisher; Interference stacks Physical Attack on block.",
+      "synergy_note": "Block-tank anchor: Roaring Howl (Extreme) taunts + dizzies while shielding allies' Defense; Class 'Sonic Blast' is a Block Counter that dizzies; Special 'Sound-Breaking Noise' auto-fires off her Extreme/Class casts to nuke + apply a damage-taken debuff; Passive shields allies off her normal-attack finisher; in a support slot her Interference stacks Physical Attack on the carry on block.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -650,7 +650,7 @@
         "Normal",
         "Interference"
       ],
-      "synergy_note": "Smoke support-tank: Extreme 'Mist Assault' shields allies (Toughness+Defense) then hits; Special 'Lingering Smoke Escort' rushes to the lowest-HP ally, heals big, and taunts; her Normal HEALS allies on every hit (plus doubles damage + cuts Special CD per hit); Class is a damage-reduction Block Counter; Interference feeds Defense + a displacement-resistance shred on her Extreme. A healer/peeler wrapped in a Defender frame.",
+      "synergy_note": "Smoke support-tank: Extreme 'Mist Assault' shields allies (Toughness+Defense) then hits; Special 'Lingering Smoke Escort' rushes to the lowest-HP ally, heals big, and taunts; her Normal HEALS allies on every hit (plus doubles damage + cuts Special CD per hit); Class is a damage-reduction Block Counter; when she backs a carry, her Interference feeds that carry Defense + a displacement-resistance effect (it never touches Carmen herself). A healer/peeler wrapped in a Defender frame.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -766,7 +766,7 @@
         "Extreme",
         "Class"
       ],
-      "synergy_note": "Extreme-battery crit carry / flex support. Extreme 'Sakura Blade Dance' self-buffs Crit Damage (+50%; plus +80%) then unloads a multi-hit nuke; Passive 'Spring Sakura's Return' instantly resets her Class CD on EVERY Extreme; Class 'Serving Flower Formation' is a Charge Amp that builds her own Extreme charge (+10/stage x4) and drops a team Bonus-Damage zone (plus adds Special-CD reduction + longer zone); Interference drops an ally Attack zone on Extreme. Low 180 Charge lets her Extreme often and loop Extreme -> Class reset -> recharge. First SR captured.",
+      "synergy_note": "Extreme-battery crit carry / flex support. Extreme 'Sakura Blade Dance' self-buffs Crit Damage (+50%; plus +80%) then unloads a multi-hit nuke; Passive 'Spring Sakura's Return' instantly resets her Class CD on EVERY Extreme; Class 'Serving Flower Formation' is a Charge Amp that builds her own Extreme charge (+10/stage x4) and drops a team Bonus-Damage zone (plus adds Special-CD reduction + longer zone); in a support slot her Interference drops an ally Attack zone for the carry. Low 180 Charge lets her Extreme often and loop Extreme -> Class reset -> recharge. First SR captured.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -859,7 +859,7 @@
         "Class",
         "Passive"
       ],
-      "synergy_note": "Healer + team EXTREME-DAMAGE AMPLIFIER. Extreme 'Guardian Angel' is a big 3-stage single-target heal whose final heal grants that ally +20% Extreme damage (10s); Special 'Sacred Torch' (Class Skill Salvo) fires off her Class skill to grant ALL allies +Extreme damage (8s); Class 'Prayer's Descent' (Normal Attack Salvo) AoE-heals off her normal combos (plus: bigger heal + a bonus activation after an Extreme); Interference boosts her own Extreme charge speed; Passive gives her attack speed while healthy (fuels the normal->Class->Special salvo chain). Purpose-built to pair with Extreme-centric carries.",
+      "synergy_note": "Healer + team EXTREME-DAMAGE AMPLIFIER. Extreme 'Guardian Angel' is a big 3-stage single-target heal whose final heal grants that ally +20% Extreme damage (10s); Special 'Sacred Torch' (Class Skill Salvo) fires off her Class skill to grant ALL allies +Extreme damage (8s); Class 'Prayer's Descent' (Normal Attack Salvo) AoE-heals off her normal combos (plus: bigger heal + a bonus activation after an Extreme); her Interference boosts the CARRY's Extreme charge speed when she's slotted behind them (not her own); Passive gives her attack speed while healthy (fuels the normal->Class->Special salvo chain). Purpose-built to pair with Extreme-centric carries.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -915,7 +915,7 @@
         "Special",
         "Passive"
       ],
-      "synergy_note": "EXECUTION specialist. Special 'Void Convergence Gaze' is an [Execution] (downed targets only) that drops a damage zone (plus adds an upfront burst + cuts CD 10->8); Extreme 'Far-Seeing Blood Curse' is a huge single-area nuke (882% + 50 Stagger) that can help down targets itself; Passive 'Forbidden Evil Eye' base buffs her attack speed after HER Execution, and the PLUS re-routes it to trigger off ALLIES' Executions - so she wants a downer + fellow executioner. Class is a long-CD self stagger-value buff; Interference pumps her Normal Attack damage + max HP.",
+      "synergy_note": "EXECUTION specialist. Special 'Void Convergence Gaze' is an [Execution] (downed targets only) that drops a damage zone (plus adds an upfront burst + cuts CD 10->8); Extreme 'Far-Seeing Blood Curse' is a huge single-area nuke (882% + 50 Stagger) that can help down targets itself; Passive 'Forbidden Evil Eye' base buffs her attack speed after HER Execution, and the PLUS re-routes it to trigger off ALLIES' Executions - so she wants a downer + fellow executioner. Class is a long-CD self stagger-value buff; in a support slot her Interference pumps the carry's Normal Attack damage + max HP.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -964,7 +964,7 @@
         "Special",
         "Normal"
       ],
-      "synergy_note": "Stagger engine + EXECUTIONER (the only mental Vanguard). Piles on Stagger everywhere (Extreme 2.5x2, Class +2, Normal +1/hit -> plus +3 on hit3, Passive +2, Interference), knocking enemies DOWN, then her Special 'Twin Blades Heart Breaker' is an [Execution] that nukes downed targets (plus 460->603%, CD 8->7). She's self-sufficient for the down->execute loop AND enables Dusan (whose plus passive pays off ALLY Executions). Also dodge-flavored (Class = Dodge Counter, Interference procs on Dodge), so she overlaps the dodge cluster too. Note her Passive/Interference zones deal Magic/Mental Attack damage respectively.",
+      "synergy_note": "Stagger engine + EXECUTIONER (the only mental Vanguard). Piles on Stagger everywhere (Extreme 2.5x2, Class +2, Normal +1/hit -> plus +3 on hit3, Passive +2), knocking enemies DOWN, then her Special 'Twin Blades Heart Breaker' is an [Execution] that nukes downed targets (plus 460->603%, CD 8->7). She's self-sufficient for the down->execute loop AND enables Dusan (whose plus passive pays off ALLY Executions). Also dodge-flavored (Class = Dodge Counter, Interference procs on Dodge), so she overlaps the dodge cluster too. Note her Passive/Interference zones deal Magic/Mental Attack damage respectively.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [],
@@ -1000,7 +1000,7 @@
         "Extreme",
         "Interference"
       ],
-      "synergy_note": "Selfish self-buff DPS (tennis-themed Arcanist, Physical). Core loop: Class 'Racket Concentration' ([Charge Amp]: +20-21% Attack Speed & Crit Rate, 8s) -> 'Spinning Ball Strike' Special fires as a [Class Skill Salvo] (canonical tag ClassFollowUp) after every Class use, 5 hits / 730%. Passive 'Match Point' stacks self Crit Damage; Interference 'Break Point' trims her own Class Skill CD (-5->-9%) and adds Bonus Damage, tightening the loop so shorter Class CD = more Special procs. Extreme 'Victorious Barrage' plus leaps 6 hits/972% -> 9 hits/1395%. Almost no team utility: her only outward tool is Break Point when slotted as support (a generic Class-CD + Bonus-Damage battery for a Class-reliant carry). Shares Tomoe's Arcanist/Physical stat frame, but as an SR her base ATK caps her ceiling vs SSR carries. WEIGHTING-MODEL flag (owner's planned base_ATK x coefficients x damage-passives system): strong coefficient sum (Extreme 1395%, Special-loop 730%, Normal 280%) but only self crit buffs and SR base ATK -> expect 'great early/F2P DPS, falls behind SSR ATK bases at endgame'.",
+      "synergy_note": "Selfish self-buff DPS (tennis-themed Arcanist, Physical). Core loop: Class 'Racket Concentration' ([Charge Amp]: +20-21% Attack Speed & Crit Rate, 8s) -> 'Spinning Ball Strike' Special fires as a [Class Skill Salvo] (canonical tag ClassFollowUp) after every Class use, 5 hits / 730%. Passive 'Match Point' stacks self Crit Damage; Interference 'Break Point' only works when Grina is slotted as support: it trims the CARRY's Class Skill CD (-5->-9%) and adds their Bonus Damage — it never affects Grina herself. Extreme 'Victorious Barrage' plus leaps 6 hits/972% -> 9 hits/1395%. Almost no team utility: her only outward tool is Break Point when slotted as support (a generic Class-CD + Bonus-Damage battery for a Class-reliant carry). Shares Tomoe's Arcanist/Physical stat frame, but as an SR her base ATK caps her ceiling vs SSR carries. WEIGHTING-MODEL flag (owner's planned base_ATK x coefficients x damage-passives system): strong coefficient sum (Extreme 1395%, Special-loop 730%, Normal 280%) but only self crit buffs and SR base ATK -> expect 'great early/F2P DPS, falls behind SSR ATK bases at endgame'.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -1107,7 +1107,7 @@
         "Extreme",
         "Interference"
       ],
-      "synergy_note": "Taunt/mitigation Defender (SR, Magic damage / Physical weakness), finance-debt flavor. Anchors squishy comps: Extreme 'Debt Judgment' charges in, self-buffs Defense (+40 -> +50% on plus) and AoE-nukes with Taunt (plus = 3 hits with Taunt on EACH -> stronger aggro pull + 880% -> 1167%). Layered self-mitigation: Special 'Financial Ruling' (self Bonus Damage Reduction, an [Ultimate Salvo] that auto-fires after her Extreme), Passive 'Capital Protection' (self Magic Resistance). Damage payoff on blocking via Class 'Account Lock' [Block Counter] (dash-in + hit) -> joins the block-counter cluster (Garana/Carmen/Yun/Zhijie). Team utility from Interference 'Budget Allocation' (her block CD down + on-block enemy-Attack debuff, max 3 stacks). ALL her damage is Magic. Niche vs other Defenders: Yun/Garana/Carmen don't hard-taunt -- Qing is the aggro-magnet damage-reduction tank, best in front of fragile carries that need enemies peeled off them.",
+      "synergy_note": "Taunt/mitigation Defender (SR, Magic damage / Physical weakness), finance-debt flavor. Anchors squishy comps: Extreme 'Debt Judgment' charges in, self-buffs Defense (+40 -> +50% on plus) and AoE-nukes with Taunt (plus = 3 hits with Taunt on EACH -> stronger aggro pull + 880% -> 1167%). Layered self-mitigation: Special 'Financial Ruling' (self Bonus Damage Reduction, an [Ultimate Salvo] that auto-fires after her Extreme), Passive 'Capital Protection' (self Magic Resistance). Damage payoff on blocking via Class 'Account Lock' [Block Counter] (dash-in + hit) -> joins the block-counter cluster (Garana/Carmen/Yun/Zhijie). Team utility from Interference 'Budget Allocation' (when she backs a carry: that carry's block CD down + on-block enemy-Attack debuff, max 3 stacks). ALL her damage is Magic. Niche vs other Defenders: Yun/Garana/Carmen don't hard-taunt -- Qing is the aggro-magnet damage-reduction tank, best in front of fragile carries that need enemies peeled off them.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -1208,7 +1208,7 @@
         "Special",
         "Interference"
       ],
-      "synergy_note": "Extreme-SNOWBALL Arcanist boss-killer (SSR, Magic dmg / Mental weakness), death/burial theme. Self-charges Extreme from two sources -- Class 'Crowning the Departed' [Charge Amp] (+30-32 charge, CD 6) and the Special 'Six Feet Under' PLUS (+15-16 charge, a [Class Skill Salvo] that fires after Class) -- while Passive 'Taking Turns' instantly resets her Class CD whenever an allied ARCANIST casts Extreme, letting her chain Class -> more charge. Each Extreme she casts ('Burial Constellation', 510-525% + 880-900% + 2 Stagger) applies Magic Resistance -10% (max 2 = -20%, 30s) to the target AND, via Interference 'Weakening Breath', stacks her own Magic Attack (max 5 base / 8 plus, +2.1-2.4% each) and boosts her Extreme damage (+6/+12%). Net: the more she Extremes, the faster and harder she Extremes -- a single-target boss melter. Best on an Arcanist-heavy team (Tomoe/Dusan/Jenny/Yuhong/Grina trigger her Passive) with Extreme enablers (Tomoe battery, Peseshet Extreme-damage amp). Her MR shred also lifts the team's magic dealers. Her Extreme is base-only, so her ceiling rides on charge economy + Interference stacks rather than an Extreme evolution.",
+      "synergy_note": "Extreme-SNOWBALL Arcanist boss-killer (SSR, Magic dmg / Mental weakness), death/burial theme. Self-charges Extreme from two sources -- Class 'Crowning the Departed' [Charge Amp] (+30-32 charge, CD 6) and the Special 'Six Feet Under' PLUS (+15-16 charge, a [Class Skill Salvo] that fires after Class) -- while Passive 'Taking Turns' instantly resets her Class CD whenever an allied ARCANIST casts Extreme, letting her chain Class -> more charge. Each Extreme she casts ('Burial Constellation', 510-525% + 880-900% + 2 Stagger) applies Magic Resistance -10% (max 2 = -20%, 30s) to the target AND, and — only when she is slotted as support — her Interference 'Weakening Breath' stacks the CARRY's Magic Attack (max 5 base / 8 plus, +2.1-2.4% each) and boosts that carry's Extreme damage (+6/+12%). Net: the more she Extremes, the faster and harder she Extremes -- a single-target boss melter. Best on an Arcanist-heavy team (Tomoe/Dusan/Jenny/Yuhong/Grina trigger her Passive) with Extreme enablers (Tomoe battery, Peseshet Extreme-damage amp). Her MR shred also lifts the team's magic dealers. Her Extreme is base-only, so her ceiling rides on charge economy rather than an Extreme evolution.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -1269,7 +1269,7 @@
         "Extreme",
         "Class"
       ],
-      "synergy_note": "Downed-target EXECUTIONER carry (SSR Arcanist, Mental dmg / Magic weakness), twilight/time theme. Self-sufficient execute loop: her Extreme 'Final Twilight' piles Stagger (3 per initial/zone-tick/final; plus = a 9s zone ticking every 1s + 700-715% finisher) to knock enemies DOWN, then her [Execution] skills capitalize -- Class 'Twilight's Edge' [Charge][Execution] (399-409 base / 524-537 plus, +self stagger) and Special 'Timeless Standstill' [Execution] (510-523 execute + a TEAM +10% damage buff). Snowballs off an execution team: Passive 'Fleeting Years' stacks self Attack Speed +3% (max 20 = +60%) each time an ALLY uses an Execution skill, and Interference 'Fading Light' shaves Special CD + adds bonus damage vs downed targets. Slots into the execution cluster (Leed the downer/stagger-engine, Dusan, Jenny): allies down targets and trigger her Passive; she executes AND buffs the team. Her Extreme's zone is not counted as her skill (excluded from skill totals).",
+      "synergy_note": "Downed-target EXECUTIONER carry (SSR Arcanist, Mental dmg / Magic weakness), twilight/time theme. Self-sufficient execute loop: her Extreme 'Final Twilight' piles Stagger (3 per initial/zone-tick/final; plus = a 9s zone ticking every 1s + 700-715% finisher) to knock enemies DOWN, then her [Execution] skills capitalize -- Class 'Twilight's Edge' [Charge][Execution] (399-409 base / 524-537 plus, +self stagger) and Special 'Timeless Standstill' [Execution] (510-523 execute + a TEAM +10% damage buff). Snowballs off an execution team: Passive 'Fleeting Years' stacks self Attack Speed +3% (max 20 = +60%) each time an ALLY uses an Execution skill, and — in a support slot — her Interference 'Fading Light' shaves the carry's Special CD + adds their bonus damage vs downed targets. Slots into the execution cluster (Leed the downer/stagger-engine, Dusan, Jenny): allies down targets and trigger her Passive; she executes AND buffs the team. Her Extreme's zone is not counted as her skill (excluded from skill totals).",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [

@@ -23,7 +23,7 @@ const bossArt = id => {
   <div class="wrap tier">
     <header class="thead">
       <h1 class="display">Tier List</h1>
-      <p class="sub">Not an all-around ranking \u2014 team guidance for <b>current content and known walls</b>. Recommendations update with the rotation.</p>
+      <p class="sub">Not an all-around ranking — team guidance for <b>current content and known walls</b>. Recommendations update with the rotation.</p>
     </header>
 
     <section class="mode">
@@ -83,7 +83,7 @@ const bossArt = id => {
                   ) : null;
                 })}
               </div>
-              <span class="dl mono" style="margin-top:16px">Auto \u2014 all {cap(b.weak)} dealers <span class="auto-note">(he's weak to {cap(b.weak)})</span></span>
+              <span class="dl mono" style="margin-top:16px">Auto — all {cap(b.weak)} dealers <span class="auto-note">(he's weak to {cap(b.weak)})</span></span>
               <div class="dealer-chips">
                 {dealersByType(b.weak).map(w => (
                   <a class={`dchip2 is-${w.rarity}`} href={`${base}witch/${w.witch_id.toLowerCase()}`}>

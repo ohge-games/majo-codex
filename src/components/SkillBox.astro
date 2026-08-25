@@ -4,9 +4,7 @@ import fs from 'node:fs';
 
 const { witch, skill, hero = false, rarity = witch.rarity, baseLevel } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const ui = name => `${base}img/ui/${name}.png`;
 const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
-const hasUi = name => hasImg(`/img/ui/${name}.png`);
 
 const s = skill;
 const name = (s.name && s.name !== 'None' && s.name !== witch.name) ? s.name : `${s.slot} Skill`;
@@ -23,30 +21,38 @@ if (a) {
 }
 if (s.plus_range != null) meta.push(`plus range ${s.plus_range}`);
 
-const maxLevel = rarity === 'SSR' ? 10 : 7;  // 6star=L7, EX1-3=L8-10 (SSR); SR caps at L7
+const maxLevel = rarity === 'SSR' ? 10 : 7;   // 6star=L7; SSR EX1-3 = L8-10
 const startStar = baseLevel ?? (rarity === 'SSR' ? 2 : 1);
-const startLevel = Math.min(startStar + 1, maxLevel);  // each star = +1 skill level
+const startLevel = Math.min(startStar + 1, maxLevel);   // each star = +1 level
 const coefB = Array.isArray(s.coefficients) ? s.coefficients : [];
 const coefP = Array.isArray(s.plus_coefficients) ? s.plus_coefficients : null;
 const plusAt = s.plus_unlocks_at_star ? (parseInt(s.plus_unlocks_at_star) || 99) : 99;
+const plusStar = (s.plus_unlocks_at_star ?? '').toString().replace('*', '');
 
-const countOf = l => { const m = /[x\u00d7](\d+)/i.exec(l); return m ? `\u00d7${m[1]}` : ''; };
-const humLabel = l => l.replace(/\(.*?\)/g, '').replace(/[x\u00d7]\d+/i, '').replace(/_pct$|_s$/, '').replace(/_/g, ' ').trim();
+const countOf = l => { const m = /[x×](\d+)/i.exec(l); return m ? `×${m[1]}` : ''; };
+const humLabel = l => l.replace(/\(.*?\)/g, '').replace(/[x×]\d+/i, '').replace(/_pct$|_s$/, '').replace(/_/g, ' ').trim();
 const unitOf = l => (/pct/i.test(l) ? '%' : (/(_s$|dur|second)/i.test(l) ? 's' : ''));
 const valAt = (c, lv) => { const v = c.val_low + (c.per_level || 0) * (lv - 1); return Math.round(v * 100) / 100; };
 const fmtCoef = (c, lv) => `${humLabel(c.label)}${countOf(c.label) ? ' ' + countOf(c.label) : ''} ${valAt(c, lv)}${unitOf(c.label)}`;
-const curLine = (coef, lv) => coef.map(c => fmtCoef(c, lv)).join(' \u00b7 ');
+const curLine = (coef, lv) => coef.map(c => fmtCoef(c, lv)).join(' · ');
 
 const hasScale = coefB.length > 0;
 const levels = Array.from({ length: maxLevel }, (_, i) => i + 1);
 const iconPath = `/img/skill/${witch.witch_id.toLowerCase()}_${s.slot.toLowerCase()}.png`;
 const hasIcon = hasImg(iconPath);
+const hasPlus = s.has_plus === 'yes';
 ---
 <article class={`skill-box ${hero ? 'is-hero' : ''} slotc-${s.slot.toLowerCase()}`}>
   <div class="sk-left">
-    {hasIcon
-      ? <img class="sk-icon" src={`${base}${iconPath.slice(1)}`} alt="" width={52} height={52} loading="lazy" />
-      : <span class="sk-icon ph" aria-hidden="true"></span>}
+    <span class="sk-icon-wrap">
+      {hasIcon
+        ? <img class="sk-icon" src={`${base}${iconPath.slice(1)}`} alt="" width={64} height={64} loading="lazy" />
+        : <span class="sk-icon ph" aria-hidden="true"></span>}
+      {hasPlus && (
+        <span class="evo-badge locked" data-unlock={s.plus_unlocks_at_star ?? '6*'}
+          title={`Evolves at ${plusStar || '?'}★`}>+{plusStar}★</span>
+      )}
+    </span>
     <div class="sk-titles">
       <span class={`slot slot-${s.slot.toLowerCase()}`}>{s.slot}</span>
       <h3 class="sk-name">{name}</h3>
@@ -54,7 +60,7 @@ const hasIcon = hasImg(iconPath);
   </div>
   <div class="sk-right">
     {s.description && <p class="desc">{s.description}</p>}
-    {meta.length > 0 && <p class="frames mono">{meta.join('  \u00b7  ')}</p>}
+    {meta.length > 0 && <p class="frames mono">{meta.join('  ·  ')}</p>}
 
     {hasScale && (
       <div class="sk-scale"
@@ -78,7 +84,7 @@ const hasIcon = hasImg(iconPath);
             </table>
             {coefP && (
               <table class="scale-tbl plus">
-                <caption class="mono">Plus \u00b7 from {plusAt}\u2605</caption>
+                <caption class="mono">Plus · from {plusStar}★</caption>
                 <thead><tr><th>Lv</th>{coefP.map(c => <th>{humLabel(c.label)}{countOf(c.label) ? ' ' + countOf(c.label) : ''}</th>)}</tr></thead>
                 <tbody>
                   {levels.map(lv => (
@@ -92,15 +98,11 @@ const hasIcon = hasImg(iconPath);
       </div>
     )}
 
-    {s.has_plus === 'yes' && s.plus_description && (
+    {hasPlus && s.plus_description && (
       <div class="plus-block" data-unlock={s.plus_unlocks_at_star ?? '6*'}>
-        <span class="plus-tag mono">
-          {hasUi('skill_plus')
-            ? <img class="plus-ic" src={ui('skill_plus')} alt="+" height="16" />
-            : '+'} {(s.plus_unlocks_at_star ?? '').toString().replace('*', '')}\u2605
-        </span>
+        <span class="plus-tag mono">PLUS</span>
         <span class="plus-text">{s.plus_description}</span>
-        <span class="lock-note mono">Unlocks at {(s.plus_unlocks_at_star ?? '?').toString().replace('*', '')}\u2605</span>
+        <span class="lock-note mono">Evolves at {plusStar || '?'}★ — raise her stars to unlock.</span>
       </div>
     )}
   </div>
@@ -109,12 +111,17 @@ const hasIcon = hasImg(iconPath);
 <style>
   .skill-box{display:grid;grid-template-columns:210px 1fr;gap:18px;background:var(--veil);
     border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;align-items:start}
-  .skill-box.is-hero{grid-template-columns:230px 1fr;padding:20px 22px;
-    border-color:color-mix(in srgb,var(--ssr) 42%,var(--line));
+  .skill-box.is-hero{border-color:color-mix(in srgb,var(--ssr) 42%,var(--line));
     background:linear-gradient(180deg,color-mix(in srgb,var(--ssr) 7%,var(--veil)),var(--veil))}
   .sk-left{display:flex;align-items:center;gap:14px;min-width:0}
-  .sk-icon{width:52px;height:52px;border-radius:10px;background:var(--nightshade);border:1px solid var(--line);flex-shrink:0;object-fit:contain}
-  .sk-icon.ph{width:52px;height:52px}
+  .sk-icon-wrap{position:relative;width:64px;height:64px;flex-shrink:0}
+  .sk-icon{width:64px;height:64px;border-radius:11px;background:var(--nightshade);border:1px solid var(--line);object-fit:contain;display:block}
+  .sk-icon.ph{width:64px;height:64px}
+  .evo-badge{position:absolute;top:-7px;right:-7px;z-index:2;font-family:"Space Mono",monospace;
+    font-size:.56rem;font-weight:700;letter-spacing:.02em;color:#1c1406;
+    background:linear-gradient(180deg,#ffe08a,var(--ssr));border:1px solid rgba(0,0,0,.35);
+    border-radius:7px;padding:2px 5px;box-shadow:0 1px 4px rgba(0,0,0,.55)}
+  .evo-badge.locked{filter:grayscale(1) brightness(.8);opacity:.55}
   .sk-titles{display:flex;flex-direction:column;gap:6px;min-width:0}
   .slot{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
     padding:3px 8px;border-radius:6px;border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap;align-self:flex-start}
@@ -122,9 +129,9 @@ const hasIcon = hasImg(iconPath);
   .slot-special{color:var(--sigil);border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
   .slot-interference{color:var(--magic);border-color:color-mix(in srgb,var(--magic) 40%,var(--line))}
   .sk-name{margin:0;font-weight:600;font-size:1.05rem;line-height:1.15}
-  .is-hero .sk-name{font-size:1.25rem}
+  .is-hero .sk-name{font-size:1.2rem}
   .desc{color:var(--ink-dim);font-size:.9rem;margin:0 0 10px}
-  .is-hero .desc{font-size:.96rem}
+  .is-hero .desc{font-size:.94rem}
   .frames{font-size:.74rem;color:var(--ink-faint);background:var(--nightshade);border:1px solid var(--line);
     border-radius:7px;padding:6px 10px;margin:0;word-break:break-word;display:inline-block}
   .sk-scale{margin-top:10px}
@@ -142,13 +149,13 @@ const hasIcon = hasImg(iconPath);
   .scale-tbl td:first-child,.scale-tbl th:first-child{text-align:center;color:var(--ink-faint)}
   .scale-tbl tr.active td{background:color-mix(in srgb,var(--sigil) 16%,transparent);color:var(--ink)}
   .plus-block{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);
-    display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;font-size:.85rem;color:var(--ink-dim)}
-  .plus-tag{color:var(--ssr);font-size:.7rem;display:inline-flex;align-items:center;gap:3px}
-  .plus-ic{height:16px;width:auto;vertical-align:middle}
-  .lock-note{display:none;color:var(--ink-faint);font-size:.72rem}
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;font-size:.85rem;color:var(--ink-dim)}
+  .plus-tag{color:var(--ssr);font-size:.62rem;letter-spacing:.14em;border:1px solid color-mix(in srgb,var(--ssr) 40%,var(--line));
+    border-radius:5px;padding:1px 6px}
+  .lock-note{display:none;color:var(--ink-faint);font-size:.74rem}
   .plus-block.locked .plus-text{display:none}
+  .plus-block.locked .plus-tag{opacity:.5}
   .plus-block.locked .lock-note{display:inline}
-  .plus-block.locked{opacity:.7}
   @media(max-width:640px){
     .skill-box,.skill-box.is-hero{grid-template-columns:1fr;gap:12px}
   }

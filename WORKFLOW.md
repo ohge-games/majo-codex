@@ -36,3 +36,11 @@ The authoritative capture is `majo_skill_data_captured.json` (+ `.md`), maintain
 - **Codes** (`/codes`, `codes.json`): 14 live codes populated (rewards TBD), tap-to-copy with mobile-friendly layout.
 - **Tier** (`/tier`, `guides.json`): Abyssal Slime now lists **Control for the Wake-up Kickback** (Carmen, Dusan, Xini) and an **auto-generated "all {weakness} dealers"** list derived from `witches.json` (the boss-weakness → dealers auto-suggestion).
 - **Roster tiles** (`index.astro`): damage/weakness icons enlarged and corner-anchored (bottom-left / bottom-right); rarity icon enlarged and lowered so its centerline sits on the portrait's bottom border. `.portrait` clipping moved to the image so icons can straddle the edge.
+
+## Update 2026-08-25
+- Fixed literal `\uXXXX` escapes that were rendering as text (·, ★, ×, — now real glyphs).
+- Skill cards: icons enlarged to 64px; a gold **evolution badge** sits on the icon's top-right (greyscale until the star unlocks the plus, then lit). Extreme card text re-aligned to match the others (emphasis via border/bg only).
+- Roster: added **Traits** filter row (tri-state) from `tier_synergy` clusters+role_tags; cards carry `data-tags`; trait keywords also feed search.
+- Corrected all synergy notes that implied a witch's own interference buffs herself — interference only ever buffs the carry she's slotted behind (fixed in site + outputs `tier_synergy.json` and the source record).
+- Detail page: art + star selector now a **sticky left rail** (`position:sticky`) so the star control stays in view while scrolling skills; collapses to inline (non-sticky, ~280px art) under 860px so it doesn't dominate mobile.
+- NEXT: skill-up priority + weighting formula (max unit ATK × max skill coefficient × over-stat/per-witch modifiers).

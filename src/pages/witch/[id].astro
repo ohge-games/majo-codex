@@ -33,7 +33,7 @@ const interference = bySlot['Interference'];
 const tip = (tiers.witches || []).find(t => t.witch_id === witch.witch_id) || null;
 const archetype = (tip && tip.synergy_note && tip.synergy_note.includes(':'))
   ? tip.synergy_note.split(':')[0].trim() : null;
-const verdict = archetype ? `${archetype} \u2014 ${witch.rarity} ${witch.class}, ${cap(witch.damage_type)} damage` : null;
+const verdict = archetype ? `${archetype} — ${witch.rarity} ${witch.class}, ${cap(witch.damage_type)} damage` : null;
 
 // tags from ability data
 const wAbil = abilities.filter(a => a.witch_id === witch.witch_id && (a.variant ?? 'base') === 'base');
@@ -56,10 +56,9 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
   <a class="back mono" href={base}>&larr; All witches</a>
 
   <article class={`witch rar-${witch.rarity}`}>
-    <section class="hero">
-      {heroSrc && <div class="hero-bg" style={`background-image:url(${heroSrc})`}></div>}
-      <div class="hero-inner wrap">
-        <div class="portrait-col">
+    {heroSrc && <div class="hero-bg" style={`background-image:url(${heroSrc})`}></div>}
+    <div class="witch-layout wrap">
+      <aside class="rail">
           <div class="portrait-frame">
             {heroSrc ? (
               <img class="hero-img" src={heroSrc} alt={witch.name} width="293" height="512" />
@@ -87,8 +86,9 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
             ))}
           </div>
           <p class="rank-hint mono">Click stars to set rank · plus skills unlock as you promote</p>
-        </div>
+      </aside>
 
+      <div class="main">
         <div class="info-col">
           <div class="rarity-row">
             {hasUi(`rarity_${lc(witch.rarity)}`)
@@ -129,10 +129,7 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
           {tags.length > 0 && <div class="tags">{tags.map(t => <span class="tag">{t}</span>)}</div>}
           {witch.atk_spd && <div class="atkspd mono">ATK SPD {witch.atk_spd}</div>}
         </div>
-      </div>
-    </section>
 
-    <div class="wrap body">
       {verdict && <p class="verdict">{verdict}</p>}
 
       {tip && (
@@ -185,16 +182,16 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
   .back:hover{color:var(--ink)}
   .rar-SR{--rc:var(--sr)} .rar-SSR{--rc:var(--ssr)} .rar-UR{--rc:var(--ur)}
 
-  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);margin-top:8px}
-  .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 18%;
-    filter:blur(30px) brightness(.5) saturate(1.3);transform:scale(1.08);opacity:.78;z-index:0}
-  .hero::after{content:"";position:absolute;inset:0;z-index:0;
-    background:linear-gradient(180deg,rgba(12,10,21,.18),rgba(12,10,21,.72)),
-               radial-gradient(720px 340px at 18% -20%, color-mix(in srgb,var(--rc) 26%,transparent), transparent 70%)}
-  .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:290px 1fr;gap:38px;align-items:center;padding:38px 24px 42px}
-
-  .portrait-col{display:flex;flex-direction:column;gap:12px}
-  .portrait-frame{position:relative;aspect-ratio:293/512;border-radius:16px;overflow:hidden;
+  .witch{position:relative}
+  .hero-bg{position:absolute;top:0;left:0;right:0;height:440px;background-size:cover;background-position:center 18%;
+    filter:blur(34px) brightness(.5) saturate(1.3);transform:scale(1.08);opacity:.6;z-index:0}
+  .witch::before{content:"";position:absolute;top:0;left:0;right:0;height:440px;z-index:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(12,10,21,.12),var(--bg) 94%),
+               radial-gradient(720px 340px at 15% -10%, color-mix(in srgb,var(--rc) 22%,transparent), transparent 70%)}
+  .witch-layout{position:relative;z-index:1;display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:start;padding-top:24px;padding-bottom:56px}
+  .rail{position:sticky;top:14px;align-self:start;display:flex;flex-direction:column;gap:12px}
+  .main{min-width:0}
+  .portrait-frame{position:relative;aspect-ratio:293/512;height:min(58vh,520px);width:auto;margin:0 auto;border-radius:16px;overflow:hidden;
     border:1px solid color-mix(in srgb,var(--rc) 50%,var(--line));background:linear-gradient(160deg,var(--veil-2),#0e0b1a);
     color:var(--rc);display:grid;place-items:center;box-shadow:0 20px 60px -18px rgba(0,0,0,.8), 0 0 40px -20px var(--rc)}
   .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
@@ -263,6 +260,12 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
   .dchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
   .dchip{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.04em;color:var(--ink-dim);
     background:var(--nightshade);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  @media(max-width:860px){
+    .witch-layout{grid-template-columns:1fr;gap:18px;padding-top:16px}
+    .rail{position:static;top:auto}
+    .portrait-frame{height:auto;width:min(280px,72%)}
+    .hero-bg,.witch::before{height:300px}
+  }
 </style>
 
 <script>
@@ -277,10 +280,11 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
     const stars = [...rankEl.querySelectorAll('.star')];
     const exs = [...rankEl.querySelectorAll('.exstar')];
     const plusBlocks = [...document.querySelectorAll('.plus-block')];
+    const evoBadges = [...document.querySelectorAll('.evo-badge')];
     const scales = [...document.querySelectorAll('.sk-scale')];
     const round2 = v => Math.round(v * 100) / 100;
-    const countOf = l => { const m = /[x\u00d7](\d+)/i.exec(l); return m ? '\u00d7' + m[1] : ''; };
-    const humLabel = l => l.replace(/\(.*?\)/g, '').replace(/[x\u00d7]\d+/i, '').replace(/_pct$|_s$/, '').replace(/_/g, ' ').trim();
+    const countOf = l => { const m = /[x×](\d+)/i.exec(l); return m ? '×' + m[1] : ''; };
+    const humLabel = l => l.replace(/\(.*?\)/g, '').replace(/[x×]\d+/i, '').replace(/_pct$|_s$/, '').replace(/_/g, ' ').trim();
     const unitOf = l => (/pct/i.test(l) ? '%' : (/(_s$|dur|second)/i.test(l) ? 's' : ''));
     const fmt = (c, lv) => { const v = round2(c.val_low + (c.per_level || 0) * (lv - 1)); const cnt = countOf(c.label); return humLabel(c.label) + (cnt ? ' ' + cnt : '') + ' ' + v + unitOf(c.label); };
     function paint() {
@@ -292,6 +296,7 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
       });
       exs.forEach(btn => btn.classList.toggle('on', rank >= +btn.dataset.pos));
       plusBlocks.forEach(pb => { const need = parseInt(pb.dataset.unlock) || 6; pb.classList.toggle('locked', rank < need); });
+      evoBadges.forEach(b => { const need = parseInt(b.dataset.unlock) || 6; b.classList.toggle('locked', rank < need); });
       scales.forEach(sc => {
         const base = JSON.parse(sc.dataset.coef || '[]');
         const plus = (sc.dataset.pluscoef && sc.dataset.pluscoef !== 'null') ? JSON.parse(sc.dataset.pluscoef) : null;
@@ -300,7 +305,7 @@ const heroSrc = hasImg(`/img/hero/${witch.portrait_filename}`) ? `${base}img/her
         const lv = Math.min(rank + 1, maxLv);
         const usePlus = plus && rank >= plusAt;
         const active = usePlus ? plus : base;
-        const cur = sc.querySelector('.cur-vals'); if (cur) cur.textContent = active.map(c => fmt(c, lv)).join(' \u00b7 ');
+        const cur = sc.querySelector('.cur-vals'); if (cur) cur.textContent = active.map(c => fmt(c, lv)).join(' · ');
         const lvTag = sc.querySelector('.lv-tag'); if (lvTag) lvTag.textContent = 'Lv ' + lv + (usePlus ? ' +' : '');
         const tbls = [...sc.querySelectorAll('.scale-tbl')];
         tbls.forEach(t => t.querySelectorAll('tr').forEach(tr => tr.classList.remove('active')));
