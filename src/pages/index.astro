@@ -91,8 +91,8 @@ const upcoming = [
               {hasUi(`cclass_${lc(w.class)}`)
                 ? <img class="cclass" src={ui(`cclass_${lc(w.class)}`)} alt={w.class} title={w.class} width="34" height="34" loading="lazy" />
                 : <span class="cls-badge">{w.class}</span>}
-              {hasImg(`/img/card/${w.portrait_filename}`) ? (
-                <img class="portrait-img" src={`${base}img/card/${w.portrait_filename}`} alt={w.name} loading="lazy" width="256" height="256" />
+              {(hasImg(`/img/card/${w.portrait_filename}`) || hasImg(`/img/hero/${w.portrait_filename}`)) ? (
+                <img class="portrait-img" src={`${base}img/${hasImg(`/img/card/${w.portrait_filename}`) ? 'card' : 'hero'}/${w.portrait_filename}`} alt={w.name} loading="lazy" width="256" height="256" />
               ) : (
                 <svg viewBox="0 0 24 24" class="sigil" aria-hidden="true">
                   <path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width="1"/>

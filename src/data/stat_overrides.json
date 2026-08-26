@@ -1,0 +1,146 @@
+[
+  {
+    "witch_id": "W006",
+    "attribute_id": "dodge_val",
+    "override_value": 10,
+    "op": "add",
+    "highlight": "no",
+    "tooltip_note": null
+  },
+  {
+    "witch_id": "W011",
+    "attribute_id": "dodge_val",
+    "override_value": 10,
+    "op": "add",
+    "highlight": "no",
+    "tooltip_note": null
+  },
+  {
+    "witch_id": "W017",
+    "attribute_id": "dodge_val",
+    "override_value": 10,
+    "op": "add",
+    "highlight": "no",
+    "tooltip_note": null
+  },
+  {
+    "witch_id": "W006",
+    "attribute_id": "dodge_cd",
+    "override_value": -1,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "25% increased dodge rate compared to other Arcanists"
+  },
+  {
+    "witch_id": "W014",
+    "attribute_id": "block_rate",
+    "override_value": 10,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "Slightly higher block rate than most Defenders"
+  },
+  {
+    "witch_id": "W003",
+    "attribute_id": "block_rate",
+    "override_value": 15,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "Higher block rate than most Defenders"
+  },
+  {
+    "witch_id": "W022",
+    "attribute_id": "block_rate",
+    "override_value": 20,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "Highest block rate of all Defenders"
+  },
+  {
+    "witch_id": "W008",
+    "attribute_id": "dodge_val",
+    "override_value": 10,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "Slightly higher dodge rate compared to other Supporters"
+  },
+  {
+    "witch_id": "W023",
+    "attribute_id": "dodge_val",
+    "override_value": 20,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "Highest dodge rate of all Supporters"
+  },
+  {
+    "witch_id": "W002",
+    "attribute_id": "dodge_val",
+    "override_value": -10,
+    "op": "add",
+    "highlight": "no",
+    "tooltip_note": null
+  },
+  {
+    "witch_id": "W010",
+    "attribute_id": "dodge_cd",
+    "override_value": -0.5,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "20% increased dodge rate compared to other Vanguards"
+  },
+  {
+    "witch_id": "W018",
+    "attribute_id": "dodge_cd",
+    "override_value": -0.5,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "20% increased dodge rate compared to other Vanguards"
+  },
+  {
+    "witch_id": "W014",
+    "attribute_id": "block_dur",
+    "override_value": 0.5,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "50% longer block duration than all other Defenders"
+  },
+  {
+    "witch_id": "W021",
+    "attribute_id": "dodge_dur",
+    "override_value": 0.5,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "100% longer dodge duration than all other Witches"
+  },
+  {
+    "witch_id": "W014",
+    "attribute_id": "block_dr",
+    "override_value": 10,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "20% more block reduction than all other Witches"
+  },
+  {
+    "witch_id": "W022",
+    "attribute_id": "block_dr",
+    "override_value": 25,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "50% more block reduction than all other Witches"
+  },
+  {
+    "witch_id": "W024",
+    "attribute_id": "block_rate",
+    "override_value": -10,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "Lowest block rate of any Defender (30% vs the 40% class base)"
+  },
+  {
+    "witch_id": "W024",
+    "attribute_id": "block_dr",
+    "override_value": 25,
+    "op": "add",
+    "highlight": "yes",
+    "tooltip_note": "Tied for the highest block damage reduction (75%) — blocks rarely but hard"
+  }
+]

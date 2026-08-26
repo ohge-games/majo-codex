@@ -190,7 +190,7 @@
         "Passive",
         "Interference"
       ],
-      "synergy_note": "",
+      "synergy_note": "Downed-target burst carry: her Extreme is a massive single hit that also stuns, and her Special is an [Execution] that only strikes knocked-down enemies — pair her with a knockdown setter and land the Extreme in the downed window. Interference boosts a carry's Mental damage, more vs downed.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -311,7 +311,7 @@
         "Passive",
         "Interference"
       ],
-      "synergy_note": "",
+      "synergy_note": "Counter-attack bruiser: her Class is a [Dodge Counter], her Extreme repositions and shreds with knockback immunity, and her Passive stacks Physical Attack on every dodge. As support, her Interference gives the carry Physical Attack and an on-counter Physical-Resistance shred on enemies.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -1000,7 +1000,7 @@
         "Extreme",
         "Interference"
       ],
-      "synergy_note": "Selfish self-buff DPS (tennis-themed Arcanist, Physical). Core loop: Class 'Racket Concentration' ([Charge Amp]: +20-21% Attack Speed & Crit Rate, 8s) -> 'Spinning Ball Strike' Special fires as a [Class Skill Salvo] (canonical tag ClassFollowUp) after every Class use, 5 hits / 730%. Passive 'Match Point' stacks self Crit Damage; Interference 'Break Point' only works when Grina is slotted as support: it trims the CARRY's Class Skill CD (-5->-9%) and adds their Bonus Damage — it never affects Grina herself. Extreme 'Victorious Barrage' plus leaps 6 hits/972% -> 9 hits/1395%. Almost no team utility: her only outward tool is Break Point when slotted as support (a generic Class-CD + Bonus-Damage battery for a Class-reliant carry). Shares Tomoe's Arcanist/Physical stat frame, but as an SR her base ATK caps her ceiling vs SSR carries. WEIGHTING-MODEL flag (owner's planned base_ATK x coefficients x damage-passives system): strong coefficient sum (Extreme 1395%, Special-loop 730%, Normal 280%) but only self crit buffs and SR base ATK -> expect 'great early/F2P DPS, falls behind SSR ATK bases at endgame'.",
+      "synergy_note": "Selfish self-buff DPS: a Special-centric carry who piles crit and bonus damage on herself and tightens her own loop — give her the damage seat. Interference 'Break Point' (support only) trims the carry's Class-Skill CD and adds Bonus Damage; it never buffs Grina herself.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -1063,7 +1063,7 @@
         "Extreme",
         "Interference"
       ],
-      "synergy_note": "Pure raw-throughput healer (Supporter, Magic/Physical), the 'Heart-Obsessed Mad Doctor'. Three heal engines: Extreme 'Heartfelt Cure' = burst AoE heal + a 10s healing zone (plus trades the 91% burst down to 54% but ticks every 1.5s instead of 3s -> higher sustained HPS; the zone is explicitly NOT counted as her skill); Special 'Caring Consultation' = huge single-target heal (194-199%); Class 'Alluring Whisper' [Heal] = AoE heal centered on an ally on a short 6s CD (spammable). Passive 'Heart Craving' keeps herself topped (self healing effect +16-17%). Interference 'Heart Gazing' = Class-CD cut + healing-effect boost to the carry she supports. Almost no offense (Normal 'Heartfelt' is her only damage, 280%). Where Carmen peels/shields, Peseshet amps Extreme damage, and Maro gates on Human race, Doroa is the plain highest-volume healer with self-sustain -> the safe default 'main healer' behind squishy carries that need constant topping.",
+      "synergy_note": "Pure raw-throughput healer: the biggest straight heals in the roster, no damage pretensions — just keeping the team alive. Interference 'Heart Gazing' cuts the carry's Class CD and boosts their healing received.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -1107,7 +1107,7 @@
         "Extreme",
         "Interference"
       ],
-      "synergy_note": "Taunt/mitigation Defender (SR, Magic damage / Physical weakness), finance-debt flavor. Anchors squishy comps: Extreme 'Debt Judgment' charges in, self-buffs Defense (+40 -> +50% on plus) and AoE-nukes with Taunt (plus = 3 hits with Taunt on EACH -> stronger aggro pull + 880% -> 1167%). Layered self-mitigation: Special 'Financial Ruling' (self Bonus Damage Reduction, an [Ultimate Salvo] that auto-fires after her Extreme), Passive 'Capital Protection' (self Magic Resistance). Damage payoff on blocking via Class 'Account Lock' [Block Counter] (dash-in + hit) -> joins the block-counter cluster (Garana/Carmen/Yun/Zhijie). Team utility from Interference 'Budget Allocation' (when she backs a carry: that carry's block CD down + on-block enemy-Attack debuff, max 3 stacks). ALL her damage is Magic. Niche vs other Defenders: Yun/Garana/Carmen don't hard-taunt -- Qing is the aggro-magnet damage-reduction tank, best in front of fragile carries that need enemies peeled off them.",
+      "synergy_note": "Taunt/mitigation anchor: a hard-taunt Defender with layered self-mitigation (Defense, damage reduction, Magic Resistance) and an on-block enemy Attack debuff — built to eat hits and protect the carry. Interference cuts the carry's block CD and adds an on-block enemy-Attack debuff.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -1152,7 +1152,7 @@
         "Extreme",
         "Special"
       ],
-      "synergy_note": "Dodge-driven Extreme/Special spam carry (SR Vanguard, Magic dmg / Mental weakness), skateboard flavor. Dodge is her engine: Passive 'Balanced Glide' converts every dodge into +30 Extreme charge (self-battery, CD 2s), and Class 'Swift Flip' is a [Dodge Counter] (2x200-205%) -> she wants high dodge uptime (joins the dodge-counter cluster: Xinzi/Yun/Yuhong/Alice/Lumi/Huarui). Extreme 'Flash Board' is a double-strike mobility nuke (8 hits; plus adds self Knockback/Knockdown/Stagger Resistance during the cast = uninterruptible, + big damage, unlocks 6*). Special 'Air-Piercing Back Stomp' gap-closes to the farthest enemy; its plus grants +100% Critical Rate (guaranteed crit). Normal 'Board Breaker' Hit3 shaves Special CD by up to 5 -> more Specials. Interference 'Fancy Footwork' = crit rate + Extreme-skill bonus damage (DPS-flavored support). Overall: a self-sufficient dodge -> Extreme/Special loop with a guaranteed-crit nuke; pairs with dodge-enablers (Yuhong feeds ally dodges) and crit/Extreme amplifiers (Peseshet Extreme-damage, Tomoe Extreme battery).",
+      "synergy_note": "Dodge-driven spam carry: evasions fuel rapid Extreme/Special casts, and her kit lands a knockdown that doubles as control (handy for the slime's wake-up). A high-uptime, budget-friendly pick. Interference gives the carry crit rate and Extreme bonus damage.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [
           "Special"
@@ -1208,7 +1208,7 @@
         "Special",
         "Interference"
       ],
-      "synergy_note": "Extreme-SNOWBALL Arcanist boss-killer (SSR, Magic dmg / Mental weakness), death/burial theme. Self-charges Extreme from two sources -- Class 'Crowning the Departed' [Charge Amp] (+30-32 charge, CD 6) and the Special 'Six Feet Under' PLUS (+15-16 charge, a [Class Skill Salvo] that fires after Class) -- while Passive 'Taking Turns' instantly resets her Class CD whenever an allied ARCANIST casts Extreme, letting her chain Class -> more charge. Each Extreme she casts ('Burial Constellation', 510-525% + 880-900% + 2 Stagger) applies Magic Resistance -10% (max 2 = -20%, 30s) to the target AND, and — only when she is slotted as support — her Interference 'Weakening Breath' stacks the CARRY's Magic Attack (max 5 base / 8 plus, +2.1-2.4% each) and boosts that carry's Extreme damage (+6/+12%). Net: the more she Extremes, the faster and harder she Extremes -- a single-target boss melter. Best on an Arcanist-heavy team (Tomoe/Dusan/Jenny/Yuhong/Grina trigger her Passive) with Extreme enablers (Tomoe battery, Peseshet Extreme-damage amp). Her MR shred also lifts the team's magic dealers. Her Extreme is base-only, so her ceiling rides on charge economy rather than an Extreme evolution.",
+      "synergy_note": "Extreme-snowball boss-killer: a charge-amp carry who fires her Extreme over and over, so her ceiling rides on charge economy rather than an evolution — ideal for long single-target boss fights. As support, her Interference stacks the carry's Magic Attack and Extreme damage.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -1269,7 +1269,7 @@
         "Extreme",
         "Class"
       ],
-      "synergy_note": "Downed-target EXECUTIONER carry (SSR Arcanist, Mental dmg / Magic weakness), twilight/time theme. Self-sufficient execute loop: her Extreme 'Final Twilight' piles Stagger (3 per initial/zone-tick/final; plus = a 9s zone ticking every 1s + 700-715% finisher) to knock enemies DOWN, then her [Execution] skills capitalize -- Class 'Twilight's Edge' [Charge][Execution] (399-409 base / 524-537 plus, +self stagger) and Special 'Timeless Standstill' [Execution] (510-523 execute + a TEAM +10% damage buff). Snowballs off an execution team: Passive 'Fleeting Years' stacks self Attack Speed +3% (max 20 = +60%) each time an ALLY uses an Execution skill, and — in a support slot — her Interference 'Fading Light' shaves the carry's Special CD + adds their bonus damage vs downed targets. Slots into the execution cluster (Leed the downer/stagger-engine, Dusan, Jenny): allies down targets and trigger her Passive; she executes AND buffs the team. Her Extreme's zone is not counted as her skill (excluded from skill totals).",
+      "synergy_note": "Downed-target executioner: her damage explodes against knocked-down enemies, so she snowballs behind a knockdown/control setter — pure single-target execution. Interference 'Fading Light' (support slot) shaves the carry's Special CD and adds bonus damage vs downed targets.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [
@@ -1321,7 +1321,7 @@
         "Extreme",
         "Class"
       ],
-      "synergy_note": "Self-sustaining TAUNT tank (SR Defender, Physical/Physical), axe/undead theme. Layered survivability + heavy taunt: Extreme 'Earth-Splitting Shockwave' self-heals (200-250%) + grants Max HP (+20/+30%) then a guaranteed-crit nuke (975-995; plus adds a 418-424% rectangular finisher); Class 'Panic Spin Slash' [Block Counter] feeds her own Extreme charge (+20/+30) and multi-hits with a Taunt per hit (2 hits base / 4 plus); Special 'Death Axe Sweep' [Normal Attack Salvo] AoEs + Taunts off her Normal combo. Self-mitigation from Passive 'Soul Tether' (Physical Resistance) and Interference 'Undead Whisper' (Crit Power + Magic Resistance to the carry). Like Qing she's a hard-TAUNT Defender, but Budi trades Qing's damage-reduction/MR-shred for SELF-HEAL + Max-HP sustain and a bigger (guaranteed-crit) Extreme. Coefficients are high (Extreme ~1400%+ at guaranteed crit, Class 4x97 + charge) but SR Defender base ATK caps real output -> a bruiser/aggro anchor, not a carry. Two hard-taunt Defenders now (Qing, Budi) for peeling squishy carries.",
+      "synergy_note": "Self-sustaining taunt tank: holds aggro while healing herself and padding max HP, with a guaranteed-crit Extreme for real chip damage and one of the highest block rates in the class. Interference feeds the carry Crit Power and Magic Resistance.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [
           "Extreme",
@@ -1388,7 +1388,7 @@
         "Extreme",
         "Class"
       ],
-      "synergy_note": "UR Defender TAUNT tank built around survival, Stagger and debuff (Magic attack / Physical weakness). Loop: Extreme 'Victorious Barrage' grants self a big Defense buff (30-43%) then a large AoE with HEAVY Stagger (8 base / 12 plus) and Taunt; Passive 'Rolling Checkmates' instantly REFILLS her Extreme gauge after use (40s ICD) for very high Extreme uptime, and each Extreme hit stacks Attack-reduction on the target (max 8%). Special 'Kings Unbowed' = self bonus damage reduction (30%); Class 'Desperate Outlaw' [Block Counter] AoE + Taunt. Interference 'Flawless Strategy' gives the CARRY she backs Attack% + a Defense-on-their-Extreme stack. Best-in-class Stagger among Defenders (great vs high-posture bosses) and the most Extreme-centric tank (refills her own). Modest block rate (30%) — leans on active mitigation (Def buffs, damage reduction, +13.2% class damage-resistance) over passive block. Physically WEAK, so a poor tank into physical bosses (e.g. Venomfrill). Primarily a utility / Law piece (magic unit), not a damage pull.",
+      "synergy_note": "Taunt tank built around survival and debuff: her Extreme self-buffs Defense then hits a big AoE with heavy Stagger (up to 12) and Taunt, and her Passive refills her Extreme gauge for near-constant uptime while stacking enemy Attack-reduction. Best-in-class Stagger, but she rarely blocks (lowest rate of any Defender) and is physically weak — more a utility / Law piece than a damage pull.",
       "weighting_inputs": {
         "guaranteed_crit_slots": [],
         "self_damage_buffs": [

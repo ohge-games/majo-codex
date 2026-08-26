@@ -8,6 +8,8 @@ import skills from '../../data/skills.json';
 import constants from '../../data/constants.json';
 import tiers from '../../data/tier_synergy.json';
 import scores from '../../data/skill_scores.json';
+import statOverrides from '../../data/stat_overrides.json';
+import classBaseStats from '../../data/class_base_stats.json';
 import fs from 'node:fs';
 
 export async function getStaticPaths() {
@@ -34,6 +36,13 @@ const interference = bySlot['Interference'];
 const tip = (tiers.witches || []).find(t => t.witch_id === witch.witch_id) || null;
 const ws = (scores.witches || {})[witch.witch_id] || { overall_by_rank: {}, skills: {} };
 const scoreFor = sk => ((ws.skills || {})[`${witch.witch_id}_${sk.slot.toLowerCase()}`] || {}).by_rank || null;
+const sigTraits = (statOverrides || []).filter(o => o.witch_id === witch.witch_id && o.highlight === 'yes' && o.tooltip_note).map(o => o.tooltip_note);
+const baseStat = attr => { const e = (classBaseStats || []).find(x => x.class === witch.class && x.attribute_id === attr); return e ? e.base_value : null; };
+const effStat = attr => { let v = baseStat(attr); if (v == null) return null; for (const o of (statOverrides || [])) if (o.witch_id === witch.witch_id && o.attribute_id === attr && o.op === 'add') v += o.override_value; return v; };
+const blockRate = effStat('block_rate');
+const defLine = (blockRate && blockRate > 0)
+  ? `Block ${blockRate}% · DR ${effStat('block_dr')}%`
+  : (effStat('dodge_val') != null ? `Dodge ${effStat('dodge_val')} · CD ${effStat('dodge_cd')}s` : null);
 const archetype = (tip && tip.synergy_note && tip.synergy_note.includes(':'))
   ? tip.synergy_note.split(':')[0].trim() : null;
 const verdict = archetype ? `${archetype} — ${witch.rarity} ${witch.class}, ${cap(witch.damage_type)} damage` : null;
@@ -44,11 +53,12 @@ const humanize = s => s.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ').t
 const tags = [...new Set(wAbil.flatMap(a => (a.tags ? String(a.tags).split(';') : [])).map(t => t.trim()).filter(Boolean))].map(humanize);
 
 // rank stars
-const START = { SSR: 2, SR: 3, R: 1, UR: 2 };
+const START = { SSR: 2, SR: 3, R: 1, UR: 3 };
 const baseStars = START[witch.rarity] ?? 2;
-const minRank = witch.rarity === 'SSR' ? 2 : 1;
-const maxRank = witch.rarity === 'SSR' ? 9 : 6;
-const showEx = witch.rarity === 'SSR';
+const exTier = witch.rarity === 'SSR' || witch.rarity === 'UR';
+const minRank = witch.rarity === 'UR' ? 3 : (witch.rarity === 'SSR' ? 2 : 1);
+const maxRank = exTier ? 9 : 6;
+const showEx = exTier;
 const hasStars = hasUi('star_red') && hasUi('star_yellow') && hasUi('star_grey');
 
 // art
@@ -98,6 +108,7 @@ const heroVideo = heroStem ? (['mp4','webm'].map(e => hasImg(`/img/hero/${heroSt
             <span class="dps-val">{(ws.overall_by_rank || {})[String(baseStars)] ?? '—'}</span>
             <span class="dps-note mono">provisional · damage only</span>
           </div>
+          {defLine && <div class="def-line mono">{defLine}</div>}
       </aside>
 
       <div class="main">
@@ -143,6 +154,12 @@ const heroVideo = heroStem ? (['mp4','webm'].map(e => hasImg(`/img/hero/${heroSt
         </div>
 
       {verdict && <p class="verdict">{verdict}</p>}
+      {sigTraits.length > 0 && (
+        <div class="sig-traits">
+          <span class="sig-label mono">Signature</span>
+          {sigTraits.map(t => <span class="sig-chip">{t}</span>)}
+        </div>
+      )}
 
       {tip && (
         <section class="deploy">
@@ -208,6 +225,8 @@ const heroVideo = heroStem ? (['mp4','webm'].map(e => hasImg(`/img/hero/${heroSt
   .dps-overall .dps-label{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
   .dps-overall .dps-val{font-size:1.8rem;font-weight:800;color:var(--ssr);line-height:1}
   .dps-overall .dps-note{font-size:.56rem;color:var(--ink-faint);letter-spacing:.04em}
+  .def-line{font-size:.72rem;color:var(--ink-dim);background:var(--nightshade);border:1px solid var(--line);
+    border-radius:8px;padding:6px 10px;text-align:center}
   .main{min-width:0}
   .portrait-frame{position:relative;aspect-ratio:293/512;height:min(58vh,520px);width:auto;margin:0 auto;border-radius:16px;overflow:hidden;
     border:1px solid color-mix(in srgb,var(--rc) 50%,var(--line));background:linear-gradient(160deg,var(--veil-2),#0e0b1a);
@@ -262,6 +281,10 @@ const heroVideo = heroStem ? (['mp4','webm'].map(e => hasImg(`/img/hero/${heroSt
     .info-col{width:100%}
     .rarity-row,.class-row,.type-row,.tags{justify-content:center}
   }
+  .sig-traits{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-8px 0 20px}
+  .sig-label{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+  .sig-chip{font-size:.78rem;color:var(--ink);background:linear-gradient(180deg,color-mix(in srgb,var(--ssr) 12%,var(--veil)),var(--veil));
+    border:1px solid color-mix(in srgb,var(--ssr) 38%,var(--line));border-radius:999px;padding:5px 12px}
   .verdict{margin:0 0 20px;font-size:1.05rem;line-height:1.4;color:var(--ink);
     background:linear-gradient(180deg,color-mix(in srgb,var(--sigil) 12%,var(--veil)),var(--veil));
     border:1px solid color-mix(in srgb,var(--sigil) 34%,var(--line));border-left:3px solid var(--sigil);

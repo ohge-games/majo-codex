@@ -21,8 +21,8 @@ if (a) {
 }
 if (s.plus_range != null) meta.push(`plus range ${s.plus_range}`);
 
-const maxLevel = rarity === 'SSR' ? 10 : 7;   // 6star=L7; SSR EX1-3 = L8-10
-const startStar = baseLevel ?? (rarity === 'SSR' ? 2 : 1);
+const maxLevel = (rarity === 'SSR' || rarity === 'UR') ? 10 : 7;   // 6star=L7; SSR/UR EX1-3 = L8-10
+const startStar = baseLevel ?? (rarity === 'UR' ? 3 : (rarity === 'SSR' ? 2 : 1));
 const startLevel = Math.min(startStar + 1, maxLevel);   // each star = +1 level
 const coefB = Array.isArray(s.coefficients) ? s.coefficients : [];
 const coefP = Array.isArray(s.plus_coefficients) ? s.plus_coefficients : null;
