@@ -1,9 +1,68 @@
 {
   "bosses": [
     {
+      "id": "venomfrill",
+      "name": "Venomfrill",
+      "mode": "Boss Training",
+      "blurb": "The current world boss. A frilled, mutated venomous lizard — hits Physical and is weak to Physical.",
+      "deals": "physical",
+      "weak": "physical",
+      "race": "beast",
+      "media": "boss_venom",
+      "source": "Datamined from config N3097 — stats confirmed; ability details to be confirmed on release.",
+      "mechanics": [
+        {
+          "name": "Ability set — TBD on release",
+          "text": "His config carries 24 ability references (vs the slime's 17), so expect a busier kit. Exact abilities will be filled in from play once he's live."
+        }
+      ],
+      "tips": [
+        "Weak to Physical — Physical dealers post the highest scores (auto-list below).",
+        "Very high knockback resistance (30, vs the slime's 10) and posture 300 — CC and interrupts are far less reliable here, so lean on sustained Physical damage and survivability rather than a stun-lock plan.",
+        "Beast race — relevant for any race-targeted effects."
+      ],
+      "recommended": [],
+      "full_name": "Rampaging Mutant Venomous Lizard",
+      "ranks": [
+        {
+          "rank": 1,
+          "hp": 106800,
+          "rec_power": "50K"
+        },
+        {
+          "rank": 2,
+          "hp": 177900,
+          "rec_power": "70K"
+        },
+        {
+          "rank": 3,
+          "hp": 282300,
+          "rec_power": "100K"
+        },
+        {
+          "rank": 4,
+          "hp": 495600,
+          "rec_power": "135K"
+        },
+        {
+          "rank": 5,
+          "hp": 784200,
+          "rec_power": "140K",
+          "endless": true
+        }
+      ]
+    }
+  ],
+  "tower": {
+    "name": "Tower of Anomalies",
+    "blurb": "TBD — awaiting floor data and personalized team information to provide suggestions.",
+    "floors": []
+  },
+  "past_bosses": [
+    {
       "id": "abyssal-slime",
       "name": "Abyssal Slime",
-      "mode": "Boss Training",
+      "mode": "Boss Training (rotated out)",
       "blurb": "World boss — compete for the highest score, measured by total damage dealt before you die or the timer runs out.",
       "deals": "mental",
       "weak": "mental",
@@ -65,35 +124,6 @@
       ],
       "media": "boss_slime",
       "source": "Community-observed — no datamined ability data available for this boss."
-    },
-    {
-      "id": "venomfrill",
-      "name": "Venomfrill",
-      "mode": "Boss Training",
-      "upcoming": true,
-      "blurb": "The next world boss (rotating in this week). A frilled beast — hits Physical and is weak to Physical.",
-      "deals": "physical",
-      "weak": "physical",
-      "race": "beast",
-      "media": "boss_venom",
-      "source": "Datamined from config N3097 — stats confirmed; ability details to be confirmed on release.",
-      "mechanics": [
-        {
-          "name": "Ability set — TBD on release",
-          "text": "His config carries 24 ability references (vs the slime's 17), so expect a busier kit. Exact abilities will be filled in from play once he's live."
-        }
-      ],
-      "tips": [
-        "Weak to Physical — Physical dealers post the highest scores (auto-list below).",
-        "Very high knockback resistance (30, vs the slime's 10) and posture 300 — CC and interrupts are far less reliable here, so lean on sustained Physical damage and survivability rather than a stun-lock plan.",
-        "Beast race — relevant for any race-targeted effects."
-      ],
-      "recommended": []
     }
-  ],
-  "tower": {
-    "name": "Tower of Anomalies",
-    "blurb": "TBD — awaiting floor data and personalized team information to provide suggestions.",
-    "floors": []
-  }
+  ]
 }

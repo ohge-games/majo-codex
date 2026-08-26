@@ -45,9 +45,24 @@ const bossMedia = (b) => {
             </div>
             <div class="boss-meta">
               <span class="mode-tag mono">{b.mode}</span>{b.upcoming && <span class="up-tag mono">Upcoming</span>}
+              {b.full_name && <span class="boss-full">{b.full_name}</span>}
               <h3 class="boss-name">{b.name}</h3>
               <p class="boss-blurb">{b.blurb}</p>
               {b.source && <p class="boss-source mono">{b.source}</p>}
+              {b.ranks && b.ranks.length > 0 && (
+                <div class="ranks">
+                  <span class="dl mono">HP by rank</span>
+                  <div class="rank-grid mono">
+                    {b.ranks.map(r => (
+                      <div class="rank-cell">
+                        <span class="rk">Rank {r.rank}{r.endless ? ' · Endless' : ''}</span>
+                        <span class="rk-hp">{r.hp.toLocaleString()}</span>
+                        <span class="rk-pw">rec {r.rec_power}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div class="type-row">
                 <span class="tchip">{hasUi(`type_${lc(b.deals)}`) ? <img class="tic" src={ui(`type_${lc(b.deals)}`)} width="20" height="20" alt="" /> : <EyeBadge type={b.deals} size={20} title="" />} <span><b>{cap(b.deals)}</b> damage</span></span>
                 <span class="tchip weak">{hasUi(`type_${lc(b.weak)}`) ? <img class="tic" src={ui(`type_${lc(b.weak)}`)} width="20" height="20" alt="" /> : <EyeBadge type={b.weak} size={20} title="" />} <span>Weak to <b>{cap(b.weak)}</b></span></span>
@@ -110,6 +125,20 @@ const bossMedia = (b) => {
       ))}
     </section>
 
+    {guides.past_bosses && guides.past_bosses.length > 0 && (
+      <section class="past">
+        <details>
+          <summary class="mono">Previous bosses ({guides.past_bosses.length})</summary>
+          {guides.past_bosses.map(b => (
+            <div class="past-boss">
+              <h3 class="past-name">{b.name} <span class="mono past-tag">rotated out</span></h3>
+              {b.mechanics && b.mechanics.map(m => <p class="past-mech"><b>{m.name}:</b> {m.text}</p>)}
+            </div>
+          ))}
+        </details>
+      </section>
+    )}
+
     <section class="mode">
       <h2 class="sec display">{guides.tower.name}</h2>
       <div class="tower-empty">
@@ -163,6 +192,20 @@ const bossMedia = (b) => {
   .dc-dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint)}
   .dchip2.is-SSR .dc-dot{background:var(--ssr)} .dchip2.is-SR .dc-dot{background:var(--sr)}
   .dc-r{font-size:.6rem;color:var(--ink-faint)}
+  .ranks{margin:12px 0 4px}
+  .rank-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .rank-cell{display:flex;flex-direction:column;gap:1px;background:var(--nightshade);border:1px solid var(--line);
+    border-radius:8px;padding:6px 11px;min-width:96px}
+  .rank-cell .rk{font-size:.62rem;color:var(--ink-faint)}
+  .rank-cell .rk-hp{font-size:.95rem;color:var(--ink);font-weight:700}
+  .rank-cell .rk-pw{font-size:.6rem;color:var(--ink-faint)}
+  .boss-full{display:block;font-size:.66rem;letter-spacing:.06em;color:var(--ink-faint);margin-top:2px}
+  .past{padding:0 20px 40px;max-width:var(--maxw,1100px);margin:0 auto}
+  .past summary{cursor:pointer;color:var(--ink-faint);font-size:.8rem;letter-spacing:.04em}
+  .past-boss{margin:12px 0;padding:12px 14px;background:var(--veil);border:1px solid var(--line);border-radius:var(--r);opacity:.75}
+  .past-name{margin:0 0 6px;font-size:1rem}
+  .past-tag{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  .past-mech{font-size:.82rem;color:var(--ink-dim);margin:4px 0}
   .tower-empty{background:var(--veil);border:1px dashed var(--line);border-radius:var(--r);padding:22px;color:var(--ink-dim)}
   .auto-note{color:var(--ink-faint);font-size:.66rem;letter-spacing:0;text-transform:none}
   .dealer-chips{display:flex;flex-wrap:wrap;gap:7px}
