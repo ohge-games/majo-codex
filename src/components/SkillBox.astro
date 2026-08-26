@@ -50,7 +50,7 @@ const hasPlus = s.has_plus === 'yes';
         : <span class="sk-icon ph" aria-hidden="true"></span>}
       {hasPlus && (
         <span class="evo-badge locked" data-unlock={s.plus_unlocks_at_star ?? '6*'}
-          title={`Evolves at ${plusStar || '?'}★`}>+{plusStar}★</span>
+          title={plusStar ? `Evolves at ${plusStar}★` : 'Evolves on rank-up'}>{plusStar ? `+${plusStar}★` : '+'}</span>
       )}
     </span>
     <div class="sk-titles">

@@ -1356,6 +1356,53 @@
         "block-counter",
         "hard-taunt"
       ]
+    },
+    {
+      "witch_id": "W024",
+      "name": "Isabelle",
+      "class": "Defender",
+      "rarity": "UR",
+      "deals": "magic",
+      "weak": "physical",
+      "role_tags": [
+        "tank",
+        "taunt",
+        "block-counter",
+        "stagger",
+        "debuff-shred",
+        "extreme-battery"
+      ],
+      "clusters": [
+        "block-counter",
+        "hard-taunt"
+      ],
+      "debuffs": [
+        "enemy-attack-down"
+      ],
+      "interference": {
+        "name": "Flawless Strategy",
+        "effect": "Character's Attack +5%; after the carry uses their Extreme, grants the carry a Defense stack (max 3, 30s).",
+        "role_match": "for DPS carries (Attack%) — also defensive"
+      },
+      "plus_skills": [
+        "Extreme",
+        "Class"
+      ],
+      "synergy_note": "UR Defender TAUNT tank built around survival, Stagger and debuff (Magic attack / Physical weakness). Loop: Extreme 'Victorious Barrage' grants self a big Defense buff (30-43%) then a large AoE with HEAVY Stagger (8 base / 12 plus) and Taunt; Passive 'Rolling Checkmates' instantly REFILLS her Extreme gauge after use (40s ICD) for very high Extreme uptime, and each Extreme hit stacks Attack-reduction on the target (max 8%). Special 'Kings Unbowed' = self bonus damage reduction (30%); Class 'Desperate Outlaw' [Block Counter] AoE + Taunt. Interference 'Flawless Strategy' gives the CARRY she backs Attack% + a Defense-on-their-Extreme stack. Best-in-class Stagger among Defenders (great vs high-posture bosses) and the most Extreme-centric tank (refills her own). Modest block rate (30%) — leans on active mitigation (Def buffs, damage reduction, +13.2% class damage-resistance) over passive block. Physically WEAK, so a poor tank into physical bosses (e.g. Venomfrill). Primarily a utility / Law piece (magic unit), not a damage pull.",
+      "weighting_inputs": {
+        "guaranteed_crit_slots": [],
+        "self_damage_buffs": [
+          {
+            "slot": "Extreme",
+            "variant": "base",
+            "label": "self_def_buff_pct",
+            "lv1": 30
+          }
+        ],
+        "damage_gating": [
+          "Block Counter"
+        ]
+      }
     }
   ]
 }

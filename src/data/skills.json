@@ -6734,5 +6734,371 @@
     "plus_description": null,
     "mechanics": null,
     "description_original": null
+  },
+  {
+    "ability_id": "W024_extreme",
+    "witch_id": "W024",
+    "slot": "Extreme",
+    "name": "Victorious Barrage",
+    "description": "Self-Defense buff, then a large-circle AoE with heavy Stagger and Taunt.",
+    "has_plus": "yes",
+    "plus_unlocks_at_star": null,
+    "plus_description": "Grants self a Defense 40% buff (lasts 20 seconds) and moves to the designated location. First deals 2 hits of 200% damage and 3 Stagger to enemies in a circular area and applies Taunt. Then deals 2 hits of 465% damage and 3 Stagger to enemies in a circular area and applies Taunt.",
+    "mechanics": "self Def 30->32% (12s) · 300->307% + 650->665% · 8 Stagger · Charge 400 · Range 8 · Magic",
+    "description_original": "Self-Defense buff, then a large-circle AoE with heavy Stagger and Taunt.",
+    "required_rank": null,
+    "cooldown_s": null,
+    "charge": 400,
+    "range": 8,
+    "tags": [],
+    "base_text": "Grants self a Defense 30% buff (lasts 12 seconds) and moves to the designated location. Deals 300% damage and 4 Stagger to enemies in a circular area and applies Taunt. Then deals 650% damage and 4 Stagger to enemies in a circular area and applies Taunt.",
+    "coefficients": [
+      {
+        "label": "self_def_buff_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 30,
+        "val_high": 32,
+        "per_level": 2
+      },
+      {
+        "label": "buff_dur_s (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 12,
+        "val_high": 12,
+        "per_level": 0.0
+      },
+      {
+        "label": "initial_hit_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 300,
+        "val_high": 307,
+        "per_level": 7
+      },
+      {
+        "label": "initial_stagger (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 4,
+        "val_high": 4,
+        "per_level": 0.0
+      },
+      {
+        "label": "final_hit_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 650,
+        "val_high": 665,
+        "per_level": 15
+      },
+      {
+        "label": "final_stagger (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 4,
+        "val_high": 4,
+        "per_level": 0.0
+      }
+    ],
+    "plus_coefficients": [
+      {
+        "label": "self_def_buff_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 40,
+        "val_high": 43,
+        "per_level": 3
+      },
+      {
+        "label": "buff_dur_s (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 20,
+        "val_high": 20,
+        "per_level": 0.0
+      },
+      {
+        "label": "initial_hit_pct (x2)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 200,
+        "val_high": 205,
+        "per_level": 5
+      },
+      {
+        "label": "initial_stagger (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 3,
+        "val_high": 3,
+        "per_level": 0.0
+      },
+      {
+        "label": "final_hit_pct (x2)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 465,
+        "val_high": 476,
+        "per_level": 11
+      },
+      {
+        "label": "final_stagger (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 3,
+        "val_high": 3,
+        "per_level": 0.0
+      }
+    ],
+    "plus_text": "Grants self a Defense 40% buff (lasts 20 seconds) and moves to the designated location. First deals 2 hits of 200% damage and 3 Stagger to enemies in a circular area and applies Taunt. Then deals 2 hits of 465% damage and 3 Stagger to enemies in a circular area and applies Taunt."
+  },
+  {
+    "ability_id": "W024_special",
+    "witch_id": "W024",
+    "slot": "Special",
+    "name": "Kings Unbowed",
+    "description": "Self bonus damage reduction.",
+    "has_plus": "no",
+    "plus_unlocks_at_star": null,
+    "plus_description": null,
+    "mechanics": "self Bonus Damage Reduction 30->31% (6s) · CD 6",
+    "description_original": "Self bonus damage reduction.",
+    "required_rank": 3,
+    "cooldown_s": 6,
+    "charge": null,
+    "range": null,
+    "tags": [],
+    "base_text": "Grants self Bonus Damage Reduction 30% (lasts 6 seconds).",
+    "coefficients": [
+      {
+        "label": "bonus_dmg_reduction_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 30,
+        "val_high": 31,
+        "per_level": 1
+      },
+      {
+        "label": "dur_s (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 6,
+        "val_high": 6,
+        "per_level": 0.0
+      }
+    ]
+  },
+  {
+    "ability_id": "W024_normal",
+    "witch_id": "W024",
+    "slot": "Normal",
+    "name": "Rising Swift Slash",
+    "description": "A 3-hit Magic combo on one enemy.",
+    "has_plus": "no",
+    "plus_unlocks_at_star": null,
+    "plus_description": null,
+    "mechanics": "hit1 80->82 · hit2 80->82 · hit3 123->126 · Range 2",
+    "description_original": "A 3-hit Magic combo on one enemy.",
+    "required_rank": null,
+    "cooldown_s": null,
+    "charge": null,
+    "range": 2,
+    "tags": [],
+    "base_text": "Hit 1: Deals 80% damage to one enemy. Hit 2: Deals 80% damage to one enemy. Hit 3: Deals 123% damage to one enemy.",
+    "coefficients": [
+      {
+        "label": "hit1_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 80,
+        "val_high": 82,
+        "per_level": 2
+      },
+      {
+        "label": "hit2_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 80,
+        "val_high": 82,
+        "per_level": 2
+      },
+      {
+        "label": "hit3_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 123,
+        "val_high": 126,
+        "per_level": 3
+      }
+    ]
+  },
+  {
+    "ability_id": "W024_class",
+    "witch_id": "W024",
+    "slot": "Class",
+    "name": "Desperate Outlaw",
+    "description": "Block Counter — bigger AoE + Taunt, and (plus) an enemy damage-reduction debuff.",
+    "has_plus": "yes",
+    "plus_unlocks_at_star": null,
+    "plus_description": "[Block Counter] Trigger Conditions: Activates after blocking, only if a target is within range. Deals 230% damage to enemies in a circular area, applies Taunt, and reduces the damage dealt by enemies in the area by 12% (lasts 6 seconds).",
+    "mechanics": "[Block Counter] 160->163% · Taunt · CD 6 · Magic",
+    "description_original": "Block Counter — AoE damage + Taunt after a block.",
+    "required_rank": 1,
+    "cooldown_s": 6,
+    "charge": null,
+    "range": null,
+    "tags": [],
+    "base_text": "[Block Counter] Trigger Conditions: Activates after blocking, only if a target is within range. Deals 160% damage to enemies in a circular area and applies Taunt.",
+    "coefficients": [
+      {
+        "label": "damage_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 160,
+        "val_high": 163,
+        "per_level": 3
+      }
+    ],
+    "plus_text": "[Block Counter] Trigger Conditions: Activates after blocking, only if a target is within range. Deals 230% damage to enemies in a circular area, applies Taunt, and reduces the damage dealt by enemies in the area by 12% (lasts 6 seconds).",
+    "plus_coefficients": [
+      {
+        "label": "damage_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 230,
+        "val_high": 235,
+        "per_level": 5
+      },
+      {
+        "label": "enemy_dmg_dealt_reduction_pct (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 12,
+        "val_high": 12,
+        "per_level": 0.0
+      },
+      {
+        "label": "debuff_dur_s (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 6,
+        "val_high": 6,
+        "per_level": 0.0
+      }
+    ]
+  },
+  {
+    "ability_id": "W024_passive",
+    "witch_id": "W024",
+    "slot": "Passive",
+    "name": "Rolling Checkmates",
+    "description": "Refills her own Extreme after use; Extreme hits stack enemy Attack-reduction.",
+    "has_plus": "no",
+    "plus_unlocks_at_star": null,
+    "plus_description": null,
+    "mechanics": "Extreme gauge refill (40s ICD) · Extreme hits: enemy Attack -1%/stack (max 8, 15s) · CD 30",
+    "description_original": "Refills her own Extreme after use; Extreme hits stack enemy Attack-reduction.",
+    "required_rank": 4,
+    "cooldown_s": 30,
+    "charge": null,
+    "range": null,
+    "tags": [],
+    "base_text": "After using an Extreme Skill, instantly refill the Extreme Skill gauge (CD: 40 sec). Each time the Extreme Skill hits an enemy, apply 1 stack of Attack reduction 1% to the target (max 8 stacks) (lasts 15 sec).",
+    "coefficients": [
+      {
+        "label": "extreme_refill (flat, binary)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 1,
+        "val_high": 1,
+        "per_level": 0.0
+      },
+      {
+        "label": "refill_icd_s (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 40,
+        "val_high": 40,
+        "per_level": 0.0
+      },
+      {
+        "label": "atk_reduction_per_stack_pct (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 1,
+        "val_high": 1,
+        "per_level": 0.0
+      },
+      {
+        "label": "max_stacks (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 8,
+        "val_high": 8,
+        "per_level": 0.0
+      },
+      {
+        "label": "debuff_dur_s (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 15,
+        "val_high": 15,
+        "per_level": 0.0
+      }
+    ]
+  },
+  {
+    "ability_id": "W024_interference",
+    "witch_id": "W024",
+    "slot": "Interference",
+    "name": "Flawless Strategy",
+    "description": "Support slot: gives the carry Attack% + Defense-on-their-Extreme.",
+    "has_plus": "no",
+    "plus_unlocks_at_star": null,
+    "plus_description": null,
+    "mechanics": "carry Attack 4->5% · after carry Extreme: carry Def +5->6%/stack (max 3, 25->30s)",
+    "description_original": "Support slot: gives the carry Attack% + Defense-on-their-Extreme.",
+    "required_rank": null,
+    "cooldown_s": null,
+    "charge": null,
+    "range": null,
+    "tags": [],
+    "base_text": "Character's Attack 5%. After the character uses their Extreme Skill, grants self a Defense 6% effect for 1 stack (max 3 stacks) (lasts 30 seconds).",
+    "coefficients": [
+      {
+        "label": "carry_attack_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 4,
+        "val_high": 5,
+        "per_level": 1
+      },
+      {
+        "label": "carry_def_per_stack_pct",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 5,
+        "val_high": 6,
+        "per_level": 1
+      },
+      {
+        "label": "max_stacks (flat)",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 3,
+        "val_high": 3,
+        "per_level": 0.0
+      },
+      {
+        "label": "dur_s",
+        "lv_low": 1,
+        "lv_high": 2,
+        "val_low": 25,
+        "val_high": 30,
+        "per_level": 5
+      }
+    ]
   }
 ]

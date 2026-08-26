@@ -16,7 +16,7 @@ const dealersByType = t => witches.filter(w => w.damage_type === t)
   .sort((a, b) => (a.rarity === 'SSR' ? 0 : 1) - (b.rarity === 'SSR' ? 0 : 1) || a.name.localeCompare(b.name));
 const bossMedia = (b) => {
   const stems = [b.media, b.id].filter(Boolean);
-  const poster = [`/img/boss/${b.id}.png`, `/img/boss/${b.id}.jpg`].map(x => hasImg(x) ? `${base}${x.slice(1)}` : null).find(Boolean) || null;
+  const poster = [b.media, b.id].filter(Boolean).flatMap(st => [`/img/boss/${st}.png`, `/img/boss/${st}.jpg`]).map(x => hasImg(x) ? `${base}${x.slice(1)}` : null).find(Boolean) || null;
   for (const stem of stems) {
     for (const ext of ['mp4', 'webm']) { const p = `/img/boss/${stem}.${ext}`; if (hasImg(p)) return { type: 'video', ext, src: `${base}${p.slice(1)}`, poster }; }
     const gp = `/img/boss/${stem}.gif`; if (hasImg(gp)) return { type: 'gif', src: `${base}${gp.slice(1)}` };
@@ -44,12 +44,14 @@ const bossMedia = (b) => {
                 : <span class="boss-ph" aria-hidden="true"></span>; })()}
             </div>
             <div class="boss-meta">
-              <span class="mode-tag mono">{b.mode}</span>
+              <span class="mode-tag mono">{b.mode}</span>{b.upcoming && <span class="up-tag mono">Upcoming</span>}
               <h3 class="boss-name">{b.name}</h3>
               <p class="boss-blurb">{b.blurb}</p>
+              {b.source && <p class="boss-source mono">{b.source}</p>}
               <div class="type-row">
-                <span class="tchip"><EyeBadge type={b.deals} size={20} title="" /> <span><b>{cap(b.deals)}</b> damage</span></span>
-                <span class="tchip weak"><EyeBadge type={b.weak} size={20} title="" /> <span>Weak to <b>{cap(b.weak)}</b></span></span>
+                <span class="tchip">{hasUi(`type_${lc(b.deals)}`) ? <img class="tic" src={ui(`type_${lc(b.deals)}`)} width="20" height="20" alt="" /> : <EyeBadge type={b.deals} size={20} title="" />} <span><b>{cap(b.deals)}</b> damage</span></span>
+                <span class="tchip weak">{hasUi(`type_${lc(b.weak)}`) ? <img class="tic" src={ui(`type_${lc(b.weak)}`)} width="20" height="20" alt="" /> : <EyeBadge type={b.weak} size={20} title="" />} <span>Weak to <b>{cap(b.weak)}</b></span></span>
+                {b.race && <span class="tchip"><span>Race: <b>{cap(b.race)}</b></span></span>}
               </div>
             </div>
           </div>
@@ -77,19 +79,23 @@ const bossMedia = (b) => {
               <ul class="tips">{b.tips.map(t => <li>{t}</li>)}</ul>
             </div>
             <div class="col">
-              <span class="dl mono">Recommended</span>
-              <div class="recs">
-                {b.recommended.map(r => {
-                  const w = wById[r.witch_id];
-                  return w ? (
-                    <a class="rec" href={`${base}witch/${w.witch_id.toLowerCase()}`}>
-                      <span class={`rdot is-${w.rarity}`}></span>
-                      <span class="rname">{w.name}</span>
-                      <span class="rnote">{r.note}</span>
-                    </a>
-                  ) : null;
-                })}
-              </div>
+              {(b.recommended || []).length > 0 && (
+                <>
+                  <span class="dl mono">Recommended</span>
+                  <div class="recs">
+                    {b.recommended.map(r => {
+                      const w = wById[r.witch_id];
+                      return w ? (
+                        <a class="rec" href={`${base}witch/${w.witch_id.toLowerCase()}`}>
+                          <span class={`rdot is-${w.rarity}`}></span>
+                          <span class="rname">{w.name}</span>
+                          <span class="rnote">{r.note}</span>
+                        </a>
+                      ) : null;
+                    })}
+                  </div>
+                </>
+              )}
               <span class="dl mono" style="margin-top:16px">Auto — all {cap(b.weak)} dealers <span class="auto-note">(he's weak to {cap(b.weak)})</span></span>
               <div class="dealer-chips">
                 {dealersByType(b.weak).map(w => (
@@ -120,6 +126,7 @@ const bossMedia = (b) => {
   .thead .sub{color:var(--ink-dim);max-width:60ch;margin:0 0 8px}
   .sec{font-size:1.5rem;margin:36px 0 16px}
   .mode-tag{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--sigil)}
+  .up-tag{margin-left:8px;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:#1c1406;background:linear-gradient(180deg,#ffe08a,var(--ssr));border-radius:6px;padding:2px 7px}
   .boss{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
   .boss-head{display:flex;gap:20px;padding:20px 22px;align-items:center;
     background:radial-gradient(600px 200px at 0% 0%, color-mix(in srgb,var(--mental,#d9c34a) 16%,transparent), transparent 70%)}
@@ -132,6 +139,8 @@ const bossMedia = (b) => {
   .tchip{display:inline-flex;align-items:center;gap:8px;background:rgba(20,16,32,.7);border:1px solid var(--line);
     border-radius:10px;padding:6px 11px;font-size:.86rem;color:var(--ink-dim)}
   .tchip b{color:var(--ink)}
+  .tchip .tic{display:block}
+  .boss-source{font-size:.66rem;color:var(--ink-faint);margin:0 0 10px}
   .tchip.weak{box-shadow:inset 0 0 0 1px color-mix(in srgb,#e0574b 40%,transparent)}
   .boss-body{display:grid;grid-template-columns:1fr 1fr;gap:22px;padding:20px 22px;border-top:1px solid var(--line)}
   .dl{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px}

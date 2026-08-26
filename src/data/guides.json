@@ -9,14 +9,23 @@
       "weak": "mental",
       "mechanics": [
         {
-          "name": "Wake-up Kickback",
-          "text": "When he exits knockdown he unleashes a huge, high-damage kickback. Stun him exactly as the knockdown is ending to cancel it entirely — Carmen's Extreme nails the timing."
+          "name": "Slam",
+          "text": "Slams the targeted hero for heavy AoE damage to that unit and everyone near it, and applies heavy Stagger."
+        },
+        {
+          "name": "Map-wide Knockback",
+          "text": "Guaranteed right after he exits a knockdown (unless he is CC'd as it ends), and occasionally outside that window. Knocks every unit back with heavy damage and a stun. This is the one to interrupt — CC him as the knockdown ends to cancel it."
+        },
+        {
+          "name": "Water Pull",
+          "text": "Drags all units to the center of the map three times, dealing damage on each pull and briefly stunning/interrupting everyone. Save Extremes for just before or after — casting during it risks being interrupted or outranged."
         }
       ],
       "tips": [
-        "He is weak to Mental, so Mental dealers post the highest scores.",
-        "Bring one reliable stun to neutralize the Wake-up Kickback and protect your run.",
-        "Score is cumulative damage-before-death — survivability and uptime matter as much as raw burst."
+        "Weak to Mental — Mental dealers post the highest scores.",
+        "Bring one reliable stun to cancel the Map-wide Knockback (see control units below).",
+        "Time Extremes around the Water Pull, not during it — the pull + stun makes a mid-cast Extreme a gamble.",
+        "Score is cumulative damage before you die, so survivability and uptime matter as much as burst."
       ],
       "recommended": [
         {
@@ -54,12 +63,37 @@
           "note": "Xini — Extreme applies a knockdown (surfaced from her skill text); useful control, confirm timing in-run."
         }
       ],
-      "media": "boss_slime"
+      "media": "boss_slime",
+      "source": "Community-observed — no datamined ability data available for this boss."
+    },
+    {
+      "id": "venomfrill",
+      "name": "Venomfrill",
+      "mode": "Boss Training",
+      "upcoming": true,
+      "blurb": "The next world boss (rotating in this week). A frilled beast — hits Physical and is weak to Physical.",
+      "deals": "physical",
+      "weak": "physical",
+      "race": "beast",
+      "media": "boss_venom",
+      "source": "Datamined from config N3097 — stats confirmed; ability details to be confirmed on release.",
+      "mechanics": [
+        {
+          "name": "Ability set — TBD on release",
+          "text": "His config carries 24 ability references (vs the slime's 17), so expect a busier kit. Exact abilities will be filled in from play once he's live."
+        }
+      ],
+      "tips": [
+        "Weak to Physical — Physical dealers post the highest scores (auto-list below).",
+        "Very high knockback resistance (30, vs the slime's 10) and posture 300 — CC and interrupts are far less reliable here, so lean on sustained Physical damage and survivability rather than a stun-lock plan.",
+        "Beast race — relevant for any race-targeted effects."
+      ],
+      "recommended": []
     }
   ],
   "tower": {
     "name": "Tower of Anomalies",
-    "blurb": "Static 50-floor tower of increasing difficulty. Notable-floor breakdowns coming as we chart the hard walls.",
+    "blurb": "TBD — awaiting floor data and personalized team information to provide suggestions.",
     "floors": []
   }
 }
