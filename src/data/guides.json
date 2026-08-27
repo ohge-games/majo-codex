@@ -9,8 +9,33 @@
       "weak": "physical",
       "race": "beast",
       "media": "boss_venom",
-      "source": "Datamined from config N3097. Stats confirmed; per-ability breakdown in progress.",
-      "mechanics": [],
+      "source": "Datamined from config N3097 — stats and full kit confirmed; per-hit damage values pending a deeper resolve.",
+      "mechanics": [
+        {
+          "name": "Extreme damage feeds his resistance",
+          "text": "Every Extreme-type hit he takes adds a stacking Extreme-resist buff — up to 4 stacks through Rank 4, up to 6 at Endless, each lasting ~20s. At Endless he also opens with a permanent Extreme-resist buff. Extreme-burst comps lose value the longer they hammer him, so build around his Physical weakness instead."
+        },
+        {
+          "name": "The kit unlocks by rank",
+          "text": "Higher ranks aren't just more HP. Rank 1 is three basic attacks plus a stagger hit. Rank 2 adds a four-part dash rush and a fog attack. Rank 3 and up add a long, telegraphed roar. Expect a busier, more punishing rotation the higher you climb."
+        },
+        {
+          "name": "Dash rush (Rank 2+)",
+          "text": "A four-hit dash combo (four ~2s lunges) that he banks charges for on roughly a 30-second cooldown. When he's dash-ready he'll close the gap fast — leave yourself room to reposition."
+        },
+        {
+          "name": "Roar (Rank 3+)",
+          "text": "His longest move at about 10.5 seconds, so it's heavily telegraphed. Treat the windup as a free window to burst or reposition rather than something you need to interrupt."
+        },
+        {
+          "name": "Endless revive (Rank 5)",
+          "text": "In Endless he revives after going down and returns with an extra-damage buff. Hold a cooldown or two for the second phase instead of dumping everything before the first kill."
+        },
+        {
+          "name": "Hard to lock down",
+          "text": "High punch resistance (3000) and a 1000 stagger threshold make stuns and interrupts unreliable — he'll power through most CC. He can still be pulled or teleported, and he never dodges or blocks, so no hits are wasted. Plan for sustained Physical pressure over a stun-lock."
+        }
+      ],
       "tips": [
         "Weak to Physical — Physical dealers post the highest scores (auto-list below).",
         "Very high knockback resistance (30, vs the slime's 10) and posture 300 — CC and interrupts are far less reliable here, so lean on sustained Physical damage and survivability rather than a stun-lock plan.",
