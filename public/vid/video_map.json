@@ -1,0 +1,224 @@
+{
+  "W019": {
+    "cutin": "cutins/w019_w019.mp4",
+    "skills": {
+      "special": "skills/w019_special.mp4",
+      "class": "skills/w019_class.mp4",
+      "extreme": "skills/w019_extreme.mp4",
+      "normal": "skills/w019_normal.mp4"
+    }
+  },
+  "W018": {
+    "cutin": "cutins/w018_w018.mp4",
+    "skills": {
+      "class": "skills/w018_class.mp4",
+      "special": "skills/w018_special.mp4",
+      "extreme": "skills/w018_extreme.mp4",
+      "normal": "skills/w018_normal.mp4"
+    }
+  },
+  "W009": {
+    "cutin": "cutins/w009_w009.mp4",
+    "skills": {
+      "special": "skills/w009_special.mp4",
+      "class": "skills/w009_class.mp4",
+      "extreme": "skills/w009_extreme.mp4",
+      "normal": "skills/w009_normal.mp4"
+    }
+  },
+  "W008": {
+    "cutin": "cutins/w008_w008.mp4",
+    "skills": {
+      "special": "skills/w008_special.mp4",
+      "class": "skills/w008_class.mp4",
+      "extreme": "skills/w008_extreme.mp4",
+      "normal": "skills/w008_normal.mp4"
+    }
+  },
+  "W017": {
+    "cutin": "cutins/w017_w017.mp4",
+    "skills": {
+      "special": "skills/w017_special.mp4",
+      "class": "skills/w017_class.mp4",
+      "extreme": "skills/w017_extreme.mp4",
+      "normal": "skills/w017_normal.mp4"
+    }
+  },
+  "W007": {
+    "cutin": "cutins/w007_w007.mp4",
+    "skills": {
+      "special": "skills/w007_special.mp4",
+      "class": "skills/w007_class.mp4",
+      "extreme": "skills/w007_extreme.mp4",
+      "normal": "skills/w007_normal.mp4"
+    }
+  },
+  "W006": {
+    "cutin": "cutins/w006_w006.mp4",
+    "skills": {
+      "class": "skills/w006_class.mp4",
+      "special": "skills/w006_special.mp4",
+      "extreme": "skills/w006_extreme.mp4",
+      "normal": "skills/w006_normal.mp4"
+    }
+  },
+  "W020": {
+    "cutin": "cutins/w020_w020.mp4",
+    "skills": {
+      "special": "skills/w020_special.mp4",
+      "class": "skills/w020_class.mp4",
+      "extreme": "skills/w020_extreme.mp4",
+      "normal": "skills/w020_normal.mp4"
+    }
+  },
+  "W016": {
+    "cutin": "cutins/w016_w016.mp4",
+    "skills": {
+      "special": "skills/w016_special.mp4",
+      "class": "skills/w016_class.mp4",
+      "extreme": "skills/w016_extreme.mp4",
+      "normal": "skills/w016_normal.mp4"
+    }
+  },
+  "W015": {
+    "cutin": "cutins/w015_w015.mp4",
+    "skills": {
+      "special": "skills/w015_special.mp4",
+      "class": "skills/w015_class.mp4",
+      "extreme": "skills/w015_extreme.mp4",
+      "normal": "skills/w015_normal.mp4",
+      "interference": "skills/w015_interference.mp4"
+    }
+  },
+  "W005": {
+    "cutin": "cutins/w005_w005.mp4",
+    "skills": {
+      "special": "skills/w005_special.mp4",
+      "class": "skills/w005_class.mp4",
+      "extreme": "skills/w005_extreme.mp4",
+      "normal": "skills/w005_normal.mp4"
+    }
+  },
+  "W014": {
+    "cutin": "cutins/w014_w014.mp4",
+    "skills": {
+      "special": "skills/w014_special.mp4",
+      "class": "skills/w014_class.mp4",
+      "extreme": "skills/w014_extreme.mp4",
+      "normal": "skills/w014_normal.mp4",
+      "passive": "skills/w014_passive.mp4"
+    }
+  },
+  "W013": {
+    "cutin": "cutins/w013_w013.mp4",
+    "skills": {
+      "special": "skills/w013_special.mp4",
+      "class": "skills/w013_class.mp4",
+      "extreme": "skills/w013_extreme.mp4",
+      "normal": "skills/w013_normal.mp4",
+      "passive": "skills/w013_passive.mp4"
+    }
+  },
+  "W012": {
+    "cutin": "cutins/w012_w012.mp4",
+    "skills": {
+      "special": "skills/w012_special.mp4",
+      "class": "skills/w012_class.mp4",
+      "extreme": "skills/w012_extreme.mp4",
+      "normal": "skills/w012_normal.mp4"
+    }
+  },
+  "W011": {
+    "cutin": "cutins/w011_w011.mp4",
+    "skills": {
+      "special": "skills/w011_special.mp4",
+      "class": "skills/w011_class.mp4",
+      "extreme": "skills/w011_extreme.mp4",
+      "normal": "skills/w011_normal.mp4"
+    }
+  },
+  "W004": {
+    "cutin": "cutins/w004_w004.mp4",
+    "skills": {
+      "special": "skills/w004_special.mp4",
+      "class": "skills/w004_class.mp4",
+      "extreme": "skills/w004_extreme.mp4",
+      "normal": "skills/w004_normal.mp4"
+    }
+  },
+  "W023": {
+    "cutin": "cutins/w023_w023.mp4",
+    "skills": {
+      "special": "skills/w023_special.mp4",
+      "class": "skills/w023_class.mp4",
+      "extreme": "skills/w023_extreme.mp4",
+      "normal": "skills/w023_normal.mp4"
+    }
+  },
+  "W003": {
+    "cutin": "cutins/w003_w003.mp4",
+    "skills": {
+      "special": "skills/w003_special.mp4",
+      "class": "skills/w003_class.mp4",
+      "extreme": "skills/w003_extreme.mp4",
+      "normal": "skills/w003_normal.mp4"
+    }
+  },
+  "W022": {
+    "cutin": "cutins/w022_w022.mp4",
+    "skills": {
+      "special": "skills/w022_special.mp4",
+      "class": "skills/w022_class.mp4",
+      "extreme": "skills/w022_extreme.mp4",
+      "normal": "skills/w022_normal.mp4"
+    }
+  },
+  "W002": {
+    "cutin": "cutins/w002_w002.mp4",
+    "skills": {
+      "special": "skills/w002_special.mp4",
+      "class": "skills/w002_class.mp4",
+      "extreme": "skills/w002_extreme.mp4",
+      "interference": "skills/w002_interference.mp4",
+      "normal": "skills/w002_normal.mp4",
+      "passive": "skills/w002_passive.mp4"
+    }
+  },
+  "W010": {
+    "cutin": "cutins/w010_w010.mp4",
+    "skills": {
+      "special": "skills/w010_special.mp4",
+      "class": "skills/w010_class.mp4",
+      "extreme": "skills/w010_extreme.mp4",
+      "interference": "skills/w010_interference.mp4",
+      "normal": "skills/w010_normal.mp4"
+    }
+  },
+  "W001": {
+    "cutin": "cutins/w001_w001.mp4",
+    "skills": {
+      "special": "skills/w001_special.mp4",
+      "class": "skills/w001_class.mp4",
+      "extreme": "skills/w001_extreme.mp4",
+      "normal": "skills/w001_normal.mp4"
+    }
+  },
+  "W021": {
+    "cutin": "cutins/w021_w021.mp4",
+    "skills": {
+      "special": "skills/w021_special.mp4",
+      "class": "skills/w021_class.mp4",
+      "extreme": "skills/w021_extreme.mp4",
+      "normal": "skills/w021_normal.mp4"
+    }
+  },
+  "W024": {
+    "skills": {
+      "class": "skills/w024_class.mp4",
+      "extreme": "skills/w024_extreme.mp4",
+      "normal": "skills/w024_normal.mp4",
+      "special": "skills/w024_special.mp4"
+    },
+    "cutin": "cutins/w024_isabelle.mp4"
+  }
+}
