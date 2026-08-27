@@ -77,8 +77,11 @@ html,body{margin:0;height:100%;background:#0b0d10;overflow:hidden;font-family:'S
 .dsec{margin-top:14px}
 .dsec-h{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7c2b25;border-bottom:1px dotted #cfc6ad;padding-bottom:4px;margin-bottom:7px}
 .dsec-b.typed{font-family:'Special Elite',monospace;font-size:12.5px;line-height:19px;color:#2a2a2a}
-.dsec-b.hand{font-family:'Caveat',cursive;font-size:19px;line-height:26px;color:#26344a}
-.dsec-b.hand .red{color:#7c2b25;font-weight:700}
+/* observer's handwritten marginalia: scattered, slightly angled, not parallel */
+.dsec-b.scrawl{font-family:'Caveat',cursive;padding:2px 0 6px}
+.scrawl-line{font-size:21px;line-height:1.35;color:#2b3a52;margin:5px 0;transform-origin:left center;display:block}
+.scrawl-line.dir{color:#7c2b25;font-weight:700;font-size:22px;margin-top:12px}
+.scrawl-line .redact{background:#1a1512}
 .bigx{position:fixed;top:14px;right:18px;z-index:24;width:44px;height:44px;border:none;background:none;color:#7c2b25;font-size:40px;line-height:40px;cursor:pointer;opacity:.7;transition:opacity .15s,transform .15s;font-family:Arial,sans-serif}
 .bigx:hover{opacity:1;color:#c0392b;transform:scale(1.15)}
 .ovarrow{position:absolute;bottom:-40px;right:0;color:#7c2b25;text-decoration:none;font-size:11px;letter-spacing:.18em;text-transform:uppercase;border:1px solid #7c2b2555;padding:7px 12px;border-radius:2px;background:#0b0d1088}
@@ -145,7 +148,7 @@ html,body{margin:0;height:100%;background:#0b0d10;overflow:hidden;font-family:'S
       </div>
       <div class="dsec"><div class="dsec-h">Summary</div><div class="dsec-b typed" id="dv-summary"></div></div>
       <div class="dsec"><div class="dsec-h">Background</div><div class="dsec-b typed" id="dv-bg"></div></div>
-      <div class="dsec"><div class="dsec-h">Notes</div><div class="dsec-b hand" id="dv-notes"></div></div>
+      <div class="dsec"><div class="dsec-h">Notes</div><div class="dsec-b scrawl" id="dv-notes"></div></div>
     </div></div>
     <a class="ovarrow" id="ovarrow" href="#">open full file &rarr;</a>
   </div>
@@ -419,9 +422,11 @@ function openFolder(w){document.getElementById('spreadtab').innerHTML='<span>'+w
     setVal($('dv-race'), d.header.race, '\u2014 unrecorded');
     setVal($('dv-summary'), d.summary, 'No analyst summary on file.');
     setVal($('dv-bg'), d.background, '[ background awaiting field capture ]');
-    const notes=(d.notes||[]).join('<br>');
-    const dir=d.directive?'<br><span class="red">Directive: '+d.directive+'</span>':'';
-    $('dv-notes').innerHTML=notes+dir;
+    // scattered handwritten look: each line gets its own slight tilt + offset
+    const ang=[-2.3,1.5,-1.1,2.1,-1.7,0.9,-0.6], off=[0,12,5,16,7,3,10];
+    const lines=(d.notes||[]).map((t,i)=>'<span class="scrawl-line" style="transform:rotate('+ang[i%ang.length]+'deg);margin-left:'+off[i%off.length]+'px">'+t+'</span>').join('');
+    const dir=d.directive?'<span class="scrawl-line dir" style="transform:rotate(-2.6deg);margin-left:6px">Directive: '+d.directive+'</span>':'';
+    $('dv-notes').innerHTML=lines+dir;
     (d.plates||[]).forEach((p,i)=>{if(plateSpans[i])plateSpans[i].querySelector('span').textContent=p;});
   }else{
     $('dh-name').textContent=w.name; $('dh-id').textContent=w.id.replace('W','W-');
