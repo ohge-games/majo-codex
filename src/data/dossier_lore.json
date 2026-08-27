@@ -1,98 +1,114 @@
 {
+  "_meta": {
+    "race_values": [
+      "human",
+      "beast",
+      "meccha"
+    ],
+    "note": "race: read the top-right race icon in-game (spartan helmet = human). background: paste/summarize the in-game Backstory panel. Empty fields render as awaiting-capture placeholders.",
+    "race_enum": {
+      "0": "none (enemies/NPCs)",
+      "1": "human",
+      "2": "meccha",
+      "3": "beast",
+      "_source": "_raceType via yoink_backstory.py; W<->P via skill_hits.source_timeline",
+      "_confirmed": "Xinzi=human, Tomoe=meccha, Dusan=beast, Isabelle=human"
+    }
+  },
   "W001": {
-    "race": "",
-    "background": ""
+    "race": "beast",
+    "background": "A timid apprentice shrine maiden who became a living sacrifice at eighteen; the ritual failed and transformed her hair into countless eyeballs, flipping her personality to clingy and possessive. Believing herself god-chosen, she names the eyes \"Little Eyes,\" converses with them, and plucks them out to hide in corners and restrooms to watch anyone she fixates on."
   },
   "W002": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "Rigidly rule-bound to the point of OCD and self-sacrifice, she seems blindly loyal but keeps a private standard: superiors she judges unworthy she'll betray and kill without hesitation. A once-noble child exiled into soldiering, she has already turned on and killed a group leader she deemed unfit."
   },
   "W003": {
-    "race": "",
-    "background": ""
+    "race": "beast",
+    "background": "Gentle and overly cautious by default, she flips to abnormal aggression the moment she enters combat mode. She crafts dolls from battlefield hide, bone, and broken shields to hold the spirits of the fallen she has defended — and when the horn sounds, those war-hungry spirits possess her."
   },
   "W004": {
-    "race": "",
-    "background": ""
+    "race": "beast",
+    "background": "Her senses are muted and the world feels gray and distant, so she chases street extreme sports to feel alive in the moment. Delayed pain and extraordinary healing mean she often returns bloodied and tattered, not even noticing she was hurt."
   },
   "W005": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "Her warm, big-sisterly gentleness is armor grown over childhood neglect — she wields it to subconsciously, emotionally manipulate people into staying close. Craving love, she \"accidentally\" drips candle wax on herself and projects a belief that only through pain can one be loved onto those she treasures."
   },
   "W006": {
-    "race": "",
-    "background": ""
+    "race": "meccha",
+    "background": "An \"ultimate maid\" android from a destroyed timeline, built to serve a supreme ruler and gripped by an obsession with etiquette — she holds that the impolite don't deserve to live. After certain upheavals she relaxed her \"etiquette core\" to a single rule: as long as you speak politely, that's enough."
   },
   "W007": {
-    "race": "",
-    "background": ""
+    "race": "meccha",
+    "background": "A serious, bookish data analyst — sharp with numbers yet naively easy to deceive — quietly hiding that part of her brain has been rebuilt with mechanical components. She treats wardrobe \"malfunctions\" as an art form, delivered with such academic seriousness that others take her fashion pronouncements gravely."
   },
   "W008": {
-    "race": "",
-    "background": ""
+    "race": "meccha",
+    "background": "A brilliant surgeon who once dissected her late husband's corpse to keep his heart for company. She collects hearts and is enraptured by the sound of heartbeats — even replacing her own ears with electronic ones — so beneath her sociable white-coat warmth lurks the dread that you might not walk out of her care."
   },
   "W009": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "A washed-up tennis player whose supernatural reflexes and kinetic control awakened in a car crash, turning a benchwarmer into a champion. False doping rumors led her to a \"test\" that turned out to be MAJO, and the rebellious recruit was only won over when a guiding witch reverse-psychologied her into joining."
   },
   "W010": {
-    "race": "",
-    "background": ""
+    "race": "meccha",
+    "background": "A sharp-tongued android with chuunibyou bluster who threatens to destroy the world at the slightest slight — all talk, since her creator simply never gave her a gentler way to express herself. She secretly cares more than most, though thanking her makes her awkwardly furious, and her genuine road rage is dangerous enough that she's banned from any driving work."
   },
   "W011": {
-    "race": "",
-    "background": ""
+    "race": "beast",
+    "background": "The sole survivor of a childhood paint-factory explosion that left her body dyed in color and able to \"see\" colors' emotions and hear paint whisper. A mischievous ex-graffiti-gang artist, she tries to crack MAJO cases by reading colors — at such a low hit rate that others suspect the voices are just hallucinations."
   },
   "W012": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "A fickle whim-chaser who burns hot for people and hobbies then forgets them once the novelty fades; she joined MAJO to clear debts from a hookah shop she abandoned out of boredom. Obsessed with smoke and its scents, she grows unstable without a cigarette for half an hour and will start fires just to watch it curl."
   },
   "W013": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "The proud keeper of order in the red-light district, who fights for the women there and refuses any payment but the chance to \"admire beautiful legs.\" Nicknamed \"Leg Sister\" for disciplining troublemakers by breaking their legs, she tends her own with ritual devotion, holding that legs are a person's second face."
   },
   "W014": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "A music-addicted loner with her headphones always blasting, a failed-producer dream, and a knack for coincidentally playing background music that fits the moment — earning the nickname \"walking BGM.\" Beneath the obliviousness she's acutely sound-sensitive, reading danger from subtle noise and pulling off her headphones when it truly counts."
   },
   "W015": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "A cool, semi-retired instructor running MAJO's training grounds and a fanatical shounen-manga devotee who pours her whole salary into collecting editions and drills newcomers by making them re-enact classic manga scenes. A purist to a strange degree — she refuses to watch the anime even of the series she loves most."
   },
   "W016": {
-    "race": "",
+    "race": "human",
     "background": ""
   },
   "W017": {
-    "race": "",
-    "background": ""
+    "race": "beast",
+    "background": "A doll-like being from a parallel minority race who ages to a certain point and then stops, living around 200 years. Sold to a circus and displayed for decades as a \"living doll,\" she perfected a sweet, girlish persona that cracks into arrogance when cuteness fails — and secretly hates sweets and pink, with an unsettling talent for staring, unblinking and motionless."
   },
   "W018": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "Blunt, hot-tempered, and cynical, she's too impatient for pleasantries but keeps a cool head for tactics — and on the battlefield she's the fearless ace who charges enemy lines alone. Her values sit closer to ordinary people's than most witches', but having witnessed too much human malice she's grown world-weary, holding to her morals while learning to turn a blind eye, and climbing MAJO's ranks for information she's quietly after."
   },
   "W019": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "Quiet, elegant, and unreadable, she speaks gently and is practiced at manipulating hearts — yet beneath the calm exterior and ambiguous rhetoric she's fundamentally fragile and sensitive. Her sense of right and wrong differs from ordinary people's, so she'll say shocking things without a flicker, and she suffers serious insomnia."
   },
   "W020": {
-    "race": "",
-    "background": ""
+    "race": "meccha",
+    "background": "A serious, loyal mechanical gunner from a parallel world who protects her teammates fiercely but goes shy the moment she's praised. She never removes her tactical earpiece and constantly converses with \"Barrett\" — an intelligent weapon built from old-style firearms that she treats as a lifelong war buddy and an independent being."
   },
   "W021": {
-    "race": "",
-    "background": ""
+    "race": "beast",
+    "background": "A timid beastman from a parallel world, obedient and rule-bound to a fault, who triple-checks every regulation for fear of being sent back to her original timeline. Raised in a primitive, natural culture, she carries oddly outdated, internet-learned notions of modern \"workplace etiquette.\""
   },
   "W022": {
-    "race": "",
-    "background": ""
+    "race": "meccha",
+    "background": "From a sunless parallel world, her fireproof skin dissolves in direct sunlight and her eyes can't bear the sun — yet she aches for it constantly. She turns frenzied in battle because combustion is the closest she gets to sunlight, fills her room with incandescent bulbs, and is allowed just thirty supervised seconds of dawn sun a month."
   },
   "W023": {
-    "race": "",
-    "background": ""
+    "race": "meccha",
+    "background": "A romantic idealist who believes in fairy-tale love with a faintly yandere edge, yet is at heart a naive, defenseless love-struck girl. Her dream is to be wholly consumed by her true love — one hand is already eaten and now prosthetic — so she studies medicine to prolong her survival through the process, voluntarily staffing MAJO's medical room in a nurse uniform around the clock."
   },
   "W024": {
-    "race": "",
-    "background": ""
+    "race": "human",
+    "background": "A gleeful, near-empathyless troublemaker who revels in chaos and believes the world exists for her amusement — recruited by MAJO with the promise of endless spectacle before she could commit anything truly unforgivable. Arrogant and theatrical, she's a chess devotee who reads reality as a board, still schemes behind the scenes (so she's kept out of the loop), and drapes herself in an extravagant cape."
   }
 }
