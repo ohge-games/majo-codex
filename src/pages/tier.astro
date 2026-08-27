@@ -12,6 +12,7 @@ const ui = name => `${base}img/ui/${name}.png`;
 const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
 const hasUi = name => hasImg(`/img/ui/${name}.png`);
 const wById = Object.fromEntries(witches.map(w => [w.witch_id, w]));
+const accentVar = t => ({physical:'var(--physical)',magic:'var(--magic)',mental:'var(--mental)'}[lc(t)] || 'var(--sigil)');
 const dealersByType = t => witches.filter(w => w.damage_type === t)
   .sort((a, b) => (a.rarity === 'SSR' ? 0 : 1) - (b.rarity === 'SSR' ? 0 : 1) || a.name.localeCompare(b.name));
 const bossMedia = (b) => {
@@ -43,7 +44,7 @@ const bossMedia = (b) => {
     <section class="mode">
       <h2 class="sec display">Boss Training</h2>
       {guides.bosses.map(b => (
-        <article class="boss">
+        <article class="boss" style={`--accent:${accentVar(b.deals)}`}>
           <div class="boss-head">
             <div class="boss-art">
               {(() => { const m = bossMedia(b); return m
@@ -51,6 +52,7 @@ const bossMedia = (b) => {
                     ? <video class="boss-media" autoplay loop muted playsinline poster={m.poster || undefined}><source src={m.src} type={`video/${m.ext}`} /></video>
                     : <img class="boss-media" src={m.src} alt={b.name} />)
                 : <span class="boss-ph" aria-hidden="true"></span>; })()}
+              <span class="boss-frame" aria-hidden="true"></span>
             </div>
             <div class="boss-meta">
               <span class="mode-tag mono">{b.mode}</span>{b.upcoming && <span class="up-tag mono">Upcoming</span>}
@@ -82,10 +84,12 @@ const bossMedia = (b) => {
 
           <div class="boss-body">
             <div class="col">
-              <span class="dl mono">Mechanics &amp; counters</span>
-              {b.mechanics.map(m => (
-                <div class="mech"><b>{m.name}.</b> {m.text}</div>
-              ))}
+              {b.mechanics && b.mechanics.length > 0 && (<>
+                <span class="dl mono">Mechanics &amp; counters</span>
+                {b.mechanics.map(m => (
+                  <div class="mech"><b>{m.name}.</b> {m.text}</div>
+                ))}
+              </>)}
               {b.control && b.control.length > 0 && (
                 <>
                   <span class="dl mono" style="margin-top:16px">Control for the Wake-up Kickback</span>
@@ -166,11 +170,28 @@ const bossMedia = (b) => {
   .mode-tag{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--sigil)}
   .up-tag{margin-left:8px;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:#1c1406;background:linear-gradient(180deg,#ffe08a,var(--ssr));border-radius:6px;padding:2px 7px}
   .boss{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-  .boss-head{display:flex;gap:20px;padding:20px 22px;align-items:center;
-    background:radial-gradient(600px 200px at 0% 0%, color-mix(in srgb,var(--mental,#d9c34a) 16%,transparent), transparent 70%)}
-  .boss-art{width:120px;height:120px;flex-shrink:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--nightshade);display:grid;place-items:center}
+  .boss-head{display:flex;gap:24px;padding:22px 24px;align-items:flex-start;
+    background:radial-gradient(680px 300px at 0% 0%, color-mix(in srgb,var(--accent,#8b6cff) 15%,transparent), transparent 72%)}
+  /* Specimen feed: tall 3:4 portrait framed like a monitored anomaly */
+  .boss-art{position:relative;width:clamp(168px,23vw,248px);aspect-ratio:3/4;flex-shrink:0;
+    border-radius:12px;overflow:hidden;display:grid;place-items:center;background:var(--nightshade);
+    border:1px solid color-mix(in srgb,var(--accent,#8b6cff) 38%,var(--line));
+    box-shadow:inset 0 0 70px -22px color-mix(in srgb,var(--accent,#8b6cff) 60%,transparent), 0 14px 40px -18px rgba(0,0,0,.75)}
   .boss-art img,.boss-art .boss-media{width:100%;height:100%;object-fit:cover;display:block}
-  .boss-ph{width:56%;height:56%;border-radius:50%;background:radial-gradient(circle at 40% 35%, #5f6a3a, #23261a);opacity:.7}
+  .boss-ph{width:52%;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, color-mix(in srgb,var(--accent,#8b6cff) 40%,#23261a), #191325);opacity:.7}
+  .boss-frame{position:absolute;inset:9px;pointer-events:none;border-radius:4px;
+    border:1.5px solid color-mix(in srgb,var(--accent,#8b6cff) 78%,#ffffff 8%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) top left/16px 16px no-repeat,
+      linear-gradient(#000 0 0) top right/16px 16px no-repeat,
+      linear-gradient(#000 0 0) bottom left/16px 16px no-repeat,
+      linear-gradient(#000 0 0) bottom right/16px 16px no-repeat;
+    mask:
+      linear-gradient(#000 0 0) top left/16px 16px no-repeat,
+      linear-gradient(#000 0 0) top right/16px 16px no-repeat,
+      linear-gradient(#000 0 0) bottom left/16px 16px no-repeat,
+      linear-gradient(#000 0 0) bottom right/16px 16px no-repeat}
   .boss-name{font-size:1.6rem;margin:4px 0 6px}
   .boss-blurb{color:var(--ink-dim);margin:0 0 10px;font-size:.92rem;max-width:56ch}
   .type-row{display:flex;flex-wrap:wrap;gap:10px}
@@ -225,5 +246,5 @@ const bossMedia = (b) => {
   .dchip2.is-SSR .dc-dot{background:var(--ssr)} .dchip2.is-SR .dc-dot{background:var(--sr)}
   .dc-r{font-size:.6rem;color:var(--ink-faint)}
   .tower-empty .hint{color:var(--ink-faint);font-size:.78rem;margin-bottom:0}
-  @media(max-width:760px){ .boss-head{flex-direction:column;align-items:flex-start} .boss-body{grid-template-columns:1fr} }
+  @media(max-width:760px){ .boss-head{flex-direction:column;align-items:flex-start} .boss-body{grid-template-columns:1fr} .boss-art{width:min(70vw,280px)} }
 </style>

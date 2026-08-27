@@ -9,13 +9,8 @@
       "weak": "physical",
       "race": "beast",
       "media": "boss_venom",
-      "source": "Datamined from config N3097 — stats confirmed; ability details to be confirmed on release.",
-      "mechanics": [
-        {
-          "name": "Ability set — TBD on release",
-          "text": "His config carries 24 ability references (vs the slime's 17), so expect a busier kit. Exact abilities will be filled in from play once he's live."
-        }
-      ],
+      "source": "Datamined from config N3097. Stats confirmed; per-ability breakdown in progress.",
+      "mechanics": [],
       "tips": [
         "Weak to Physical — Physical dealers post the highest scores (auto-list below).",
         "Very high knockback resistance (30, vs the slime's 10) and posture 300 — CC and interrupts are far less reliable here, so lean on sustained Physical damage and survivability rather than a stun-lock plan.",
