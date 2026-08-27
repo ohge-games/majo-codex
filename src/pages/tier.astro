@@ -15,6 +15,15 @@ const wById = Object.fromEntries(witches.map(w => [w.witch_id, w]));
 const dealersByType = t => witches.filter(w => w.damage_type === t)
   .sort((a, b) => (a.rarity === 'SSR' ? 0 : 1) - (b.rarity === 'SSR' ? 0 : 1) || a.name.localeCompare(b.name));
 const bossMedia = (b) => {
+  // Converted showcase loop under /vid/boss/ wins (b.video = file stem, e.g. "boss_venomfrill_lobby").
+  if (b.video) {
+    const wp = `/vid/boss/${b.video}.webp`;
+    const vposter = hasImg(wp) ? `${base}${wp.slice(1)}` : null;
+    for (const ext of ['mp4', 'webm']) {
+      const vp = `/vid/boss/${b.video}.${ext}`;
+      if (hasImg(vp)) return { type: 'video', ext, src: `${base}${vp.slice(1)}`, poster: vposter };
+    }
+  }
   const stems = [b.media, b.id].filter(Boolean);
   const poster = [b.media, b.id].filter(Boolean).flatMap(st => [`/img/boss/${st}.png`, `/img/boss/${st}.jpg`]).map(x => hasImg(x) ? `${base}${x.slice(1)}` : null).find(Boolean) || null;
   for (const stem of stems) {
