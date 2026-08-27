@@ -1,0 +1,629 @@
+{
+  "_meta": {
+    "generated": "2026-08-27T08:38:40.779Z",
+    "source": "src/data/{witches,tier_synergy}.json",
+    "count": 24,
+    "note": "Auto-generated field reports for the Observer Terminal. Do not hand-edit."
+  },
+  "witches": {
+    "W001": {
+      "id": "W001",
+      "name": "Dusan",
+      "title": "Thousand Gazing Eyes",
+      "cls": "Arcanist",
+      "rarity": "SR",
+      "deals": "mental",
+      "weak": "mental",
+      "plates": [
+        "CHARGE AMP",
+        "SUPPRESS",
+        "EXECUTIONER",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued arcanist; deals mental, exposed to mental.",
+        "Suppresses enemy output over time.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Reliably breaks enemy stance on contact.",
+        "EXECUTION specialist. Special 'Void Convergence Gaze' is an [Execution] (downed targets only) that drops a damage zone (plus adds an upfront burst + cuts CD 10->8); its heaviest move 'Far-Seeing Blood Curse' is a huge single-area nuke (882% + 50 Stagger) that can help down targets itself; its resting state 'Forbidden Evil Eye' base buffs her attack speed after HER Execution, and the PLUS re-routes it to trigger off ALLIES' Executions - so she wants a downer + fellow executioner.",
+        "Reported to lift others when seconded — \"Impure Alluring Gaze.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "expect the target to be off-balance nearby.",
+      "clearance": "Clearance: standard. Rotate handlers per protocol."
+    },
+    "W002": {
+      "id": "W002",
+      "name": "Leed",
+      "title": "",
+      "cls": "Vanguard",
+      "rarity": "SR",
+      "deals": "mental",
+      "weak": "physical",
+      "plates": [
+        "EVADE/RIPOSTE",
+        "SUPPRESS",
+        "EXECUTIONER",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued vanguard; deals mental, exposed to physical.",
+        "Evasions convert into stacking retaliation.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Suppresses enemy output over time.",
+        "Stagger engine + EXECUTIONER (the only mental Vanguard).",
+        "Reported to lift others when seconded — \"Shadow Snare.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not tail alone; every miss compounds.",
+      "clearance": "Clearance: standard. Rotate handlers per protocol."
+    },
+    "W003": {
+      "id": "W003",
+      "name": "Budi",
+      "title": "",
+      "cls": "Defender",
+      "rarity": "SR",
+      "deals": "physical",
+      "weak": "physical",
+      "plates": [
+        "GUARD/RIPOSTE",
+        "EXTREME CHAR",
+        "HARD TAUNT",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued defender; deals physical, exposed to physical.",
+        "Blocks, then answers in the same motion.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Damage rides its normal-attack salvo.",
+        "Self-sustaining taunt tank: holds aggro while healing herself and padding max HP, with a guaranteed-crit its heaviest move for real chip damage and one of the highest block rates in the class.",
+        "Reported to lift others when seconded — \"Undead Whisper.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "let subject take point; it wants the aggro.",
+      "clearance": "Clearance: standard. Rotate handlers per protocol."
+    },
+    "W004": {
+      "id": "W004",
+      "name": "Xini",
+      "title": "",
+      "cls": "Vanguard",
+      "rarity": "SR",
+      "deals": "magic",
+      "weak": "mental",
+      "plates": [
+        "EVADE/RIPOSTE",
+        "CHARGE SPIKE",
+        "EXTREME CHAR",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued vanguard; deals magic, exposed to mental.",
+        "Evasions convert into stacking retaliation.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Cycles its Extreme far faster than baseline.",
+        "Dodge-driven spam carry: evasions fuel rapid its heaviest move/Special casts, and her kit lands a knockdown that doubles as control (handy for the slime's wake-up).",
+        "Reported to lift others when seconded — \"Fancy Footwork.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not tail alone; every miss compounds.",
+      "clearance": "Clearance: standard. Rotate handlers per protocol."
+    },
+    "W005": {
+      "id": "W005",
+      "name": "Peseshet",
+      "title": "",
+      "cls": "Supporter",
+      "rarity": "SR",
+      "deals": "magic",
+      "weak": "physical",
+      "plates": [
+        "EXTREME CHAR",
+        "EXTREME DAMA",
+        "MEND",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued supporter; deals magic, exposed to physical.",
+        "Restores allied condition mid-engagement.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Damage rides its normal-attack salvo.",
+        "Healer + team EXTREME-DAMAGE AMPLIFIER.",
+        "Reported to lift others when seconded — \"Lantern Guardian Stance.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "damage may not stick; account for recovery.",
+      "clearance": "Clearance: standard. Rotate handlers per protocol."
+    },
+    "W006": {
+      "id": "W006",
+      "name": "Tomoe",
+      "title": "",
+      "cls": "Arcanist",
+      "rarity": "SR",
+      "deals": "physical",
+      "weak": "physical",
+      "plates": [
+        "CHARGE AMP",
+        "SUPPRESS",
+        "CHARGE SPIKE",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued arcanist; deals physical, exposed to physical.",
+        "Suppresses enemy output over time.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Cycles its Extreme far faster than baseline.",
+        "its heaviest move-battery crit carry / flex support.",
+        "Reported to lift others when seconded — \"Flora's Blessing.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "watch for sudden charge spikes.",
+      "clearance": "Clearance: standard. Rotate handlers per protocol."
+    },
+    "W007": {
+      "id": "W007",
+      "name": "Qing",
+      "title": "",
+      "cls": "Defender",
+      "rarity": "SR",
+      "deals": "magic",
+      "weak": "physical",
+      "plates": [
+        "GUARD/RIPOSTE",
+        "ARMOR SHRED",
+        "HARD TAUNT",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued defender; deals magic, exposed to physical.",
+        "Blocks, then answers in the same motion.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Strips defenses; readings degrade in its presence.",
+        "Taunt/mitigation anchor: a hard-taunt Defender with layered self-mitigation (Defense, damage reduction, Magic Resistance) and an on-block enemy Attack debuff — built to eat hits and protect the carry.",
+        "Reported to lift others when seconded — \"Budget Allocation.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "let subject take point; it wants the aggro.",
+      "clearance": "Clearance: standard. Rotate handlers per protocol."
+    },
+    "W008": {
+      "id": "W008",
+      "name": "Doroa",
+      "title": "Heart-Obsessed Mad Doctor",
+      "cls": "Supporter",
+      "rarity": "SR",
+      "deals": "magic",
+      "weak": "physical",
+      "plates": [
+        "MEND",
+        "NO IMAGE",
+        "PARTIAL",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued supporter; deals magic, exposed to physical.",
+        "Restores allied condition mid-engagement.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Pure raw-throughput healer: the biggest straight heals in the roster, no damage pretensions — just keeping the team alive.",
+        "Reported to lift others when seconded — \"Heart Gazing.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "damage may not stick; account for recovery.",
+      "clearance": "Clearance: standard. Rotate handlers per protocol."
+    },
+    "W009": {
+      "id": "W009",
+      "name": "Grina",
+      "title": "Win Rate Addiction",
+      "cls": "Arcanist",
+      "rarity": "SR",
+      "deals": "physical",
+      "weak": "physical",
+      "plates": [
+        "CHARGE AMP",
+        "RAW DPS",
+        "SALVO CLASS",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued arcanist; deals physical, exposed to physical.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Selfish self-buff DPS: a Special-centric carry who piles crit and compounding harm on herself and tightens her own loop — give her the damage seat.",
+        "Reported to lift others when seconded — \"Break Point.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "maintain distance; report anomalies.",
+      "clearance": "Clearance: standard. Rotate handlers per protocol."
+    },
+    "W010": {
+      "id": "W010",
+      "name": "Lena",
+      "title": "",
+      "cls": "Vanguard",
+      "rarity": "SSR",
+      "deals": "physical",
+      "weak": "magic",
+      "plates": [
+        "EVADE/RIPOSTE",
+        "SALVO EXTREM",
+        "STAGGER",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued vanguard; deals physical, exposed to magic.",
+        "Evasions convert into stacking retaliation.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Reliably breaks enemy stance on contact.",
+        "Counter-attack bruiser: its core habit is a [Dodge Counter], its heaviest move repositions and shreds with knockback immunity, and its resting state stacks Physical Attack on every dodge.",
+        "Reported to lift others when seconded — \"Reckless Driving.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not tail alone; every miss compounds.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W011": {
+      "id": "W011",
+      "name": "Lumi",
+      "title": "",
+      "cls": "Arcanist",
+      "rarity": "SSR",
+      "deals": "physical",
+      "weak": "physical",
+      "plates": [
+        "CHARGE AMP",
+        "EVADE/RIPOSTE",
+        "SALVO",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued arcanist; deals physical, exposed to physical.",
+        "Evasions convert into stacking retaliation.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Damage rides its normal-attack salvo.",
+        "Normal-attack Arcanist: its core habit stacks normal-attack compounding harm 3x (plus tops off with evasion), its resting state turns dodges into big attack-speed windows (plus also shaves Special CD), in a support slot her Interference stacks crit rate on the carry off its core habit casts.",
+        "Reported to lift others when seconded — \"Swift Splash.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not tail alone; every miss compounds.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W012": {
+      "id": "W012",
+      "name": "Carmen",
+      "title": "",
+      "cls": "Defender",
+      "rarity": "SSR",
+      "deals": "mental",
+      "weak": "magic",
+      "plates": [
+        "GUARD/RIPOSTE",
+        "ARMOR SHRED",
+        "SUPPRESS",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued defender; deals mental, exposed to magic.",
+        "Blocks, then answers in the same motion.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Strips defenses; readings degrade in its presence.",
+        "Smoke support-tank: its heaviest move 'Mist Assault' shields allies (Toughness+Defense) then hits; Special 'Lingering Smoke Escort' rushes to the lowest-HP ally, heals big, and taunts; her Normal HEALS allies on every hit (plus doubles damage + cuts Special CD per hit); its core habit is a hardening Block Counter; when she backs a carry, her Interference feeds that carry Defense + a displacement-resistance effect (it never touches Carmen herself).",
+        "Reported to lift others when seconded — \"Rolling Smoke Effect.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not strike first; it feeds on the return.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W013": {
+      "id": "W013",
+      "name": "Huarui",
+      "title": "",
+      "cls": "Vanguard",
+      "rarity": "SSR",
+      "deals": "magic",
+      "weak": "physical",
+      "plates": [
+        "EVADE/RIPOSTE",
+        "SUPPRESS",
+        "CHARGE SPIKE",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued vanguard; deals magic, exposed to physical.",
+        "Evasions convert into stacking retaliation.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Suppresses enemy output over time.",
+        "Fire-fist dodge bruiser: its heaviest move 'Heaven Fallen' is a 5-hit front-loaded nuke whose plus fixes Special CD to 0 for 12s (spam Special during the window); its core habit 'Wildfire Palm' is a Dodge Counter granting attack speed (plus adds crit damage + doubles the range); Special 'Leg Cruncher' auto-fires off normal-attack finishers; its resting state lets a Special follow her 2nd normal and pumps Attack.",
+        "Reported to lift others when seconded — \"Step-by-Step Shadow Shattering.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not tail alone; every miss compounds.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W014": {
+      "id": "W014",
+      "name": "Garana",
+      "title": "",
+      "cls": "Defender",
+      "rarity": "SSR",
+      "deals": "physical",
+      "weak": "physical",
+      "plates": [
+        "GUARD/RIPOSTE",
+        "ARMOR SHRED",
+        "SUPPRESS",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued defender; deals physical, exposed to physical.",
+        "Blocks, then answers in the same motion.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Strips defenses; readings degrade in its presence.",
+        "Block-tank anchor: Roaring Howl (its heaviest move) taunts + dizzies while shielding allies' Defense; its core habit 'Sonic Blast' is a Block Counter that dizzies; Special 'Sound-Breaking Noise' auto-fires off its heaviest move/its core habit casts to nuke + apply a damage-taken debuff; its resting state shields allies off her normal-attack finisher; in a support slot her Interference stacks Physical Attack on the carry on block.",
+        "Reported to lift others when seconded — \"Stacked Resonance.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "let subject take point; it wants the aggro.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W015": {
+      "id": "W015",
+      "name": "Maro",
+      "title": "Hot-Blooded Mentor",
+      "cls": "Supporter",
+      "rarity": "SSR",
+      "deals": "mental",
+      "weak": "physical",
+      "plates": [
+        "EXECUTIONER",
+        "MEND",
+        "RACE SYNERGY",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued supporter; deals mental, exposed to physical.",
+        "Restores allied condition mid-engagement.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Faction-scaling healer: Compassionate Gift only boosts healing of HUMAN-race witches - she spikes on human-heavy teams.",
+        "Reported to lift others when seconded — \"Sacred Prayer's Gift.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "damage may not stick; account for recovery.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W016": {
+      "id": "W016",
+      "name": "Patra",
+      "title": "",
+      "cls": "Arcanist",
+      "rarity": "SSR",
+      "deals": "magic",
+      "weak": "mental",
+      "plates": [
+        "CHARGE AMP",
+        "ARMOR SHRED",
+        "CHARGE SPIKE",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued arcanist; deals magic, exposed to mental.",
+        "Strips defenses; readings degrade in its presence.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Cycles its Extreme far faster than baseline.",
+        "its heaviest move-snowball boss-killer: a charge-amp carry who fires its heaviest move over and over, so her ceiling rides on charge economy rather than an evolution — ideal for long single-target boss fights.",
+        "Reported to lift others when seconded — \"Weakening Breath.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "expect degraded readings around subject.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W017": {
+      "id": "W017",
+      "name": "Jenny",
+      "title": "",
+      "cls": "Arcanist",
+      "rarity": "SSR",
+      "deals": "mental",
+      "weak": "magic",
+      "plates": [
+        "EXECUTIONER",
+        "STAGGER",
+        "NO IMAGE",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued arcanist; deals mental, exposed to magic.",
+        "Reliably breaks enemy stance on contact.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Downed-target burst carry: its heaviest move is a massive single hit that also stuns, and her Special is an [Execution] that only strikes knocked-down enemies — pair her with a knockdown setter and land the its heaviest move in the downed window.",
+        "Reported to lift others when seconded — \"Sweet Gaze.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "expect the target to be off-balance nearby.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W018": {
+      "id": "W018",
+      "name": "Xinzi",
+      "title": "",
+      "cls": "Vanguard",
+      "rarity": "SSR",
+      "deals": "physical",
+      "weak": "physical",
+      "plates": [
+        "ARMOR SHRED",
+        "EVADE/RIPOSTE",
+        "SUPPRESS",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued vanguard; deals physical, exposed to physical.",
+        "Strips defenses; readings degrade in its presence.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Evasions convert into stacking retaliation.",
+        "Dodge-driven burst: its resting state turns evasions into accreting compounding harm; its core habit is a Dodge-Counter with a big hardening window.",
+        "Reported to lift others when seconded — \"Gathering of Hatred.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not tail alone; every miss compounds.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W019": {
+      "id": "W019",
+      "name": "Xuanji",
+      "title": "",
+      "cls": "Arcanist",
+      "rarity": "SSR",
+      "deals": "mental",
+      "weak": "magic",
+      "plates": [
+        "SUPPRESS",
+        "EXECUTIONER",
+        "STAGGER",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued arcanist; deals mental, exposed to magic.",
+        "Suppresses enemy output over time.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Reliably breaks enemy stance on contact.",
+        "Downed-target executioner: her damage explodes against knocked-down enemies, so she snowballs behind a knockdown/control setter — pure single-target execution.",
+        "Reported to lift others when seconded — \"Fading Light.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "expect the target to be off-balance nearby.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W020": {
+      "id": "W020",
+      "name": "Yuhong",
+      "title": "Soul-Pacifying Gunner",
+      "cls": "Arcanist",
+      "rarity": "SSR",
+      "deals": "physical",
+      "weak": "mental",
+      "plates": [
+        "EVADE/RIPOSTE",
+        "STAGGER",
+        "NO IMAGE",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued arcanist; deals physical, exposed to mental.",
+        "Evasions convert into stacking retaliation.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Reliably breaks enemy stance on contact.",
+        "Dodge-engine crit assassin: its heaviest move fixes Dodge CD to 2s (plus: Specials +200% while active); Calm Shot is a Dodge-Counter usable during the its heaviest move; its core habit pours crit/atk-speed off dodges (her Interference passes the same to a carry she's slotted behind, never to herself); Tactical Comms even feeds off allies' dodges.",
+        "Reported to lift others when seconded — \"Fire Support.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not tail alone; every miss compounds.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W021": {
+      "id": "W021",
+      "name": "Alice",
+      "title": "Sleepwalking White Shadow",
+      "cls": "Vanguard",
+      "rarity": "SSR",
+      "deals": "physical",
+      "weak": "mental",
+      "plates": [
+        "GUARD/RIPOSTE",
+        "COUNTER ENAB",
+        "EVADE/RIPOSTE",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued vanguard; deals physical, exposed to mental.",
+        "Blocks, then answers in the same motion.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Evasions convert into stacking retaliation.",
+        "Counter-cascade bruiser: its heaviest move fixes Dodge/Special/its core habit CDs to 1s/4s/3s and lets its core habit fire ignoring trigger conditions for 11s; its core habit is a Dodge+Block counter whose plus shaves 2s off Special CD; its resting state stacks its core habit & Special compounding harm every time an ally counters (max 7), so she spikes on counter-heavy teams.",
+        "Reported to lift others when seconded — \"Rabbit Vault.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not tail alone; every miss compounds.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W022": {
+      "id": "W022",
+      "name": "Yun",
+      "title": "Dark Molten Light",
+      "cls": "Defender",
+      "rarity": "SSR",
+      "deals": "physical",
+      "weak": "mental",
+      "plates": [
+        "GUARD/RIPOSTE",
+        "EVADE/RIPOSTE",
+        "STAGGER",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued defender; deals physical, exposed to mental.",
+        "Blocks, then answers in the same motion.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Evasions convert into stacking retaliation.",
+        "Untouchable duelist: Belt of Calm Winds gives 100% block + fixed 1.5s block/counter CD; stacked with her dodge stats she is very hard to hit, and Quick Dry lets its core habit and Special reset off each other for rapid-fire casting.",
+        "Reported to lift others when seconded — \"Open Umbrella.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not tail alone; every miss compounds.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W023": {
+      "id": "W023",
+      "name": "Zhijie",
+      "title": "",
+      "cls": "Supporter",
+      "rarity": "SSR",
+      "deals": "physical",
+      "weak": "magic",
+      "plates": [
+        "GUARD/RIPOSTE",
+        "COUNTER ENAB",
+        "MEND",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued supporter; deals physical, exposed to magic.",
+        "Blocks, then answers in the same motion.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Restores allied condition mid-engagement.",
+        "Counter-fueled support: Close Attention shaves her Special CD every time an ally counters.",
+        "Reported to lift others when seconded — \"Self-Care.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "do not strike first; it feeds on the return.",
+      "clearance": "Clearance: high. Assign experienced handlers only."
+    },
+    "W024": {
+      "id": "W024",
+      "name": "Isabelle",
+      "title": "Queen of All",
+      "cls": "Defender",
+      "rarity": "UR",
+      "deals": "magic",
+      "weak": "physical",
+      "plates": [
+        "HELD LINE",
+        "DRAWS FIRE",
+        "GUARD/RIPOSTE",
+        "SURVEIL."
+      ],
+      "notes": [
+        "Subject logged 03/--. Catalogued defender; deals magic, exposed to physical.",
+        "Absorbs fire without breaking formation.",
+        "Repeat sightings logged: <span class=\"redact\">xxxxx</span>.",
+        "Pulls hostile attention onto itself, deliberately.",
+        "Taunt tank built around survival and debuff: its heaviest move self-buffs Defense then hits a big AoE with heavy Stagger (up to 12) and Taunt, and its resting state refills its heaviest move gauge for near-constant uptime while accreting enemy Attack-reduction.",
+        "Reported to lift others when seconded — \"Flawless Strategy.\"",
+        "Calibration attempts: <span class=\"redact\">xxxxxxxxx</span>."
+      ],
+      "directive": "let subject take point; it wants the aggro.",
+      "clearance": "Clearance: QUEEN-tier. Handle only with authorization."
+    }
+  }
+}

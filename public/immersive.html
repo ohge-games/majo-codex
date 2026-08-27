@@ -373,15 +373,35 @@ function lookUp(){if(topDwell){clearTimeout(topDwell);topDwell=null;}if(state===
 function lookDown(){if(botDwell){clearTimeout(botDwell);botDwell=null;}if(state!=='W'||animating)return;aurabot.style.opacity=0;goTo(returnView||viewL,returnView===viewR?'R':'L');}
 function ndc(e){const r=renderer.domElement.getBoundingClientRect();mouse.x=((e.clientX-r.left)/r.width)*2-1;mouse.y=-((e.clientY-r.top)/r.height)*2+1;}
 const overlay=document.getElementById('overlay'), lightbox=document.getElementById('lightbox');
+// Real per-witch field reports, generated from site data at build time
+// (scripts/build-dossier.mjs -> public/dossier.json). Falls back to the
+// placeholder markup already in the DOM if the fetch fails.
+let DOSSIER={};
+fetch('/dossier.json').then(r=>r.ok?r.json():null).then(d=>{if(d&&d.witches)DOSSIER=d.witches;}).catch(()=>{});
+const scribbleEl=document.querySelector('.scribble');
+const scribbleFallback=scribbleEl?scribbleEl.innerHTML:'';
+const plateSpans=[...document.querySelectorAll('#frames .pframe')];
+const plateFallback=plateSpans.map(f=>f.querySelector('span').textContent);
 function openFolder(w){document.getElementById('spreadtab').innerHTML='<span>'+w.name.toUpperCase()+'  \u00b7  '+w.id.replace('W','W-')+'</span>';
   document.getElementById('ovarrow').href='/witch/'+w.id.toLowerCase();
+  const d=DOSSIER[w.id];
+  if(d){
+    const body=(d.notes||[]).join('<br>');
+    const dir=d.directive?'<span class="red">Directive: '+d.directive+'</span>':'';
+    if(scribbleEl)scribbleEl.innerHTML=body+(dir?'<br>'+dir:'');
+    (d.plates||[]).forEach((p,i)=>{if(plateSpans[i])plateSpans[i].querySelector('span').textContent=p;});
+  }else{
+    if(scribbleEl)scribbleEl.innerHTML=scribbleFallback;
+    plateSpans.forEach((f,i)=>f.querySelector('span').textContent=plateFallback[i]);
+  }
   overlay.classList.add('open');document.title="MAJO Archive - "+w.name;}
 document.getElementById('bigx').addEventListener('click',closeAll);
 overlay.addEventListener('pointerdown',e=>{if(e.target===overlay)closeAll();});
 function closeAll(){overlay.classList.remove('open');lightbox.classList.remove('open');clearTimeout(autoTimer);goTo(viewL,'L');}
 // DATA ONLY and open-full-file are real links now
 document.querySelectorAll('.pframe').forEach(f=>f.addEventListener('click',()=>{
-  lightbox.querySelector('span').textContent='ATTACHMENT '+f.dataset.i+' \u2014 NO IMAGE ON FILE';lightbox.classList.add('open');}));
+  const cap=(curWitch&&DOSSIER[curWitch.id]&&DOSSIER[curWitch.id].plates&&DOSSIER[curWitch.id].plates[f.dataset.i-1])||('ATTACHMENT '+f.dataset.i);
+  lightbox.querySelector('span').textContent=cap+' \u2014 NO IMAGE ON FILE';lightbox.classList.add('open');}));
 lightbox.addEventListener('click',()=>lightbox.classList.remove('open'));
 const camback=document.getElementById('camback'),camimg=document.getElementById('camimg'),cammeta=document.getElementById('cammeta');
 let gidx=0;const gallery=ASSETS.witches;
