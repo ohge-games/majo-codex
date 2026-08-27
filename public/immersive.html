@@ -57,10 +57,28 @@ html,body{margin:0;height:100%;background:#0b0d10;overflow:hidden;font-family:'S
 .pframe:hover{box-shadow:0 14px 34px #00000055;z-index:9}
 .pframe::before{content:"";position:absolute;left:50%;top:-9px;transform:translateX(-50%) rotate(-4deg);width:56px;height:18px;background:#d9cfa866;border:1px solid #00000012}
 .pframe span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.14em;color:#b3a88c}
-.sheet{background:#fdfcf8;border:1px solid #d8d0bd;box-shadow:0 8px 20px #00000026;padding:16px 18px;min-height:82%;transform:rotate(-.6deg);position:relative}
+.sheet{background:#fdfcf8;border:1px solid #d8d0bd;box-shadow:0 8px 20px #00000026;padding:18px 20px;min-height:82%;transform:rotate(-.6deg);position:relative}
+.sheet.dossier{max-height:calc(80vh - 96px);overflow-y:auto}
+.sheet.dossier::-webkit-scrollbar{width:7px}
+.sheet.dossier::-webkit-scrollbar-thumb{background:#cfc6ad;border-radius:4px}
 .scribble{font-family:'Caveat',cursive;font-size:20px;line-height:28px;color:#26344a}
 .scribble .red{color:#7c2b25;font-weight:700}
 .redact{display:inline-block;background:#14100e;color:#0000;height:16px;border-radius:1px;vertical-align:middle}
+/* --- typed dossier --- */
+.dh{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid #1f2a3a;padding-bottom:7px}
+.dh-name{font-family:'Special Elite',monospace;font-size:22px;letter-spacing:.02em;color:#1f2a3a;line-height:1.1}
+.dh-id{font-family:'Special Elite',monospace;font-size:12px;letter-spacing:.16em;color:#a89a7a;margin-left:auto}
+.dh-title{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7c2b25;margin:6px 0 2px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px 20px;margin:13px 0 4px;padding:11px 0;border-top:1px solid #d8d0bd;border-bottom:1px solid #d8d0bd}
+.dcell{display:flex;flex-direction:column;gap:2px}
+.dlabel{font-family:'Special Elite',monospace;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:#a89a7a}
+.dval{font-family:'Special Elite',monospace;font-size:14px;color:#26344a}
+.dval.empty,.dsec-b.empty{color:#b7ad93;font-style:italic}
+.dsec{margin-top:14px}
+.dsec-h{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7c2b25;border-bottom:1px dotted #cfc6ad;padding-bottom:4px;margin-bottom:7px}
+.dsec-b.typed{font-family:'Special Elite',monospace;font-size:12.5px;line-height:19px;color:#2a2a2a}
+.dsec-b.hand{font-family:'Caveat',cursive;font-size:19px;line-height:26px;color:#26344a}
+.dsec-b.hand .red{color:#7c2b25;font-weight:700}
 .bigx{position:fixed;top:14px;right:18px;z-index:24;width:44px;height:44px;border:none;background:none;color:#7c2b25;font-size:40px;line-height:40px;cursor:pointer;opacity:.7;transition:opacity .15s,transform .15s;font-family:Arial,sans-serif}
 .bigx:hover{opacity:1;color:#c0392b;transform:scale(1.15)}
 .ovarrow{position:absolute;bottom:-40px;right:0;color:#7c2b25;text-decoration:none;font-size:11px;letter-spacing:.18em;text-transform:uppercase;border:1px solid #7c2b2555;padding:7px 12px;border-radius:2px;background:#0b0d1088}
@@ -116,13 +134,19 @@ html,body{margin:0;height:100%;background:#0b0d10;overflow:hidden;font-family:'S
       <div class="pframe" data-i="3" style="left:12%;top:40%;transform:rotate(3deg)"><span>PLATE 03</span></div>
       <div class="pframe" data-i="4" style="left:40%;top:46%;transform:rotate(-4deg)"><span>SURVEIL.</span></div>
     </div></div>
-    <div class="page right"><div class="ptitle">Field Notes</div><div class="sheet"><div class="scribble">
-      Subject first logged 03/--. Grins through every debrief.<br>
-      Ocular phenomena within hair; count <span class="redact">xxxxx</span>.<br>
-      No handler will sit a second session.<br>
-      Movement traced -- old cathedral, after dark.<br>
-      Calibration attempts: <span class="redact">xxxxxxxxx</span>.<br>
-      <span class="red">Directive: do not tail alone.</span></div></div></div>
+    <div class="page right"><div class="ptitle">Dossier</div><div class="sheet dossier" id="dsheet">
+      <div class="dh"><span class="dh-name" id="dh-name">&mdash;</span><span class="dh-id" id="dh-id"></span></div>
+      <div class="dh-title" id="dh-title"></div>
+      <div class="dgrid">
+        <div class="dcell"><span class="dlabel">Damage Type</span><span class="dval" id="dv-damage">&mdash;</span></div>
+        <div class="dcell"><span class="dlabel">Weakness</span><span class="dval" id="dv-weak">&mdash;</span></div>
+        <div class="dcell"><span class="dlabel">Class</span><span class="dval" id="dv-class">&mdash;</span></div>
+        <div class="dcell"><span class="dlabel">Race</span><span class="dval" id="dv-race">&mdash;</span></div>
+      </div>
+      <div class="dsec"><div class="dsec-h">Summary</div><div class="dsec-b typed" id="dv-summary"></div></div>
+      <div class="dsec"><div class="dsec-h">Background</div><div class="dsec-b typed" id="dv-bg"></div></div>
+      <div class="dsec"><div class="dsec-h">Notes</div><div class="dsec-b hand" id="dv-notes"></div></div>
+    </div></div>
     <a class="ovarrow" id="ovarrow" href="#">open full file &rarr;</a>
   </div>
 </div>
@@ -378,20 +402,34 @@ const overlay=document.getElementById('overlay'), lightbox=document.getElementBy
 // placeholder markup already in the DOM if the fetch fails.
 let DOSSIER={};
 fetch('/dossier.json').then(r=>r.ok?r.json():null).then(d=>{if(d&&d.witches)DOSSIER=d.witches;}).catch(()=>{});
-const scribbleEl=document.querySelector('.scribble');
-const scribbleFallback=scribbleEl?scribbleEl.innerHTML:'';
 const plateSpans=[...document.querySelectorAll('#frames .pframe')];
 const plateFallback=plateSpans.map(f=>f.querySelector('span').textContent);
+const $=id=>document.getElementById(id);
+function setVal(el,v,emptyText){ if(v){el.textContent=v;el.classList.remove('empty');} else {el.textContent=emptyText;el.classList.add('empty');} }
 function openFolder(w){document.getElementById('spreadtab').innerHTML='<span>'+w.name.toUpperCase()+'  \u00b7  '+w.id.replace('W','W-')+'</span>';
   document.getElementById('ovarrow').href='/witch/'+w.id.toLowerCase();
   const d=DOSSIER[w.id];
   if(d){
-    const body=(d.notes||[]).join('<br>');
-    const dir=d.directive?'<span class="red">Directive: '+d.directive+'</span>':'';
-    if(scribbleEl)scribbleEl.innerHTML=body+(dir?'<br>'+dir:'');
+    $('dh-name').textContent=d.name;
+    $('dh-id').textContent=d.id.replace('W','W-');
+    setVal($('dh-title'), d.title?d.title.toUpperCase():'', '');
+    $('dv-damage').textContent=d.header.damage||'\u2014';
+    $('dv-weak').textContent=d.header.weakness||'\u2014';
+    $('dv-class').textContent=d.header.class||'\u2014';
+    setVal($('dv-race'), d.header.race, '\u2014 unrecorded');
+    setVal($('dv-summary'), d.summary, 'No analyst summary on file.');
+    setVal($('dv-bg'), d.background, '[ background awaiting field capture ]');
+    const notes=(d.notes||[]).join('<br>');
+    const dir=d.directive?'<br><span class="red">Directive: '+d.directive+'</span>':'';
+    $('dv-notes').innerHTML=notes+dir;
     (d.plates||[]).forEach((p,i)=>{if(plateSpans[i])plateSpans[i].querySelector('span').textContent=p;});
   }else{
-    if(scribbleEl)scribbleEl.innerHTML=scribbleFallback;
+    $('dh-name').textContent=w.name; $('dh-id').textContent=w.id.replace('W','W-');
+    ['dv-damage','dv-weak','dv-class'].forEach(k=>$(k).textContent='\u2014');
+    setVal($('dv-race'),'', '\u2014 unrecorded');
+    setVal($('dv-summary'),'', 'Record unavailable.');
+    setVal($('dv-bg'),'', '[ background awaiting field capture ]');
+    $('dv-notes').innerHTML='';
     plateSpans.forEach((f,i)=>f.querySelector('span').textContent=plateFallback[i]);
   }
   overlay.classList.add('open');document.title="MAJO Archive - "+w.name;}
