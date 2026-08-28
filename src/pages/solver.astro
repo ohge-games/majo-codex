@@ -10,6 +10,7 @@ const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`);
 const uiUrl = name => hasImg(`/img/ui/${name}.png`) ? `${base}img/ui/${name}.png` : null;
 const portraitOf = f => hasImg(`/img/card/${f}`) ? `${base}img/card/${f}`
                     : hasImg(`/img/hero/${f}`) ? `${base}img/hero/${f}` : null;
+const skillIco = (id, slot) => hasImg(`/img/skill/${lc(id)}_${slot}.png`) ? `${base}img/skill/${lc(id)}_${slot}.png` : null;
 
 const WMETA = Object.fromEntries(witches.map(w => [w.witch_id, w]));
 const SKILLNAME = {};
@@ -30,7 +31,7 @@ const W = Object.entries(engine.witches).map(([id, e]) => {
   const m = WMETA[id] || {};
   return { id, name: m.name, title: m.title || '', cls: e.cls, rar: e.rar, el: e.el, weak: e.weak,
     amp: e.amp, img: portraitOf(m.portrait_filename),
-    skills: e.skills.map(s => ({ ...s, name: SKILLNAME[`${id}_${s.slot}`] || s.slot })) };
+    skills: e.skills.map(s => ({ ...s, name: SKILLNAME[`${id}_${s.slot}`] || s.slot, ico: skillIco(id, s.slot) })) };
 });
 const carries = W.filter(w => w.cls === 'Arcanist' || w.cls === 'Vanguard').map(w => w.id);
 const fillers = W.filter(w => w.cls === 'Supporter' || w.cls === 'Defender').map(w => w.id);
@@ -312,7 +313,8 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
           <span><b>${(st.ed*100).toFixed(1)}</b>ed</span></div>`;
         const sk = w.skills.map(s => {
           const v = st.lv[s.slot], ex = v > 7;
-          return `<span class="sk${ex?' ex':''}" title="${s.name} \u00b7 ${lvLabel(v)}"><i>${s.slot[0].toUpperCase()}</i><b>${lvShort(v)}</b></span>`;
+          const face = s.ico ? `<img src="${s.ico}" alt="${s.slot}">` : `<i>${s.slot[0].toUpperCase()}</i>`;
+          return `<span class="sk${ex?' ex':''}" title="${s.name} \u00b7 ${lvLabel(v)}">${face}<b>${lvShort(v)}</b></span>`;
         }).join('');
         return `<div class="tile rar-${w.rar}" data-id="${id}">
           <div class="tportrait">${cls}${port}
@@ -356,7 +358,8 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       $('mCrWrap').style.display = w.cls === 'Arcanist' ? '' : 'none';
       $('mSkills').innerHTML = w.skills.map(s => {
         const v = (st.lv && st.lv[s.slot]) || s.maxlv;
-        return `<div class="mskill"><div class="ms-top"><span class="ms-name">${s.name}</span>
+        const face = s.ico ? `<img class="ms-ico" src="${s.ico}" alt="">` : `<span class="ms-ico txt">${s.slot[0].toUpperCase()}</span>`;
+        return `<div class="mskill"><div class="ms-top">${face}<span class="ms-name">${s.name}</span>
           <span class="ms-lv mono" id="lbl_${s.slot}">${lvLabel(v)}</span></div>
           <input type="range" min="1" max="${s.maxlv}" value="${v}" data-slot="${s.slot}" class="slider"></div>`;
       }).join('');
@@ -463,11 +466,13 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     .edit:hover{color:var(--ink);border-color:var(--sigil)}
     .tstats{display:flex;flex-wrap:wrap;gap:2px 9px;font-size:.62rem;color:var(--ink-faint)}
     .tstats b{color:var(--ink-dim);font-weight:700;margin-right:2px}
-    .tskills{display:flex;gap:4px;flex-wrap:wrap;margin-top:1px}
-    .sk{display:flex;align-items:center;gap:2px;background:var(--veil-2);border:1px solid var(--line);border-radius:5px;padding:2px 5px}
-    .sk i{font-style:normal;font-family:"Space Mono",monospace;font-size:.56rem;color:var(--ink-faint)}
-    .sk b{font-size:.64rem;color:var(--ink);font-weight:700}
-    .sk.ex{border-color:color-mix(in srgb,var(--ssr) 40%,var(--line))}
+    .tskills{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+    .sk{position:relative;width:34px;height:34px;border-radius:7px;overflow:hidden;background:var(--veil-2);border:1px solid var(--line);display:grid;place-items:center}
+    .sk img{width:100%;height:100%;object-fit:cover}
+    .sk i{font-style:normal;font-family:"Space Mono",monospace;font-size:.8rem;color:var(--ink-faint)}
+    .sk b{position:absolute;left:0;right:0;bottom:0;text-align:center;color:#fff;font-size:.62rem;font-weight:700;line-height:1;padding:5px 0 2px;
+      background:linear-gradient(transparent,rgba(8,6,14,.92));text-shadow:0 1px 2px #000}
+    .sk.ex{border-color:color-mix(in srgb,var(--ssr) 50%,var(--line))}
     .sk.ex b{color:var(--ssr)}
 
     .tile.add{cursor:pointer;align-items:center;justify-content:center;gap:8px;border-style:dashed;color:var(--ink-faint);min-height:150px;background:transparent;transition:.15s}
@@ -524,9 +529,11 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     .mf input:focus{outline:none;border-color:var(--sigil)}
     .m-skills{display:flex;flex-direction:column;gap:11px;border-top:1px solid var(--line);padding-top:14px}
     .mskill{display:flex;flex-direction:column;gap:5px}
-    .ms-top{display:flex;justify-content:space-between;align-items:baseline}
+    .ms-top{display:flex;align-items:center;gap:8px}
+    .ms-ico{width:26px;height:26px;border-radius:6px;object-fit:cover;border:1px solid var(--line);flex:none}
+    .ms-ico.txt{display:grid;place-items:center;background:var(--veil-2);font-family:"Space Mono",monospace;font-size:.72rem;color:var(--ink-faint)}
     .ms-name{font-size:.82rem;color:var(--ink)}
-    .ms-lv{font-size:.72rem;color:var(--sigil)}
+    .ms-lv{font-size:.72rem;color:var(--sigil);margin-left:auto}
     .slider{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--line);outline:none}
     .slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--sigil);cursor:pointer;border:2px solid var(--veil)}
     .slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--sigil);cursor:pointer;border:2px solid var(--veil)}
