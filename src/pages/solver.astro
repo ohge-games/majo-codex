@@ -1,10 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
 import witches from '../data/witches.json';
+import skills from '../data/skills.json';
 import engine from '../data/solver_engine.json';
+import fs from 'node:fs';
 const base = import.meta.env.BASE_URL;
+const lc = s => (s ?? '').toLowerCase();
+const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
+const uiUrl = name => hasImg(`/img/ui/${name}.png`) ? `${base}img/ui/${name}.png` : null;
+const portraitOf = f => hasImg(`/img/card/${f}`) ? `${base}img/card/${f}`
+                    : hasImg(`/img/hero/${f}`) ? `${base}img/hero/${f}` : null;
 
-const NAME = Object.fromEntries(witches.map(w => [w.witch_id, w.name]));
+const WMETA = Object.fromEntries(witches.map(w => [w.witch_id, w]));
+const SKILLNAME = {};
+for (const s of skills) SKILLNAME[`${s.witch_id}_${lc(s.slot)}`] = s.name;
+
 const MAX_STATS = {
   'Arcanist_SR': { atk: 2499, cr: 0.3698, cd: 1.8488, ed: 0.0174 },
   'Arcanist_SSR': { atk: 3483, cr: 0.3978, cd: 1.9888, ed: 0.0759 },
@@ -16,26 +26,35 @@ const MAX_STATS = {
   'Supporter_SR': { atk: 1637, cr: 0.20, cd: 1.00, ed: 0.0145 },
   'Supporter_SSR': { atk: 2300, cr: 0.20, cd: 1.00, ed: 0.0145 },
 };
-const W = Object.entries(engine.witches).map(([id, e]) => ({ id, name: NAME[id], ...e }));
-const carries = W.filter(w => w.cls === 'Arcanist' || w.cls === 'Vanguard')
-  .sort((a, b) => a.cls === b.cls ? a.name.localeCompare(b.name) : a.cls.localeCompare(b.cls));
+const W = Object.entries(engine.witches).map(([id, e]) => {
+  const m = WMETA[id] || {};
+  return { id, name: m.name, title: m.title || '', cls: e.cls, rar: e.rar, el: e.el, weak: e.weak,
+    amp: e.amp, img: portraitOf(m.portrait_filename),
+    skills: e.skills.map(s => ({ ...s, name: SKILLNAME[`${id}_${s.slot}`] || s.slot })) };
+});
+const carries = W.filter(w => w.cls === 'Arcanist' || w.cls === 'Vanguard').map(w => w.id);
+const fillers = W.filter(w => w.cls === 'Supporter' || w.cls === 'Defender').map(w => w.id);
+const UI = {};
+for (const t of ['physical','mental','magic']) UI['type_' + t] = uiUrl('type_' + t);
+for (const c of ['arcanist','vanguard','defender','supporter']) UI['cclass_' + c] = uiUrl('cclass_' + c);
+for (const r of ['sr','ssr','ur']) UI['rarity_' + r] = uiUrl('rarity_' + r);
 const BOSSES = [
   { id: 'venomfrill', name: 'Venomfrill', weak: 'physical', kd: 2.5 * 8 / 180 },
   { id: 'dummy', name: 'Test Dummy (no weakness / no knockdown)', weak: 'none', kd: 0 },
 ];
 const RES = { vanguard: [13, 19, 25], arcanist: [14, 17, 20], mental: [20, 25, 30], physical: [4, 5, 6], magic: [4, 5, 6] };
-const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
+const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
 ---
-<Base title="DPS Solver — MAJO Codex" desc="Enter your carries' stats and Astrolabe laws to rank teams for your account.">
+<Base title="DPS Solver — MAJO Codex" desc="Add the carries you've invested in and rank teams for your account.">
   <a class="back mono" href={base}>&larr; All witches</a>
 
   <section class="solver wrap">
     <header class="sv-head">
       <span class="eyebrow">Astrolabe Solver</span>
       <h1 class="display">Rank teams for <em>your</em> account</h1>
-      <p class="sub">Enter the stats for the carries you've invested in — Arcanists and Vanguards, the only classes that
-        carry. Everything defaults to the max ceiling; Supporters and Defenders fill the healer/utility slots at max.
-        The board re-ranks live. Saved to this browser — use <b>Copy link</b> to back up or move devices.</p>
+      <p class="sub">Add the Arcanists and Vanguards you've invested in with their current stats and skill levels.
+        Supporters and Defenders fill the healer and utility slots at max, so you only track your carries. The board
+        re-ranks live as you build your roster. Everything is saved to this browser — use <b>Copy link</b> to back up.</p>
     </header>
 
     <div class="lawbar panel">
@@ -60,11 +79,11 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
     <div class="sv-grid">
       <aside class="roster">
         <div class="roster-head">
-          <span class="p-title mono">Your carries</span>
-          <button id="reset" class="btn ghost sm" type="button">Reset to max</button>
+          <span class="p-title mono">Your carries · <span id="poolCount">0</span></span>
+          <button id="reset" class="btn ghost sm" type="button">Clear all</button>
         </div>
-        <div id="cards" class="cards"></div>
-        <button id="share" class="btn" type="button">Copy shareable link</button>
+        <div id="pool" class="pool"></div>
+        <button id="share" class="btn ghost" type="button">Copy shareable link</button>
       </aside>
 
       <div class="results">
@@ -77,34 +96,67 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
     </div>
   </section>
 
+  <!-- add/edit modal -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-back" id="modalBack"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <span id="modalTitle" class="display">Add a carry</span>
+        <button id="modalX" class="modal-x" type="button" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="m-row" id="mSelectRow">
+          <label class="m-lbl mono">Witch</label>
+          <select id="mWitch" class="field"></select>
+        </div>
+        <div class="m-info" id="mInfo"></div>
+        <div class="m-stats">
+          <label class="mf"><span class="mono">ATK</span><input id="mAtk" inputmode="decimal"></label>
+          <label class="mf" id="mCrWrap"><span class="mono">Crit %</span><input id="mCr" inputmode="decimal"></label>
+          <label class="mf"><span class="mono">Crit Dmg %</span><input id="mCd" inputmode="decimal"></label>
+          <label class="mf"><span class="mono">Extra %</span><input id="mEd" inputmode="decimal"></label>
+        </div>
+        <div class="m-skills" id="mSkills"></div>
+      </div>
+      <div class="modal-foot">
+        <button id="mRemove" class="btn ghost danger" type="button" hidden>Remove</button>
+        <span class="spacer"></span>
+        <button id="mCancel" class="btn ghost" type="button">Cancel</button>
+        <button id="mSave" class="btn" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
   <script type="application/json" id="sv-data" set:html={JSON.stringify(payload)}></script>
 
   <script>
     const DATA = JSON.parse(document.getElementById('sv-data').textContent);
-    const { W, carries, MAX_STATS, BOSSES, RES } = DATA;
-    const CARRY = new Set(carries);
+    const { W, carries, fillers, MAX_STATS, UI, BOSSES, RES } = DATA;
+    const CARRY = new Set(carries), FILLERS = fillers;
     const WMAP = new Map(W.map(w => [w.id, w]));
     const byId = id => WMAP.get(id);
     const CAP = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+    const lc = s => (s || '').toLowerCase();
     const $ = id => document.getElementById(id);
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const lvLabel = v => v <= 7 ? `Lv ${v}` : `EX-${v - 7}`;
+    const lvShort = v => v <= 7 ? `${v}` : `EX${v - 7}`;
 
     const defStats = w => ({ ...MAX_STATS[`${w.cls}_${w.rar}`] });
     const defLevels = w => Object.fromEntries(w.skills.map(s => [s.slot, s.maxlv]));
-    function DEFAULT() {
-      const units = {};
-      for (const id of carries) { const w = byId(id); units[id] = { ...defStats(w), lv: defLevels(w) }; }
-      return { boss: 'venomfrill', units,
-        laws: { charge: true, start120: true, van: 0, arc: 0, mental: 0, physical: 0, magic: 0 } };
-    }
+    const DEFAULT = () => ({ boss: 'venomfrill', units: {},
+      laws: { charge: true, start120: true, van: 0, arc: 0, mental: 0, physical: 0, magic: 0 } });
     let S = load() || DEFAULT();
 
     function statsFor(id) {
       const w = byId(id);
-      if (CARRY.has(id) && S.units[id]) return S.units[id];
+      if (S.units[id]) return S.units[id];
       return { ...MAX_STATS[`${w.cls}_${w.rar}`], lv: defLevels(w) };
     }
+    const owned = () => Object.keys(S.units).filter(id => CARRY.has(id));
+    const teamPool = () => [...owned(), ...FILLERS];
 
+    // ---------- timeline recompute ----------
     const T = 180;
     function timeline(id) {
       const w = byId(id), st = statsFor(id);
@@ -128,8 +180,7 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
       for (const [D, an, n, e] of rest) { const c = n * sc * D; restDmg += c; if (e) execDmg += c; }
       const left = Math.max(0, T - eo - restOcc);
       const nDmg = normal ? left / normal[1] * normal[0] : 0;
-      const amp = w.amp || 1;
-      const total = (extDmg + restDmg + nDmg) * amp;
+      const amp = w.amp || 1, total = (extDmg + restDmg + nDmg) * amp;
       return { total, extreme: total ? (extDmg * amp) / total : 0, normal: total ? (nDmg * amp) / total : 0, exec: total ? (execDmg * amp) / total : 0 };
     }
     const critMul = (st, add) => (1 + (st.cr + add) * st.cd) / (1 + st.cr * st.cd);
@@ -137,8 +188,7 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
 
     function lawMult(carry, team, boss, base) {
       const cw = byId(carry), st = statsFor(carry), why = [];
-      const ex = base.exec;
-      const cls = {}, el = {};
+      const ex = base.exec, cls = {}, el = {};
       for (const t of team) { const w = byId(t); cls[w.cls] = (cls[w.cls]||0)+1; el[w.el] = (el[w.el]||0)+1; }
       let mult = 1;
       if ((cls.Arcanist||0) >= 2 && S.laws.arc > 0) {
@@ -168,16 +218,17 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
       }
       return { mult, why };
     }
-
     const hasHealer = team => team.some(t => byId(t).cls === 'Supporter');
     let _t; const scheduleSolve = () => { clearTimeout(_t); _t = setTimeout(solve, 90); };
 
     function solve() {
+      const own = owned();
       const boss = BOSSES.find(b => b.id === S.boss);
-      const bases = new Map(W.map(w => [w.id, timeline(w.id)]));
-      const ids = W.map(w => w.id);
+      if (!own.length) { renderEmpty(); return; }
+      const ids = teamPool();
+      const bases = new Map(ids.map(id => [id, timeline(id)]));
       const rows = [];
-      for (const carry of carries) {
+      for (const carry of own) {
         const base = bases.get(carry), weak = byId(carry).el === boss.weak ? 1 : 0.75;
         let best = null;
         for (let i = 0; i < ids.length; i++) {
@@ -197,10 +248,16 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
         if (best) rows.push({ carry, ...best });
       }
       rows.sort((a, b) => b.eff - a.eff);
-      render(rows.slice(0, 10), boss);
+      render(rows, boss);
     }
 
+    // ---------- render ----------
     const elC = e => `type-${e}`;
+    function renderEmpty() {
+      $('resNote').textContent = '';
+      $('board').innerHTML = `<div class="empty"><p>No carries yet.</p>
+        <p class="mono">Add an Arcanist or Vanguard to see the teams that rank best for your account.</p></div>`;
+    }
     function render(rows, boss) {
       const top = rows[0]?.eff || 1;
       $('resNote').textContent = `vs ${boss.name} \u00b7 relative to top`;
@@ -215,47 +272,110 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
         return `<article class="comp${i===0?' top':''}">
           <div class="comp-rank mono">#${i+1}</div>
           <div class="comp-body">
-            <div class="comp-carry">
-              <span class="c-name display">${cw.name}</span>
+            <div class="comp-carry"><span class="c-name display">${cw.name}</span>
               <span class="rarity-chip is-${cw.rar}">${cw.rar}</span>
               <span class="c-tag ${elC(cw.el)} mono">${CAP(cw.el)} ${cw.cls}</span>
-              ${r.weak < 1 ? '<span class="offweak mono">off-weakness \u00d7.75</span>' : ''}
-            </div>
+              ${r.weak < 1 ? '<span class="offweak mono">off-weakness \u00d7.75</span>' : ''}</div>
             <div class="comp-team">${mates}</div>
-            <ul class="comp-why mono">${why}</ul>
-          </div>
+            <ul class="comp-why mono">${why}</ul></div>
           <div class="comp-score"><span class="s-val">${pct}</span><span class="s-bar"><i style="width:${pct}%"></i></span></div>
         </article>`;
       }).join('');
     }
 
-    function buildCards() {
-      $('cards').innerHTML = carries.map(id => {
-        const w = byId(id), st = S.units[id], isArc = w.cls === 'Arcanist';
-        const num = (up, key, on, scale=1) => on
-          ? `<label class="f"><span>${up}</span><input data-id="${id}" data-k="${key}" value="${key==='atk'?st[key]:(st[key]*100).toFixed(2)}" inputmode="decimal"></label>`
-          : `<label class="f off"><span>${up}</span><span class="fixed">${(st[key]*scale).toFixed(0)}${scale===100?'%':''}</span></label>`;
-        const lvls = w.skills.map(s => `<label class="lv"><span>${s.slot[0].toUpperCase()}</span><input data-id="${id}" data-lv="${s.slot}" type="number" min="1" max="${s.maxlv}" value="${st.lv[s.slot]}"></label>`).join('');
-        return `<div class="card">
-          <div class="c-top"><span class="rarity-chip is-${w.rar}">${w.rar}</span><b class="${elC(w.el)}">${w.name}</b><span class="cls mono">${w.cls}</span></div>
-          <div class="c-stats">
-            ${num('ATK','atk',true)}
-            ${num('Crit%','cr',isArc,100)}
-            ${num('CDmg%','cd',true,100)}
-            ${num('Extra%','ed',true,100)}
-          </div>
-          <div class="c-lv"><span class="lv-lbl mono">Skill lv</span>${lvls}</div>
-        </div>`;
-      }).join('');
-      $('cards').querySelectorAll('input[data-k]').forEach(inp => inp.addEventListener('input', () => {
-        const v = parseFloat(inp.value); if (isNaN(v)) return;
-        const k = inp.dataset.k; S.units[inp.dataset.id][k] = k === 'atk' ? v : v/100; save(); scheduleSolve();
-      }));
-      $('cards').querySelectorAll('input[data-lv]').forEach(inp => inp.addEventListener('input', () => {
-        const v = parseInt(inp.value); if (isNaN(v)) return;
-        S.units[inp.dataset.id].lv[inp.dataset.lv] = v; save(); scheduleSolve();
-      }));
+    // ---------- pool tiles ----------
+    function typeIco(t, title) {
+      return UI['type_' + lc(t)]
+        ? `<img class="tico" src="${UI['type_'+lc(t)]}" alt="${title}" title="${title}" width="20" height="20">`
+        : `<span class="tico txt ${elC(lc(t))}" title="${title}">${CAP(t)[0]}</span>`;
     }
+    function renderPool() {
+      const ids = owned();
+      $('poolCount').textContent = ids.length;
+      const add = `<button class="tile add" id="addTile" type="button">
+        <span class="plus">+</span><span class="mono">Add my Witch</span></button>`;
+      $('pool').innerHTML = ids.map(id => {
+        const w = byId(id), st = S.units[id];
+        const cls = UI['cclass_' + lc(w.cls)]
+          ? `<img class="cclass" src="${UI['cclass_'+lc(w.cls)]}" alt="${w.cls}" title="${w.cls}" width="30" height="30">`
+          : `<span class="cclass txt">${w.cls[0]}</span>`;
+        const rar = UI['rarity_' + lc(w.rar)]
+          ? `<img class="rar" src="${UI['rarity_'+lc(w.rar)]}" alt="${w.rar}" height="24">`
+          : `<span class="rarity-chip is-${w.rar}">${w.rar}</span>`;
+        const port = w.img
+          ? `<img class="portrait-img" src="${w.img}" alt="${w.name}" loading="lazy">`
+          : `<svg viewBox="0 0 24 24" class="sigil"><path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>`;
+        const crCell = w.cls === 'Arcanist' ? `<span><b>${(st.cr*100).toFixed(1)}</b>cr</span>` : '';
+        const stats = `<div class="tstats mono">
+          <span><b>${st.atk}</b>atk</span>${crCell}
+          <span><b>${(st.cd*100).toFixed(0)}</b>cd</span>
+          <span><b>${(st.ed*100).toFixed(1)}</b>ed</span></div>`;
+        const sk = w.skills.map(s => {
+          const v = st.lv[s.slot], ex = v > 7;
+          return `<span class="sk${ex?' ex':''}" title="${s.name} \u00b7 ${lvLabel(v)}"><i>${s.slot[0].toUpperCase()}</i><b>${lvShort(v)}</b></span>`;
+        }).join('');
+        return `<div class="tile rar-${w.rar}" data-id="${id}">
+          <div class="tportrait">${cls}${port}
+            <div class="tbadges">${typeIco(w.el,CAP(w.el)+' damage')}${rar}${typeIco(w.weak,'Weak to '+CAP(w.weak))}</div></div>
+          <div class="tfoot">
+            <div class="tname"><span class="display">${w.name}</span>
+              <button class="edit mono" data-edit="${id}" type="button">Edit</button></div>
+            ${stats}<div class="tskills">${sk}</div>
+          </div></div>`;
+      }).join('') + add;
+      $('addTile').addEventListener('click', () => openModal(null));
+      $('pool').querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openModal(b.dataset.edit)));
+    }
+
+    // ---------- modal ----------
+    let editing = null;
+    function openModal(id) {
+      editing = id;
+      $('modalTitle').textContent = id ? `Edit ${byId(id).name}` : 'Add a carry';
+      $('mRemove').hidden = !id;
+      const sel = $('mWitch'), selRow = $('mSelectRow');
+      if (id) { selRow.hidden = true; buildModalBody(id, statsFor(id)); }
+      else {
+        selRow.hidden = false;
+        const avail = carries.filter(c => !S.units[c]);
+        sel.innerHTML = avail.map(c => `<option value="${c}">${byId(c).name} \u00b7 ${byId(c).cls} ${byId(c).rar}</option>`).join('');
+        if (!avail.length) { sel.innerHTML = '<option>All carries added</option>'; }
+        const first = avail[0];
+        if (first) buildModalBody(first, { ...defStats(byId(first)), lv: defLevels(byId(first)) });
+      }
+      $('modal').hidden = false;
+    }
+    function buildModalBody(id, st) {
+      const w = byId(id);
+      $('mInfo').innerHTML = `<span class="chip mono">${w.cls}</span>
+        <span class="chip mono ${elC(w.el)}">${CAP(w.el)} dmg</span>
+        <span class="chip mono ${elC(w.weak)}">Weak: ${CAP(w.weak)}</span>
+        <span class="rarity-chip is-${w.rar}">${w.rar}</span>`;
+      $('mAtk').value = st.atk;
+      $('mCr').value = (st.cr*100).toFixed(2); $('mCd').value = (st.cd*100).toFixed(2); $('mEd').value = (st.ed*100).toFixed(2);
+      $('mCrWrap').style.display = w.cls === 'Arcanist' ? '' : 'none';
+      $('mSkills').innerHTML = w.skills.map(s => {
+        const v = (st.lv && st.lv[s.slot]) || s.maxlv;
+        return `<div class="mskill"><div class="ms-top"><span class="ms-name">${s.name}</span>
+          <span class="ms-lv mono" id="lbl_${s.slot}">${lvLabel(v)}</span></div>
+          <input type="range" min="1" max="${s.maxlv}" value="${v}" data-slot="${s.slot}" class="slider"></div>`;
+      }).join('');
+      $('mSkills').querySelectorAll('.slider').forEach(sl => sl.addEventListener('input', () => {
+        $('lbl_' + sl.dataset.slot).textContent = lvLabel(+sl.value);
+      }));
+      $('mWitch').onchange = () => { const nid = $('mWitch').value; buildModalBody(nid, { ...defStats(byId(nid)), lv: defLevels(byId(nid)) }); };
+    }
+    function readModal() {
+      const id = editing || $('mWitch').value, w = byId(id);
+      const num = (el, d) => { const v = parseFloat($(el).value); return isNaN(v) ? d : v; };
+      const lv = {};
+      $('mSkills').querySelectorAll('.slider').forEach(sl => lv[sl.dataset.slot] = +sl.value);
+      const cr = w.cls === 'Arcanist' ? num('mCr', 20)/100 : MAX_STATS[`${w.cls}_${w.rar}`].cr;
+      return { id, unit: { atk: num('mAtk', 0), cr, cd: num('mCd', 0)/100, ed: num('mEd', 0)/100, lv } };
+    }
+    const closeModal = () => { $('modal').hidden = true; editing = null; };
+
+    // ---------- selects / laws ----------
     function fillSelects() {
       $('boss').innerHTML = BOSSES.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
       $('boss').value = S.boss;
@@ -271,21 +391,26 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
       $('law_start120').addEventListener('change', e => { S.laws.start120 = e.target.checked; save(); solve(); });
       for (const k of ['van','arc','mental','physical','magic'])
         $('law_'+k).addEventListener('change', e => { S.laws[k] = +e.target.value; save(); solve(); });
-      $('reset').addEventListener('click', () => { S = DEFAULT(); save(); buildCards(); fillSelects(); solve(); });
+      $('reset').addEventListener('click', () => { if (confirm('Remove all carries?')) { S.units = {}; save(); renderPool(); solve(); } });
       $('share').addEventListener('click', () => {
         const url = location.origin + location.pathname + '#' + btoa(encodeURIComponent(JSON.stringify(S)));
-        navigator.clipboard.writeText(url).then(() => { const b = $('share'), t = b.textContent; b.textContent = 'Copied \u2713'; setTimeout(() => b.textContent = t, 1400); });
+        navigator.clipboard.writeText(url).then(() => { const b=$('share'),t=b.textContent; b.textContent='Copied \u2713'; setTimeout(()=>b.textContent=t,1400); });
       });
+      $('mSave').addEventListener('click', () => { const { id, unit } = readModal(); S.units[id] = unit; save(); closeModal(); renderPool(); solve(); });
+      $('mCancel').addEventListener('click', closeModal);
+      $('modalX').addEventListener('click', closeModal);
+      $('modalBack').addEventListener('click', closeModal);
+      $('mRemove').addEventListener('click', () => { if (editing) { delete S.units[editing]; save(); closeModal(); renderPool(); solve(); } });
     }
-    function save() { try { localStorage.setItem('majo-solver-v2', JSON.stringify(S)); } catch {} }
+    function save() { try { localStorage.setItem('majo-solver-v3', JSON.stringify(S)); } catch {} }
     function load() {
       try {
         if (location.hash.length > 1) { const h = JSON.parse(decodeURIComponent(atob(location.hash.slice(1)))); if (h.units) return h; }
-        const raw = localStorage.getItem('majo-solver-v2'); return raw ? JSON.parse(raw) : null;
+        const raw = localStorage.getItem('majo-solver-v3'); return raw ? JSON.parse(raw) : null;
       } catch { return null; }
     }
 
-    buildCards(); fillSelects(); wire(); solve();
+    fillSelects(); wire(); renderPool(); solve();
   </script>
 
   <style>
@@ -299,7 +424,7 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
     .sv-head .sub b{color:var(--ink)}
     .p-title{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
     .field{background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-family:"Inter",sans-serif}
-    .field.sm{padding:5px 7px;font-size:.8rem}
+    .field.sm{padding:5px 7px;font-size:.8rem;width:112px}
     .field:focus{outline:none;border-color:var(--sigil)}
 
     .panel{background:var(--veil);border:1px solid var(--line);border-radius:var(--r)}
@@ -311,58 +436,102 @@ const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
     .law input{accent-color:var(--sigil)}
     .law i,.law-lv i{color:var(--ink-faint);font-style:normal;font-size:.72rem}
     .law-lv{display:flex;gap:6px;align-items:center;font-size:.8rem;color:var(--ink-dim)}
-    .law-lv .field.sm{width:112px}
 
-    .sv-grid{display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start}
-    @media (max-width:900px){ .sv-grid{grid-template-columns:1fr} }
+    .sv-grid{display:grid;grid-template-columns:430px 1fr;gap:24px;align-items:start}
+    @media (max-width:920px){ .sv-grid{grid-template-columns:1fr} }
     .roster{display:flex;flex-direction:column;gap:12px}
     .roster-head{display:flex;justify-content:space-between;align-items:center}
-    .cards{display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 110px);overflow:auto;padding-right:4px}
-    @media (max-width:900px){ .cards{max-height:none} }
-    .card{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:11px 12px}
-    .c-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
-    .c-top b{font-weight:600;font-size:.94rem}
-    .c-top .cls{color:var(--ink-faint);font-size:.62rem;margin-left:auto;letter-spacing:.1em;text-transform:uppercase}
-    .c-top .rarity-chip{padding:1px 6px;font-size:.6rem}
-    .c-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:9px}
-    .f{display:flex;flex-direction:column;gap:3px}
-    .f>span:first-child{font-family:"Space Mono",monospace;font-size:.56rem;color:var(--ink-faint);letter-spacing:.03em}
-    .f input{width:100%;background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 6px;text-align:right;font-family:"Space Mono",monospace;font-size:.75rem}
-    .f input:focus{outline:none;border-color:var(--sigil)}
-    .f.off .fixed{padding:5px 6px;text-align:right;color:var(--ink-faint);font-family:"Space Mono",monospace;font-size:.75rem}
-    .c-lv{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-    .lv-lbl{color:var(--ink-faint);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase}
-    .lv{display:flex;align-items:center;gap:3px}
-    .lv>span{font-family:"Space Mono",monospace;font-size:.64rem;color:var(--ink-dim)}
-    .lv input{width:38px;background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:4px;text-align:center;font-family:"Space Mono",monospace;font-size:.72rem}
-    .lv input:focus{outline:none;border-color:var(--sigil)}
+    .pool{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+
+    .tile{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+    .tile.rar-SSR{border-color:color-mix(in srgb,var(--ssr) 30%,var(--line))}
+    .tile.rar-UR{border-color:color-mix(in srgb,var(--ur) 30%,var(--line))}
+    .tportrait{position:relative;aspect-ratio:1/1;background:radial-gradient(120% 120% at 50% 0%,var(--veil-2),var(--nightshade));display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .portrait-img{width:100%;height:100%;object-fit:cover}
+    .tportrait .sigil{width:44%;color:var(--line)}
+    .tportrait .cclass{position:absolute;top:6px;left:6px;z-index:2;filter:drop-shadow(0 1px 2px #000)}
+    .tportrait .cclass.txt{width:24px;height:24px;display:grid;place-items:center;background:rgba(12,10,21,.7);border:1px solid var(--line);border-radius:6px;font-family:"Space Mono",monospace;font-size:.7rem;color:var(--ink-dim)}
+    .tbadges{position:absolute;bottom:5px;right:5px;display:flex;align-items:center;gap:4px;z-index:2}
+    .tico{filter:drop-shadow(0 1px 2px #000)}
+    .tico.txt{width:18px;height:18px;display:grid;place-items:center;border:1px solid currentColor;border-radius:50%;font-size:.6rem;font-family:"Space Mono",monospace}
+    .tbadges .rar{filter:drop-shadow(0 1px 2px #000)}
+    .tbadges .rarity-chip{padding:1px 5px;font-size:.55rem;background:rgba(12,10,21,.7)}
+    .tfoot{padding:8px 9px 10px;display:flex;flex-direction:column;gap:6px}
+    .tname{display:flex;align-items:center;justify-content:space-between;gap:6px}
+    .tname .display{font-size:.92rem}
+    .edit{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:2px 7px;background:transparent;cursor:pointer}
+    .edit:hover{color:var(--ink);border-color:var(--sigil)}
+    .tstats{display:flex;flex-wrap:wrap;gap:2px 9px;font-size:.62rem;color:var(--ink-faint)}
+    .tstats b{color:var(--ink-dim);font-weight:700;margin-right:2px}
+    .tskills{display:flex;gap:4px;flex-wrap:wrap;margin-top:1px}
+    .sk{display:flex;align-items:center;gap:2px;background:var(--veil-2);border:1px solid var(--line);border-radius:5px;padding:2px 5px}
+    .sk i{font-style:normal;font-family:"Space Mono",monospace;font-size:.56rem;color:var(--ink-faint)}
+    .sk b{font-size:.64rem;color:var(--ink);font-weight:700}
+    .sk.ex{border-color:color-mix(in srgb,var(--ssr) 40%,var(--line))}
+    .sk.ex b{color:var(--ssr)}
+
+    .tile.add{cursor:pointer;align-items:center;justify-content:center;gap:8px;border-style:dashed;color:var(--ink-faint);min-height:150px;background:transparent;transition:.15s}
+    .tile.add:hover{border-color:var(--sigil);color:var(--ink)}
+    .tile.add .plus{font-size:2rem;line-height:1;color:var(--sigil)}
+    .tile.add .mono{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
 
     .btn{background:var(--sigil);color:#0c0a15;border:none;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;font-family:"Inter",sans-serif}
     .btn:hover{filter:brightness(1.08)}
     .btn.sm{padding:5px 10px;font-size:.74rem}
     .btn.ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);font-weight:500}
     .btn.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+    .btn.danger:hover{color:var(--physical);border-color:var(--physical)}
 
     .res-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
     .res-head .note{color:var(--ink-faint);font-size:.72rem}
     .board{display:flex;flex-direction:column;gap:11px}
+    .empty{border:1px dashed var(--line);border-radius:var(--r);padding:40px 24px;text-align:center;color:var(--ink-dim)}
+    .empty p{margin:.2em 0}.empty .mono{font-size:.78rem;color:var(--ink-faint)}
     .comp{display:grid;grid-template-columns:32px 1fr 92px;gap:14px;align-items:center;background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px}
     .comp.top{border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
     .comp-rank{color:var(--ink-faint);font-size:.95rem;font-weight:700}
     .comp-carry{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .c-name{font-size:1.08rem}
-    .c-tag{font-size:.64rem;letter-spacing:.06em}
+    .c-name{font-size:1.08rem}.c-tag{font-size:.64rem;letter-spacing:.06em}
     .offweak{color:var(--physical);font-size:.62rem;border:1px solid currentColor;border-radius:999px;padding:1px 7px}
     .comp-team{display:flex;gap:13px;flex-wrap:wrap;margin:7px 0 6px}
     .mate{display:flex;flex-direction:column;line-height:1.2;font-size:.8rem}
-    .mate b{color:var(--ink);font-weight:500}
-    .mate i{font-style:normal;font-size:.62rem;font-family:"Space Mono",monospace}
+    .mate b{color:var(--ink);font-weight:500}.mate i{font-style:normal;font-size:.62rem;font-family:"Space Mono",monospace}
     .comp-why{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 11px}
     .comp-why li{color:var(--ink-faint);font-size:.67rem}
     .comp-score{text-align:right}
     .s-val{font-family:"Cinzel",serif;font-size:1.45rem;color:var(--ssr)}
     .s-bar{display:block;height:3px;background:var(--line);border-radius:2px;margin-top:5px;overflow:hidden}
     .s-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sigil),var(--ssr))}
+
+    /* modal */
+    .modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+    .modal[hidden]{display:none}
+    .modal-back{position:absolute;inset:0;background:rgba(6,5,12,.72);backdrop-filter:blur(3px)}
+    .modal-card{position:relative;background:var(--veil);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);width:100%;max-width:440px;max-height:90vh;overflow:auto}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
+    .modal-head .display{font-size:1.15rem}
+    .modal-x{background:none;border:none;color:var(--ink-faint);font-size:1.5rem;line-height:1;cursor:pointer}
+    .modal-x:hover{color:var(--ink)}
+    .modal-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+    .m-row{display:flex;flex-direction:column;gap:6px}
+    .m-lbl{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+    .m-info{display:flex;flex-wrap:wrap;gap:6px}
+    .chip{padding:3px 9px;border:1px solid var(--line);border-radius:999px;font-size:.68rem;color:var(--ink-dim);background:var(--veil-2)}
+    .m-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .mf{display:flex;flex-direction:column;gap:4px}
+    .mf span{font-size:.62rem;color:var(--ink-faint);letter-spacing:.04em}
+    .mf input{background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:8px 9px;font-family:"Space Mono",monospace;font-size:.82rem;text-align:right}
+    .mf input:focus{outline:none;border-color:var(--sigil)}
+    .m-skills{display:flex;flex-direction:column;gap:11px;border-top:1px solid var(--line);padding-top:14px}
+    .mskill{display:flex;flex-direction:column;gap:5px}
+    .ms-top{display:flex;justify-content:space-between;align-items:baseline}
+    .ms-name{font-size:.82rem;color:var(--ink)}
+    .ms-lv{font-size:.72rem;color:var(--sigil)}
+    .slider{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--line);outline:none}
+    .slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--sigil);cursor:pointer;border:2px solid var(--veil)}
+    .slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--sigil);cursor:pointer;border:2px solid var(--veil)}
+    .modal-foot{display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
+    .modal-foot .spacer{flex:1}
     .rarity-chip.is-SR{color:var(--sr)} .rarity-chip.is-SSR{color:var(--ssr)} .rarity-chip.is-UR{color:var(--ur)}
     .type-mental{color:var(--mental)} .type-physical{color:var(--physical)} .type-magic{color:var(--magic)}
   </style>
