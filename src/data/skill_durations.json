@@ -1,163 +1,187 @@
 {
  "W001": {
   "normal": 5.0,
-  "extreme": 5.8,
+  "extreme": 3.0,
   "class": 3.367,
-  "special": 12.55
+  "special": 12.55,
+  "extreme_showcase": 5.8
  },
  "W002": {
   "normal": 4.784,
-  "extreme": 4.0,
+  "extreme": 2.0,
   "class": 2.3,
   "special": 3.067,
-  "class_showcase": 5.484
+  "class_showcase": 5.484,
+  "extreme_showcase": 4.0
  },
  "W003": {
   "normal": 3.4,
-  "extreme": 4.084,
+  "extreme": 3.0,
   "class": 1.8,
   "special": 1.4,
   "class_showcase": 4.934,
-  "special_showcase": 4.167
+  "special_showcase": 4.167,
+  "extreme_showcase": 4.084
  },
  "W004": {
   "normal": 6.884,
-  "extreme": 5.134,
+  "extreme": 4.0,
   "class": 2.25,
   "special": 3.034,
-  "class_showcase": 4.25
+  "class_showcase": 4.25,
+  "extreme_showcase": 5.134
  },
  "W005": {
   "normal": 6.9,
-  "extreme": 4.217,
+  "extreme": 3.0,
   "class": 8.7,
-  "special": 8.834
+  "special": 8.834,
+  "extreme_showcase": 4.217
  },
  "W006": {
   "normal": 3.6,
-  "extreme": 4.267,
+  "extreme": 3.0,
   "class": 8.55,
-  "special": 4.084
+  "special": 4.084,
+  "extreme_showcase": 4.267
  },
  "W007": {
   "normal": 5.784,
-  "extreme": 5.934,
+  "extreme": 2.0,
   "class": 1.2,
   "special": 6.5,
-  "class_showcase": 4.1
+  "class_showcase": 4.1,
+  "extreme_showcase": 5.934
  },
  "W008": {
   "normal": 3.767,
-  "extreme": 7.784,
+  "extreme": 2.0,
   "class": 4.434,
-  "special": 4.184
+  "special": 4.184,
+  "extreme_showcase": 7.784
  },
  "W009": {
   "normal": 3.317,
-  "extreme": 4.3,
+  "extreme": 2.0,
   "class": 3.85,
-  "special": 4.45
+  "special": 4.45,
+  "extreme_showcase": 4.3
  },
  "W010": {
   "normal": 6.95,
-  "extreme": 4.584,
+  "extreme": 3.5,
   "class": 2.5,
   "special": 5.467,
-  "class_showcase": 5.417
+  "class_showcase": 5.417,
+  "extreme_showcase": 4.584
  },
  "W011": {
   "normal": 4.6,
-  "extreme": 5.05,
+  "extreme": 2.5,
   "class": 7.334,
-  "special": 6.45
+  "special": 6.45,
+  "extreme_showcase": 5.05
  },
  "W012": {
   "normal": 4.534,
-  "extreme": 6.0,
+  "extreme": 3.0,
   "class": 1.3,
   "special": 3.6,
-  "class_showcase": 6.7
+  "class_showcase": 6.7,
+  "extreme_showcase": 6.0
  },
  "W013": {
   "normal": 4.017,
-  "extreme": 5.2,
+  "extreme": 3.5,
   "class": 1.7,
   "special": 1.5,
   "class_showcase": 4.667,
-  "special_showcase": 5.734
+  "special_showcase": 5.734,
+  "extreme_showcase": 5.2
  },
  "W014": {
   "normal": 4.367,
-  "extreme": 8.85,
+  "extreme": 3.5,
   "class": 1.4,
   "special": 5.484,
-  "class_showcase": 5.95
+  "class_showcase": 5.95,
+  "extreme_showcase": 8.85
  },
  "W015": {
   "normal": 5.534,
-  "extreme": 13.4,
+  "extreme": 2.0,
   "class": 3.567,
-  "special": 3.2
+  "special": 3.2,
+  "extreme_showcase": 13.4
  },
  "W016": {
   "normal": 3.417,
-  "extreme": 6.35,
+  "extreme": 3.0,
   "class": 2.9,
-  "special": 3.1
+  "special": 3.1,
+  "extreme_showcase": 6.35
  },
  "W017": {
   "normal": 5.45,
-  "extreme": 6.1,
+  "extreme": 4.5,
   "class": 4.834,
-  "special": 3.517
+  "special": 3.517,
+  "extreme_showcase": 6.1
  },
  "W018": {
   "normal": 3.184,
-  "extreme": 7.2,
+  "extreme": 3.2,
   "class": 1.9,
   "special": 1.0,
   "class_showcase": 4.884,
-  "special_showcase": 4.284
+  "special_showcase": 4.284,
+  "extreme_showcase": 7.2
  },
  "W019": {
   "normal": 4.05,
-  "extreme": 9.017,
+  "extreme": 3.5,
   "class": 4.634,
-  "special": 3.034
+  "special": 3.034,
+  "extreme_showcase": 9.017
  },
  "W020": {
   "normal": 3.75,
-  "extreme": 16.234,
+  "extreme": 2.5,
   "class": 8.567,
   "special": 2.0,
-  "special_showcase": 8.0
+  "special_showcase": 8.0,
+  "extreme_showcase": 16.234
  },
  "W021": {
   "normal": 5.067,
-  "extreme": 4.5,
+  "extreme": 1.3,
   "class": 1.6,
   "special": 4.7,
-  "class_showcase": 6.034
+  "class_showcase": 6.034,
+  "extreme_showcase": 4.5
  },
  "W022": {
   "normal": 4.3,
-  "extreme": 17.667,
+  "extreme": 2.0,
   "class": 1.1,
   "special": 1.3,
   "class_showcase": 9.0,
-  "special_showcase": 8.55
+  "special_showcase": 8.55,
+  "extreme_showcase": 17.667
  },
  "W023": {
   "normal": 4.884,
-  "extreme": 4.267,
+  "extreme": 3.0,
   "class": 3.25,
-  "special": 3.084
+  "special": 3.084,
+  "extreme_showcase": 4.267
  },
  "W024": {
   "normal": 4.15,
-  "extreme": 7.4,
+  "extreme": 3.5,
   "class": 1.0,
   "special": 3.934,
-  "class_showcase": 7.25
+  "class_showcase": 7.25,
+  "extreme_showcase": 7.4
  }
 }

@@ -19,6 +19,7 @@ const accentVar = t => ({physical:'var(--physical)',magic:'var(--magic)',mental:
 const dealersByType = t => witches.filter(w => w.damage_type === t)
   .sort((a, b) => (a.rarity === 'SSR' ? 0 : 1) - (b.rarity === 'SSR' ? 0 : 1) || a.name.localeCompare(b.name));
 const synById = Object.fromEntries((tierSynergy.witches || []).map(sy => [sy.witch_id, sy]));
+const HEALER_IDS = new Set((tierSynergy.witches || []).filter(sy => (sy.role_tags || []).includes('healer')).map(sy => sy.witch_id));
 const scoreOf = wid => { const ob = skillScores.witches?.[wid]?.overall_by_rank; return ob ? Math.max(...Object.values(ob)) : 0; };
 const TEAM_TAGS = new Set(['team-buff-aura','counter-enabler','charge-amp','extreme-battery','extreme-charger']);
 const rankedDealers = (weak) => {
@@ -31,7 +32,7 @@ const rankedDealers = (weak) => {
   const max = Math.max(1, ...list.map(d => d.score));
   return list.map(d => ({ ...d, pct: Math.round(100 * d.score / max) }));
 };
-const compsFor = id => (suggestedComps[id]?.comps || []);
+const compsFor = id => (suggestedComps[id]?.comps || []).filter(c => c.team_ids.some(t => HEALER_IDS.has(t)));
 const shortRes = r => r.split('->')[0].replace(':', '').trim();
 const bossMedia = (b) => {
   // Converted showcase loop under /vid/boss/ wins (b.video = file stem, e.g. "boss_venomfrill_lobby").
@@ -166,6 +167,7 @@ const bossMedia = (b) => {
           {compsFor(b.id).length > 0 && (
             <div class="comps">
               <span class="dl mono">Suggested teams <span class="auto-note">(damage × weakness × Laws × survivability · provisional)</span></span>
+              <p class="comps-note mono">Every team runs a healer — essential for a boss run. A strong Carmen can sometimes stand in.</p>
               <div class="comp-list">
                 {compsFor(b.id).slice(0, 5).map(c => (
                   <div class={`comp ${c.weakness_mult < 1 ? 'off-weak' : ''}`}>
@@ -177,11 +179,12 @@ const bossMedia = (b) => {
                     </div>
                     <div class="comp-body">
                       <div class="comp-team">
-                        {c.team_ids.map(id => { const w = wById[id]; const carry = id === c.carry_id; return w ? (
-                          <a class={`comp-unit is-${w.rarity} ${carry ? 'is-carry' : ''}`} href={`${base}witch/${id.toLowerCase()}`}>
+                        {c.team_ids.map(id => { const w = wById[id]; const carry = id === c.carry_id; const heal = HEALER_IDS.has(id); return w ? (
+                          <a class={`comp-unit is-${w.rarity} ${carry ? 'is-carry' : ''} ${heal ? 'is-healer' : ''}`} href={`${base}witch/${id.toLowerCase()}`}>
                             <span class={`cu-dot is-${w.rarity}`}></span>
                             <span class="cu-name">{w.name}</span>
                             {carry && <span class="cu-tag mono">carry</span>}
+                            {heal && <span class="cu-tag heal mono">healer</span>}
                           </a>) : null; })}
                       </div>
                       <div class="comp-res">
@@ -341,6 +344,9 @@ const bossMedia = (b) => {
   .cu-dot.is-SSR{background:var(--ssr)} .cu-dot.is-SR{background:var(--sr)}
   .cu-name{font-weight:600}
   .cu-tag{font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--weak-accent,var(--sigil))}
+  .cu-tag.heal{color:#63c99a}
+  .comp-unit.is-healer{border-color:color-mix(in srgb,#63c99a 45%,var(--line))}
+  .comps-note{font-size:.62rem;color:var(--ink-faint);letter-spacing:.02em;margin:-4px 0 12px}
   .comp-res{display:flex;flex-wrap:wrap;gap:6px}
   .res-tag{font-size:.62rem;color:var(--ink-faint);background:var(--veil);border:1px solid var(--line);
     border-radius:6px;padding:2px 8px}
