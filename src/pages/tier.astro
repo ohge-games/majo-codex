@@ -5,6 +5,7 @@ import witches from '../data/witches.json';
 import guides from '../data/guides.json';
 import skillScores from '../data/skill_scores.json';
 import tierSynergy from '../data/tier_synergy.json';
+import suggestedComps from '../data/suggested_comps.json';
 import fs from 'node:fs';
 
 const base = import.meta.env.BASE_URL;
@@ -30,6 +31,8 @@ const rankedDealers = (weak) => {
   const max = Math.max(1, ...list.map(d => d.score));
   return list.map(d => ({ ...d, pct: Math.round(100 * d.score / max) }));
 };
+const compsFor = id => (suggestedComps[id]?.comps || []);
+const shortRes = r => r.split('->')[0].replace(':', '').trim();
 const bossMedia = (b) => {
   // Converted showcase loop under /vid/boss/ wins (b.video = file stem, e.g. "boss_venomfrill_lobby").
   if (b.video) {
@@ -159,6 +162,37 @@ const bossMedia = (b) => {
               </div>
             </div>
           </div>
+
+          {compsFor(b.id).length > 0 && (
+            <div class="comps">
+              <span class="dl mono">Suggested teams <span class="auto-note">(damage × weakness × Laws × survivability · provisional)</span></span>
+              <div class="comp-list">
+                {compsFor(b.id).slice(0, 5).map(c => (
+                  <div class={`comp ${c.weakness_mult < 1 ? 'off-weak' : ''}`}>
+                    <div class="comp-score">
+                      <span class="comp-rank mono">#{c.rank}</span>
+                      <span class="comp-eff">{Math.round(c.effective_score)}</span>
+                      <span class="comp-mult mono">Laws ×{c.law_mult.toFixed(2)}</span>
+                      {c.weakness_mult < 1 && <span class="comp-offw mono">off-weakness</span>}
+                    </div>
+                    <div class="comp-body">
+                      <div class="comp-team">
+                        {c.team_ids.map(id => { const w = wById[id]; const carry = id === c.carry_id; return w ? (
+                          <a class={`comp-unit is-${w.rarity} ${carry ? 'is-carry' : ''}`} href={`${base}witch/${id.toLowerCase()}`}>
+                            <span class={`cu-dot is-${w.rarity}`}></span>
+                            <span class="cu-name">{w.name}</span>
+                            {carry && <span class="cu-tag mono">carry</span>}
+                          </a>) : null; })}
+                      </div>
+                      <div class="comp-res">
+                        {c.resonances.map(r => <span class="res-tag mono">{shortRes(r)}</span>)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </article>
       ))}
     </section>
@@ -283,5 +317,34 @@ const bossMedia = (b) => {
   .dr-fill{display:block;height:100%;border-radius:999px;
     background:linear-gradient(90deg, color-mix(in srgb,var(--weak-accent,var(--sigil)) 45%,transparent), var(--weak-accent,var(--sigil)))}
   .dr-score{font-size:.86rem;color:var(--ink);font-weight:700;min-width:26px;text-align:right}
+  .comps{padding:20px 22px;border-top:1px solid var(--line)}
+  .comp-list{display:flex;flex-direction:column;gap:10px}
+  .comp{display:grid;grid-template-columns:118px 1fr;gap:16px;align-items:center;
+    background:var(--nightshade);border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+  .comp.off-weak{opacity:.82}
+  .comp-score{display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+    border-right:1px solid var(--line);padding-right:12px}
+  .comp-rank{font-size:.62rem;color:var(--ink-faint)}
+  .comp-eff{font-size:1.5rem;font-weight:800;line-height:1;color:var(--ink);
+    font-family:"Space Mono",monospace}
+  .comp-mult{font-size:.6rem;color:var(--weak-accent,var(--sigil));margin-top:3px}
+  .comp-offw{font-size:.56rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint);
+    border:1px solid var(--line);border-radius:5px;padding:1px 5px;margin-top:3px}
+  .comp-body{display:flex;flex-direction:column;gap:9px;min-width:0}
+  .comp-team{display:flex;flex-wrap:wrap;gap:7px}
+  .comp-unit{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:.86rem;color:var(--ink-dim);
+    background:var(--veil);border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+  .comp-unit:hover{border-color:color-mix(in srgb,var(--sigil) 45%,var(--line));color:var(--ink)}
+  .comp-unit.is-carry{color:var(--ink);border-color:color-mix(in srgb,var(--weak-accent,var(--sigil)) 55%,var(--line));
+    background:color-mix(in srgb,var(--weak-accent,var(--sigil)) 12%,var(--veil))}
+  .cu-dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);flex-shrink:0}
+  .cu-dot.is-SSR{background:var(--ssr)} .cu-dot.is-SR{background:var(--sr)}
+  .cu-name{font-weight:600}
+  .cu-tag{font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--weak-accent,var(--sigil))}
+  .comp-res{display:flex;flex-wrap:wrap;gap:6px}
+  .res-tag{font-size:.62rem;color:var(--ink-faint);background:var(--veil);border:1px solid var(--line);
+    border-radius:6px;padding:2px 8px}
+  @media(max-width:640px){ .comp{grid-template-columns:1fr;gap:10px}
+    .comp-score{flex-direction:row;align-items:baseline;gap:10px;border-right:none;border-bottom:1px solid var(--line);padding:0 0 8px} }
   @media(max-width:760px){ .boss-head{flex-direction:column;align-items:flex-start} .boss-body{grid-template-columns:1fr} .boss-art{width:min(70vw,280px)} }
 </style>

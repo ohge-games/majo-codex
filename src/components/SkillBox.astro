@@ -1,5 +1,6 @@
 ---
 import abilities from '../data/abilities.json';
+import skillDurations from '../data/skill_durations.json';
 import fs from 'node:fs';
 
 const { witch, skill, hero = false, rarity = witch.rarity, baseLevel, score = null } = Astro.props;
@@ -19,6 +20,8 @@ if (a) {
   if (a.range) meta.push(`range ${a.range}`);
   if (a.total_stagger) meta.push(`${a.total_stagger} stagger`);
 }
+const dur = skillDurations[witch.witch_id]?.[s.slot.toLowerCase()];
+if (dur) meta.push(`${(+dur).toFixed(1)}s cast`);
 if (s.plus_range != null) meta.push(`plus range ${s.plus_range}`);
 
 const maxLevel = (rarity === 'SSR' || rarity === 'UR') ? 10 : 7;   // 6star=L7; SSR/UR EX1-3 = L8-10
