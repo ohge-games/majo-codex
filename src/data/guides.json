@@ -9,7 +9,7 @@
       "weak": "physical",
       "race": "beast",
       "media": "boss_venom",
-      "source": "Datamined from config N3097 — stats and full kit confirmed; per-hit damage values pending a deeper resolve.",
+      "source": "Stats and full kit current as of the live version; per-hit damage values pending.",
       "mechanics": [
         {
           "name": "Extreme damage feeds his resistance",
@@ -33,12 +33,12 @@
         },
         {
           "name": "Hard to lock down",
-          "text": "High punch resistance (3000) and a 1000 stagger threshold make stuns and interrupts unreliable — he'll power through most CC. He can still be pulled or teleported, and he never dodges or blocks, so no hits are wasted. Plan for sustained Physical pressure over a stun-lock."
+          "text": "Extremely high knockback and stagger resistance make stuns and interrupts unreliable — he powers through most CC. He can still be pulled or teleported, and he never dodges or blocks, so no hits are wasted. Plan for sustained Physical pressure over a stun-lock."
         }
       ],
       "tips": [
         "Weak to Physical — Physical dealers post the highest scores (auto-list below).",
-        "Very high knockback resistance (30, vs the slime's 10) and posture 300 — CC and interrupts are far less reliable here, so lean on sustained Physical damage and survivability rather than a stun-lock plan.",
+        "Very high knockback resistance and posture — far tougher to interrupt than the previous slime boss — so CC and stun-locks are unreliable; lean on sustained Physical damage and survivability instead.",
         "Beast race — relevant for any race-targeted effects."
       ],
       "recommended": [],
@@ -144,7 +144,7 @@
         }
       ],
       "media": "boss_slime",
-      "source": "Community-observed — no datamined ability data available for this boss."
+      "source": "Community-observed."
     }
   ]
 }

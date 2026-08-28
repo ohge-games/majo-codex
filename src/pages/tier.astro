@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import EyeBadge from '../components/EyeBadge.astro';
 import witches from '../data/witches.json';
 import guides from '../data/guides.json';
+import skillScores from '../data/skill_scores.json';
+import tierSynergy from '../data/tier_synergy.json';
 import fs from 'node:fs';
 
 const base = import.meta.env.BASE_URL;
@@ -15,6 +17,19 @@ const wById = Object.fromEntries(witches.map(w => [w.witch_id, w]));
 const accentVar = t => ({physical:'var(--physical)',magic:'var(--magic)',mental:'var(--mental)'}[lc(t)] || 'var(--sigil)');
 const dealersByType = t => witches.filter(w => w.damage_type === t)
   .sort((a, b) => (a.rarity === 'SSR' ? 0 : 1) - (b.rarity === 'SSR' ? 0 : 1) || a.name.localeCompare(b.name));
+const synById = Object.fromEntries((tierSynergy.witches || []).map(sy => [sy.witch_id, sy]));
+const scoreOf = wid => { const ob = skillScores.witches?.[wid]?.overall_by_rank; return ob ? Math.max(...Object.values(ob)) : 0; };
+const TEAM_TAGS = new Set(['team-buff-aura','counter-enabler','charge-amp','extreme-battery','extreme-charger']);
+const rankedDealers = (weak) => {
+  const list = witches.filter(w => w.damage_type === weak).map(w => {
+    const sy = synById[w.witch_id] || {};
+    const wx = (sy.debuffs || []).includes('weakness-exploit');
+    const teamBuff = wx || (sy.role_tags || []).some(t => TEAM_TAGS.has(t));
+    return { w, score: scoreOf(w.witch_id), teamBuff, wx };
+  }).sort((a, b) => b.score - a.score);
+  const max = Math.max(1, ...list.map(d => d.score));
+  return list.map(d => ({ ...d, pct: Math.round(100 * d.score / max) }));
+};
 const bossMedia = (b) => {
   // Converted showcase loop under /vid/boss/ wins (b.video = file stem, e.g. "boss_venomfrill_lobby").
   if (b.video) {
@@ -34,17 +49,17 @@ const bossMedia = (b) => {
   return poster ? { type: 'img', src: poster } : null;
 };
 ---
-<Base title="Tier List — MAJO Codex" desc="Content-specific team guidance: Boss Training and the Tower of Anomalies.">
+<Base title="Training Boss — MAJO Codex" desc="Team guidance for the current Training Boss: mechanics, counters, and damage-ranked dealers.">
   <div class="wrap tier">
     <header class="thead">
-      <h1 class="display">Tier List</h1>
-      <p class="sub">Not an all-around ranking — team guidance for <b>current content and known walls</b>. Recommendations update with the rotation.</p>
+      <h1 class="display">Training Boss</h1>
+      <p class="sub">Mechanics, counters, and damage-ranked dealers for the <b>current Training Boss</b>. Tower of Anomaly floor guidance returns once the data is ready.</p>
     </header>
 
     <section class="mode">
       <h2 class="sec display">Boss Training</h2>
       {guides.bosses.map(b => (
-        <article class="boss" style={`--accent:${accentVar(b.deals)}`}>
+        <article class="boss" style={`--accent:${accentVar(b.deals)};--weak-accent:${accentVar(b.weak)}`}>
           <div class="boss-head">
             <div class="boss-art">
               {(() => { const m = bossMedia(b); return m
@@ -59,7 +74,6 @@ const bossMedia = (b) => {
               {b.full_name && <span class="boss-full">{b.full_name}</span>}
               <h3 class="boss-name">{b.name}</h3>
               <p class="boss-blurb">{b.blurb}</p>
-              {b.source && <p class="boss-source mono">{b.source}</p>}
               {b.ranks && b.ranks.length > 0 && (
                 <div class="ranks">
                   <span class="dl mono">HP by rank</span>
@@ -103,10 +117,10 @@ const bossMedia = (b) => {
                   </div>
                 </>
               )}
-              <span class="dl mono" style="margin-top:16px">Pro tips</span>
-              <ul class="tips">{b.tips.map(t => <li>{t}</li>)}</ul>
             </div>
             <div class="col">
+              <span class="dl mono">Pro tips</span>
+              <ul class="tips">{b.tips.map(t => <li>{t}</li>)}</ul>
               {(b.recommended || []).length > 0 && (
                 <>
                   <span class="dl mono">Recommended</span>
@@ -124,11 +138,22 @@ const bossMedia = (b) => {
                   </div>
                 </>
               )}
-              <span class="dl mono" style="margin-top:16px">Auto — all {cap(b.weak)} dealers <span class="auto-note">(he's weak to {cap(b.weak)})</span></span>
-              <div class="dealer-chips">
-                {dealersByType(b.weak).map(w => (
-                  <a class={`dchip2 is-${w.rarity}`} href={`${base}witch/${w.witch_id.toLowerCase()}`}>
-                    <span class="dc-dot"></span>{w.name}<span class="dc-r mono">{w.rarity}</span>
+              <span class="dl mono" style="margin-top:16px">{cap(b.weak)} dealers, ranked <span class="auto-note">(weak to {cap(b.weak)})</span></span>
+              <p class="rank-cap mono">By single-unit damage · team-law weighting in progress</p>
+              <div class="drank">
+                {rankedDealers(b.weak).map((d, i) => (
+                  <a class={`drow is-${d.w.rarity}`} href={`${base}witch/${d.w.witch_id.toLowerCase()}`}>
+                    <span class="dr-rank mono">{i + 1}</span>
+                    <span class="dr-main">
+                      <span class="dr-line1">
+                        <span class={`dr-dot is-${d.w.rarity}`}></span>
+                        <span class="dr-name">{d.w.name}</span>
+                        <span class="dr-meta mono">{d.w.rarity} · {d.w.class}</span>
+                        {d.teamBuff && <span class="dr-buff mono" title="Buffs the team">{d.wx ? 'weakness-exploit' : 'team buff'}</span>}
+                      </span>
+                      <span class="dr-bar"><span class="dr-fill" style={`width:${d.pct}%`}></span></span>
+                    </span>
+                    <span class="dr-score mono">{d.score ? Math.round(d.score) : '—'}</span>
                   </a>
                 ))}
               </div>
@@ -152,13 +177,6 @@ const bossMedia = (b) => {
       </section>
     )}
 
-    <section class="mode">
-      <h2 class="sec display">{guides.tower.name}</h2>
-      <div class="tower-empty">
-        <p>{guides.tower.blurb}</p>
-        <p class="hint mono">Tell me the specific hard floors and I'll add per-floor mechanics + comps.</p>
-      </div>
-    </section>
   </div>
 </Base>
 
@@ -246,5 +264,24 @@ const bossMedia = (b) => {
   .dchip2.is-SSR .dc-dot{background:var(--ssr)} .dchip2.is-SR .dc-dot{background:var(--sr)}
   .dc-r{font-size:.6rem;color:var(--ink-faint)}
   .tower-empty .hint{color:var(--ink-faint);font-size:.78rem;margin-bottom:0}
+  .rank-cap{font-size:.6rem;color:var(--ink-faint);letter-spacing:.04em;margin:-4px 0 10px}
+  .drank{display:flex;flex-direction:column;gap:7px}
+  .drow{display:grid;grid-template-columns:20px 1fr auto;align-items:center;gap:11px;text-decoration:none;
+    background:var(--nightshade);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+  .drow:hover{border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
+  .dr-rank{font-size:.78rem;color:var(--ink-faint);text-align:center}
+  .dr-main{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .dr-line1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .dr-dot{width:8px;height:8px;border-radius:50%;background:var(--ink-faint);flex-shrink:0}
+  .dr-dot.is-SSR{background:var(--ssr)} .dr-dot.is-SR{background:var(--sr)}
+  .dr-name{color:var(--ink);font-weight:600;font-size:.92rem}
+  .dr-meta{font-size:.62rem;color:var(--ink-faint)}
+  .dr-buff{font-size:.56rem;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--weak-accent,var(--sigil));border:1px solid color-mix(in srgb,var(--weak-accent,var(--sigil)) 40%,var(--line));
+    border-radius:5px;padding:1px 6px}
+  .dr-bar{height:5px;border-radius:999px;background:color-mix(in srgb,var(--line) 80%,transparent);overflow:hidden}
+  .dr-fill{display:block;height:100%;border-radius:999px;
+    background:linear-gradient(90deg, color-mix(in srgb,var(--weak-accent,var(--sigil)) 45%,transparent), var(--weak-accent,var(--sigil)))}
+  .dr-score{font-size:.86rem;color:var(--ink);font-weight:700;min-width:26px;text-align:right}
   @media(max-width:760px){ .boss-head{flex-direction:column;align-items:flex-start} .boss-body{grid-template-columns:1fr} .boss-art{width:min(70vw,280px)} }
 </style>
