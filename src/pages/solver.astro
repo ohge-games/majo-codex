@@ -283,24 +283,25 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       return u ? `<img src="${u}" alt="${key}" width="22" height="22">` : `<span class="ic-fallback ${kind==='type'?elC(key):''}">${CAP(key)[0]}</span>`;
     }
     const RESLIST = [
-      { k: 'van', label: 'Vanguard', tag: '2\u00d7', icon: ['cclass','vanguard'], ladder: RES.vanguard },
-      { k: 'arc', label: 'Arcanist', tag: '2\u00d7', icon: ['cclass','arcanist'], ladder: RES.arcanist },
-      { k: 'mental', label: 'Mental', tag: '4\u00d7', icon: ['type','mental'], ladder: RES.mental },
-      { k: 'physical', label: 'Physical', tag: '4\u00d7', icon: ['type','physical'], ladder: RES.physical },
-      { k: 'magic', label: 'Magic', tag: '4\u00d7', icon: ['type','magic'], ladder: RES.magic },
+      { k: 'van', label: 'Vanguard', tag: '2\u00d7', icon: ['cclass','vanguard'], ladder: RES.vanguard, desc: 'With 2 Vanguards on the team \u2014 attack speed' },
+      { k: 'arc', label: 'Arcanist', tag: '2\u00d7', icon: ['cclass','arcanist'], ladder: RES.arcanist, desc: 'With 2 Arcanists \u2014 crit rate' },
+      { k: 'mental', label: 'Mental', tag: '4\u00d7', icon: ['type','mental'], ladder: RES.mental, desc: 'With 4 Mental units \u2014 attack speed on execution' },
+      { k: 'physical', label: 'Physical', tag: '4\u00d7', icon: ['type','physical'], ladder: RES.physical, desc: 'With 4 Physical units \u2014 attack speed on counter' },
+      { k: 'magic', label: 'Magic', tag: '4\u00d7', icon: ['type','magic'], ladder: RES.magic, desc: 'With 4 Magic units \u2014 attack speed on extreme' },
     ];
     function renderResbar() {
       const charge = `<button class="restog${S.laws.charge?' on':''}" data-tog="charge" type="button" title="+20% Extreme charge with 1 Supporter, Arcanist & Vanguard on the team">+20% charge <i>S/A/V</i></button>`;
       const start = `<button class="restog${S.laws.start120?' on':''}" data-tog="start120" type="button" title="+120 Extreme charge at battle start">+120 start</button>`;
       const pills = RESLIST.map(r => {
         const lvl = S.laws[r.k];
-        const pips = [1,2,3].map(n => `<button class="lvb${lvl>=n?' on':''}" data-res="${r.k}" data-lv="${n}" type="button" title="${r.label} Lv${n} \u00b7 +${r.ladder[n-1]}%">${n}</button>`).join('');
-        return `<div class="respill${lvl>0?' on':''}" title="${r.label} resonance"><span class="ric">${iconFor(r.icon[0], r.icon[1])}</span><span class="rtag mono">${r.tag}</span><span class="rlv">${pips}</span></div>`;
+        const off = `<button class="lvb off${lvl===0?' on':''}" data-res="${r.k}" data-lv="0" type="button" title="Not unlocked / off">\u2013</button>`;
+        const pips = [1,2,3].map(n => `<button class="lvb${lvl>=n?' on':''}" data-res="${r.k}" data-lv="${n}" type="button" title="${r.label} resonance Lv${n} \u00b7 +${r.ladder[n-1]}%">${n}</button>`).join('');
+        return `<div class="respill${lvl>0?' on':''}" title="${r.desc} (\u2013 = off)"><span class="ric">${iconFor(r.icon[0], r.icon[1])}</span><span class="rtag mono">${r.tag}</span><span class="rlv">${off}${pips}</span></div>`;
       }).join('');
       $('resbar').innerHTML = charge + start + pills;
       $('resbar').querySelectorAll('[data-tog]').forEach(b => b.addEventListener('click', () => { S.laws[b.dataset.tog] = !S.laws[b.dataset.tog]; save(); renderResbar(); solve(); }));
       $('resbar').querySelectorAll('.lvb').forEach(p => p.addEventListener('click', () => {
-        const k = p.dataset.res, n = +p.dataset.lv; S.laws[k] = (S.laws[k] === n) ? n - 1 : n; save(); renderResbar(); solve();
+        const k = p.dataset.res, n = +p.dataset.lv; S.laws[k] = (S.laws[k] === n) ? 0 : n; save(); renderResbar(); solve();
       }));
     }
 
@@ -467,6 +468,8 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     #svapp .rlv{display:flex;gap:3px;margin-left:3px}
     #svapp .lvb{width:21px;height:21px;border:1px solid var(--line);border-radius:5px;background:var(--veil-2);color:var(--ink-faint);font-size:.68rem;font-family:"Space Mono",monospace;cursor:pointer;padding:0;line-height:1}
     #svapp .lvb.on{background:var(--sigil);color:#0c0a15;border-color:var(--sigil);font-weight:700}
+    #svapp .lvb.off{color:var(--ink-faint)}
+    #svapp .lvb.off.on{background:var(--veil-2);color:var(--ink);border-color:var(--ink-faint)}
     #svapp .lvb:hover{border-color:var(--sigil)}
 
     #svapp .sv-grid{display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start}
@@ -481,16 +484,16 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     #svapp .tportrait{position:relative;aspect-ratio:4/3;background:radial-gradient(120% 120% at 50% 0%,var(--veil-2),var(--nightshade));display:flex;align-items:center;justify-content:center;overflow:hidden}
     #svapp .portrait-img{width:100%;height:100%;object-fit:cover;object-position:top center}
     #svapp .tportrait .sigil{width:30%;color:var(--line)}
-    #svapp .edit{position:absolute;top:7px;right:8px;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:rgba(8,6,14,.72);cursor:pointer}
-    #svapp .edit:hover{color:var(--ink);border-color:var(--sigil)}
+    #svapp .edit{position:absolute;top:8px;right:8px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0c0a15;border:none;border-radius:6px;padding:5px 13px;background:var(--sigil);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+    #svapp .edit:hover{filter:brightness(1.12)}
     #svapp .tname{position:absolute;left:10px;bottom:8px;font-size:1.1rem;text-shadow:0 2px 8px #000}
     #svapp .trow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px 3px}
     #svapp .mstars{display:flex;align-items:center;gap:1px}
     #svapp .ms{width:15px;height:15px;object-fit:contain}
     #svapp .msg{font-size:13px;line-height:1}#svapp .msg.red{color:#e0574b}#svapp .msg.yellow{color:var(--ssr)}#svapp .msg.grey{color:var(--ink-faint)}
     #svapp .trank{font-size:.82rem;color:var(--ssr);letter-spacing:.03em}
-    #svapp .tstat{font-size:.78rem;color:var(--ink-dim);letter-spacing:.02em}
-    #svapp .tlv{padding:0 11px 11px;font-size:.82rem;color:var(--ink);letter-spacing:.06em}
+    #svapp .tstat{font-size:.86rem;color:var(--ink-dim);letter-spacing:.02em}
+    #svapp .tlv{padding:0 11px 12px;font-size:.94rem;color:var(--ink);letter-spacing:.07em}
 
     #svapp .tile.add{cursor:pointer;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;border-style:dashed;color:var(--ink-faint);padding:16px;background:transparent;transition:.15s}
     #svapp .tile.add:hover{border-color:var(--sigil);color:var(--ink)}
@@ -558,7 +561,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     #svapp .ms-ico{width:54px;height:54px;border-radius:9px;object-fit:cover;border:1px solid var(--line)}
     #svapp .ms-ico.txt{display:grid;place-items:center;background:var(--veil-2);font-family:"Space Mono",monospace;color:var(--ink-faint)}
     #svapp .ms-plus{position:absolute;top:-5px;right:-5px;background:var(--ssr);color:#0c0a15;font-weight:800;font-size:.72rem;width:18px;height:18px;border-radius:50%;display:grid;place-items:center}
-    #svapp .ms-name{font-size:.74rem;color:var(--ink);line-height:1.25;min-height:2.4em;display:flex;flex-direction:column;justify-content:center}
+    #svapp .ms-name{font-size:.82rem;color:var(--ink);line-height:1.3;min-height:2.5em;display:flex;flex-direction:column;justify-content:center}
     #svapp .ms-note{display:block;font-size:.58rem;color:var(--ink-faint);font-family:"Space Mono",monospace;margin-top:2px}
     #svapp .ms-lv{font-size:.72rem;color:var(--sigil)}
     #svapp .mskill.locked{opacity:.55}
