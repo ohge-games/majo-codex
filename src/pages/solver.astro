@@ -38,6 +38,7 @@ const UI = {};
 for (const t of ['physical','mental','magic']) UI['type_' + t] = uiUrl('type_' + t);
 for (const c of ['arcanist','vanguard','defender','supporter']) UI['cclass_' + c] = uiUrl('cclass_' + c);
 for (const r of ['sr','ssr','ur']) UI['rarity_' + r] = uiUrl('rarity_' + r);
+for (const s of ['red','yellow','grey','ex1','ex2','ex3']) UI['star_' + s] = uiUrl('star_' + s);
 const BOSSES = [
   { id: 'venomfrill', name: 'Venomfrill', weak: 'physical', kd: 2.5 * 8 / 180 },
   { id: 'dummy', name: 'Test Dummy (no weakness / no knockdown)', weak: 'none', kd: 0 },
@@ -179,8 +180,18 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       for (const [D, an, n, e] of rest) { const c = n * sc * D; restDmg += c; if (e) execDmg += c; }
       const left = Math.max(0, T - eo - restOcc);
       const nDmg = normal ? left / normal[1] * normal[0] : 0;
-      const amp = w.amp || 1, total = (extDmg + restDmg + nDmg) * amp;
-      return { total, extreme: total ? (extDmg * amp) / total : 0, normal: total ? (nDmg * amp) / total : 0, exec: total ? (execDmg * amp) / total : 0 };
+      const amp = w.amp || 1;
+      const extA = extDmg*amp, nA = nDmg*amp, exA = execDmg*amp;
+      const pre = (extDmg + restDmg + nDmg) * amp || 1;
+      const shares = { extreme: extA/pre, normal: nA/pre, exec: exA/pre };
+      let total = (extDmg + restDmg + nDmg) * amp;
+      const sb = w.selfbuff;                                        // caster's own damage buffs (speed/crit)
+      if (sb && total) {
+        const up = sb.uptime;
+        if (sb.speed) total += nA * sb.speed * up;                  // faster normals
+        if (sb.crit) { const cm = (1 + (st.cr + sb.crit) * st.cd) / (1 + st.cr * st.cd); total += (pre - exA) * up * (cm - 1); }
+      }
+      return { total, ...shares };
     }
     const critMul = (st, add) => (1 + (st.cr + add) * st.cd) / (1 + st.cr * st.cd);
     const RAMP10 = 0.7, RAMP3 = 0.5;
@@ -210,6 +221,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
         if (m > 1.001) { mult *= m; why.push(`charge \u2192 \u00d7${m.toFixed(2)}`); }
       }
       if ((el.mental||0) >= 2 && boss.kd > 0) { const m = 1 + 0.25*boss.kd; mult *= m; why.push(`2\u00d7 Mental knockdown dmg \u2192 \u00d7${m.toFixed(2)}`); }
+      if (team.includes('W005')) { const m = 1 + base.extreme*0.15; if (m>1.001){ mult *= m; why.push(`Peseshet +Extreme dmg \u2192 \u00d7${m.toFixed(2)}`); } }
       if (boss.kd > 0) {
         const kd = (1 + 1.0*st.cd)/(1 + st.cr*st.cd), blend = (1-boss.kd) + boss.kd*kd, m = 1 + (1-ex)*(blend-1);
         if (m > 1.001) { mult *= m; why.push(`knockdown guaranteed-crit \u2192 \u00d7${m.toFixed(2)}`); }
@@ -280,42 +292,45 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       const charge = `<button class="restog${S.laws.charge?' on':''}" data-tog="charge" type="button" title="+20% Extreme charge with 1 Supporter, Arcanist & Vanguard on the team">+20% charge <i>S/A/V</i></button>`;
       const start = `<button class="restog${S.laws.start120?' on':''}" data-tog="start120" type="button" title="+120 Extreme charge at battle start">+120 start</button>`;
       const pills = RESLIST.map(r => {
-        const lvl = S.laws[r.k], dots = [1,2,3].map(n => `<span class="dot${lvl>=n?' f':''}" data-res="${r.k}" data-lv="${n}"></span>`).join('');
-        return `<div class="respill${lvl>0?' on':''}" title="${r.label} resonance">
-          <span class="ric">${iconFor(r.icon[0], r.icon[1])}</span><span class="rtag mono">${r.tag}</span>
-          <span class="rdots" data-clear="${r.k}">${dots}</span></div>`;
+        const lvl = S.laws[r.k];
+        const pips = [1,2,3].map(n => `<button class="pip${lvl>=n?' f':''}" data-res="${r.k}" data-lv="${n}" type="button" title="${r.label} Lv${n} \u00b7 +${r.ladder[n-1]}%"></button>`).join('');
+        return `<div class="respill${lvl>0?' on':''}" title="${r.label} resonance"><span class="ric">${iconFor(r.icon[0], r.icon[1])}</span><span class="rtag mono">${r.tag}</span><span class="rpips">${pips}</span></div>`;
       }).join('');
       $('resbar').innerHTML = charge + start + pills;
       $('resbar').querySelectorAll('[data-tog]').forEach(b => b.addEventListener('click', () => { S.laws[b.dataset.tog] = !S.laws[b.dataset.tog]; save(); renderResbar(); solve(); }));
-      $('resbar').querySelectorAll('.dot').forEach(d => d.addEventListener('click', () => {
-        const k = d.dataset.res, n = +d.dataset.lv; S.laws[k] = (S.laws[k] === n) ? n - 1 : n; save(); renderResbar(); solve();
+      $('resbar').querySelectorAll('.pip').forEach(p => p.addEventListener('click', () => {
+        const k = p.dataset.res, n = +p.dataset.lv; S.laws[k] = (S.laws[k] === n) ? n - 1 : n; save(); renderResbar(); solve();
       }));
     }
 
-    // ---------- pool tiles (condensed, single column) ----------
+    // ---------- pool tiles (photo + star rating + stats + skill levels) ----------
+    function miniStars(w, R) {
+      let h = '';
+      for (let r = 1; r <= 6; r++) { const k = r > R ? 'grey' : (R >= 4 ? 'yellow' : 'red');
+        h += UI['star_'+k] ? `<img class="ms" src="${UI['star_'+k]}" alt="">` : `<span class="msg ${k}">\u2605</span>`; }
+      if (w.maxrank > 6) for (let n = 1; n <= 3 && 6 + n <= R; n++)
+        h += UI['star_ex'+n] ? `<img class="ms ex" src="${UI['star_ex'+n]}" alt="EX${n}">` : `<span class="msg ex">EX${n}</span>`;
+      return h;
+    }
     function renderPool() {
       const ids = owned();
       $('poolCount').textContent = ids.length;
       const add = `<button class="tile add" id="addTile" type="button"><span class="plus">+</span><span class="mono">Add my Witch</span></button>`;
       const tiles = ids.map(id => {
-        const w = byId(id), st = statsFor(id), R = st.rank ?? w.maxrank;
+        const w = byId(id), st = statsFor(id), R = st.rank ?? w.maxrank, cap = lvCap(w, R);
         const port = w.img ? `<img class="portrait-img" src="${w.img}" alt="${w.name}" loading="lazy">`
           : `<svg viewBox="0 0 24 24" class="sigil"><path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1"/></svg>`;
-        const cap = lvCap(w, R);
-        const sk = w.skills.map(s => {
-          const locked = R < s.req, v = locked ? 0 : clamp((st.lv && st.lv[s.slot]) || cap, 1, cap), ex = v > 7;
-          const face = s.ico ? `<img src="${s.ico}" alt="${s.slot}">` : `<i>${s.slot[0].toUpperCase()}</i>`;
-          const num = locked ? `<b class="lock">\u{1F512}</b>` : `<b${ex?' class="ex"':''}>${v}</b>`;
-          return `<span class="sk${locked?' off':''}" title="${s.name}${locked?' (locked)':' \u00b7 '+lvLabel(v)}">${face}${num}</span>`;
-        }).join('');
-        const cr = w.cls === 'Arcanist' ? `${(st.cr*100).toFixed(0)}%` : '\u2014';
+        const lvStr = w.skills.map(s => {
+          if (R < s.req) return 'X';
+          const v = clamp((st.lv && st.lv[s.slot]) || cap, 1, cap);
+          return v > 7 ? `EX-${v-7}` : `${v}`;
+        }).join(' / ');
+        const cr = w.cls === 'Arcanist' ? `${(st.cr*100).toFixed(0)}%` : '20%';
         return `<div class="tile rar-${w.rar}" data-id="${id}">
-          <div class="tportrait">${port}
-            <span class="trank mono">${rankLabel(R)}</span>
-            <button class="edit mono" data-edit="${id}" type="button">Edit</button>
-            <span class="tname display">${w.name}</span></div>
-          <div class="tskills">${sk}</div>
-          <div class="tstats mono">${st.atk} <span>/</span> ${cr} <span>/</span> ${(st.cd*100).toFixed(0)}%</div>
+          <div class="tportrait">${port}<button class="edit mono" data-edit="${id}" type="button">Edit</button><span class="tname display">${w.name}</span></div>
+          <div class="trow"><span class="mstars">${miniStars(w, R)}</span>
+            <span class="tstat mono">${st.atk} / ${cr} / ${(st.cd*100).toFixed(0)}%</span></div>
+          <div class="tlv mono">${lvStr}</div>
         </div>`;
       }).join('');
       $('pool').innerHTML = add + tiles;
@@ -350,12 +365,19 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     function renderStars() {
       const w = byId(mId);
       let html = '';
-      for (let r = 1; r <= w.maxrank; r++) {
-        const on = r <= mRank, ex = r > 6, disabled = r < w.minrank;
-        html += `<button class="star${on?' on':''}${ex?' ex':''}" data-rank="${r}" type="button" ${disabled?'disabled':''} title="${rankLabel(r)}">${ex?('EX'+(r-6)):'\u2605'}</button>`;
+      for (let r = 1; r <= 6; r++) {
+        const kind = r > mRank ? 'grey' : (mRank >= 4 ? 'yellow' : 'red'), disabled = r < w.minrank;
+        const face = UI['star_'+kind] ? `<img src="${UI['star_'+kind]}" alt="">` : `<span class="star-glyph ${kind}">\u2605</span>`;
+        html += `<button class="star" data-rank="${r}" type="button" ${disabled?'disabled':''} title="${r}\u2605">${face}</button>`;
+      }
+      if (w.maxrank > 6) for (let n = 1; n <= 3; n++) {
+        const r = 6 + n, on = mRank >= r;
+        const face = UI['star_ex'+n] ? `<img src="${UI['star_ex'+n]}" alt="EX${n}">` : `<span class="ex-txt">EX${n}</span>`;
+        html += `<button class="exstar${on?' on':''}" data-rank="${r}" type="button" title="EX-${n}">${face}</button>`;
       }
       $('mStars').innerHTML = html;
-      $('mStars').querySelectorAll('.star').forEach(b => b.addEventListener('click', () => {
+      $('mStars').querySelectorAll('.star,.exstar').forEach(b => b.addEventListener('click', () => {
+        if (b.disabled) return;
         mRank = +b.dataset.rank; renderStars();
         const lv = {}; $('mSkills').querySelectorAll('.slider').forEach(sl => lv[sl.dataset.slot] = +sl.value);
         renderModalSkills(lv);
@@ -366,7 +388,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       $('mSkills').innerHTML = w.skills.map(s => {
         const locked = mRank < s.req;
         const face = s.ico ? `<img class="ms-ico" src="${s.ico}" alt="">` : `<span class="ms-ico txt">${s.slot[0].toUpperCase()}</span>`;
-        const note = !s.score && !s.amp ? '<span class="ms-note">not scored yet</span>' : s.amp ? '<span class="ms-note">amp</span>' : '';
+        const note = !s.score && !s.amp ? '<span class="ms-note">buff \u00b7 no dmg</span>' : s.amp ? '<span class="ms-note">amp</span>' : '';
         if (locked) return `<div class="mskill locked"><div class="ms-ico-wrap">${face}</div><span class="ms-name">${s.name}</span><span class="ms-lv mono">locked \u00b7 ${rankLabel(s.req)}</span></div>`;
         const v = clamp(curLv[s.slot] || cap, 1, cap);
         const plus = s.plus_star && mRank >= s.plus_star ? '<span class="ms-plus">+</span>' : '';
@@ -441,10 +463,10 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     .ric{display:flex;width:22px;height:22px}.ric img{border-radius:4px}
     .ic-fallback{width:22px;height:22px;display:grid;place-items:center;border:1px solid currentColor;border-radius:5px;font-size:.66rem;font-family:"Space Mono",monospace;color:var(--ink-faint)}
     .rtag{font-size:.6rem;color:var(--ink-faint)}
-    .rdots{display:flex;gap:3px}
-    .dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--ink-faint);cursor:pointer;transition:.1s}
-    .dot.f{background:var(--sigil);border-color:var(--sigil)}
-    .dot:hover{border-color:var(--sigil)}
+    .rpips{display:flex;gap:4px;margin-left:2px}
+    .pip{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--ink-faint);background:transparent;cursor:pointer;padding:0;transition:.1s}
+    .pip.f{background:var(--sigil);border-color:var(--sigil)}
+    .pip:hover{border-color:var(--sigil)}
 
     .sv-grid{display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start}
     @media (max-width:920px){ .sv-grid{grid-template-columns:1fr} }
@@ -458,20 +480,15 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     .tportrait{position:relative;aspect-ratio:4/3;background:radial-gradient(120% 120% at 50% 0%,var(--veil-2),var(--nightshade));display:flex;align-items:center;justify-content:center;overflow:hidden}
     .portrait-img{width:100%;height:100%;object-fit:cover;object-position:top center}
     .tportrait .sigil{width:30%;color:var(--line)}
-    .trank{position:absolute;top:7px;left:8px;background:rgba(8,6,14,.72);border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:.68rem;color:var(--ssr);letter-spacing:.05em}
     .edit{position:absolute;top:7px;right:8px;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:rgba(8,6,14,.72);cursor:pointer}
     .edit:hover{color:var(--ink);border-color:var(--sigil)}
     .tname{position:absolute;left:10px;bottom:8px;font-size:1.1rem;text-shadow:0 2px 8px #000}
-    .tskills{display:flex;gap:5px;padding:9px 10px 4px;justify-content:space-between}
-    .sk{position:relative;flex:1;aspect-ratio:1/1;max-width:46px;border-radius:7px;overflow:hidden;background:var(--veil-2);border:1px solid var(--line);display:grid;place-items:center}
-    .sk img{width:100%;height:100%;object-fit:cover}
-    .sk i{font-style:normal;font-family:"Space Mono",monospace;font-size:.8rem;color:var(--ink-faint)}
-    .sk b{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:1rem;font-weight:800;text-shadow:0 1px 3px #000,0 0 8px #000}
-    .sk b.ex{color:var(--ssr)}
-    .sk b.lock{font-size:.8rem}
-    .sk.off{opacity:.5}
-    .tstats{padding:2px 11px 11px;font-size:.82rem;color:var(--ink);letter-spacing:.02em}
-    .tstats span{color:var(--ink-faint);margin:0 2px}
+    .trow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px 3px}
+    .mstars{display:flex;align-items:center;gap:1px}
+    .ms{width:15px;height:15px;object-fit:contain}
+    .msg{font-size:13px;line-height:1}.msg.red{color:#e0574b}.msg.yellow{color:var(--ssr)}.msg.grey{color:var(--ink-faint)}
+    .tstat{font-size:.78rem;color:var(--ink-dim);letter-spacing:.02em}
+    .tlv{padding:0 11px 11px;font-size:.82rem;color:var(--ink);letter-spacing:.06em}
 
     .tile.add{cursor:pointer;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;border-style:dashed;color:var(--ink-faint);padding:16px;background:transparent;transition:.15s}
     .tile.add:hover{border-color:var(--sigil);color:var(--ink)}
@@ -520,9 +537,11 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     .m-info{display:flex;flex-wrap:wrap;gap:6px}
     .chip{padding:3px 9px;border:1px solid var(--line);border-radius:999px;font-size:.68rem;color:var(--ink-dim);background:var(--veil-2)}
     .stars{display:flex;flex-wrap:wrap;gap:4px}
-    .star{width:30px;height:30px;border:1px solid var(--line);border-radius:7px;background:var(--veil-2);color:var(--ink-faint);cursor:pointer;font-size:.9rem;display:grid;place-items:center;font-family:"Space Mono",monospace}
-    .star.on{color:var(--ssr);border-color:color-mix(in srgb,var(--ssr) 45%,var(--line))}
-    .star.ex{font-size:.6rem}.star.ex.on{color:var(--ur);border-color:color-mix(in srgb,var(--ur) 45%,var(--line))}
+    .star,.exstar{background:none;border:none;cursor:pointer;padding:2px;display:flex;line-height:0}
+    .star img,.exstar img{width:26px;height:26px;object-fit:contain}
+    .star-glyph{font-size:22px;line-height:1}.star-glyph.red{color:#e0574b}.star-glyph.yellow{color:var(--ssr)}.star-glyph.grey{color:var(--ink-faint)}
+    .exstar{opacity:.35;transition:.15s}.exstar.on{opacity:1}
+    .ex-txt{font-family:"Space Mono",monospace;font-size:.6rem;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:3px 5px}
     .star:disabled{opacity:.25;cursor:not-allowed}
     .m-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
     .mf{display:flex;flex-direction:column;gap:4px}
