@@ -1,0 +1,896 @@
+{
+ "witches": {
+  "W001": {
+   "cls": "Arcanist",
+   "rar": "SR",
+   "el": "mental",
+   "weak": "mental",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 995,
+     "B": 24.0,
+     "maxlv": 7,
+     "cad": 36.0,
+     "anim": 3.0,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 450,
+     "B": 12.0,
+     "maxlv": 7,
+     "cad": 90.0,
+     "anim": 12.55,
+     "exec": true
+    },
+    {
+     "slot": "normal",
+     "A": 280,
+     "B": 8.0,
+     "maxlv": 7,
+     "cad": 5.0,
+     "anim": 5.0,
+     "exec": false
+    }
+   ]
+  },
+  "W002": {
+   "cls": "Vanguard",
+   "rar": "SR",
+   "el": "mental",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 870,
+     "B": 22.0,
+     "maxlv": 7,
+     "cad": 18.0,
+     "anim": 2.0,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 589,
+     "B": 14.0,
+     "maxlv": 7,
+     "cad": 90.0,
+     "anim": 3.067,
+     "exec": true
+    },
+    {
+     "slot": "normal",
+     "A": 505,
+     "B": 13.0,
+     "maxlv": 7,
+     "cad": 4.784,
+     "anim": 4.784,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 210,
+     "B": 5.0,
+     "maxlv": 7,
+     "cad": 5,
+     "anim": 2.3,
+     "exec": false
+    }
+   ]
+  },
+  "W003": {
+   "cls": "Defender",
+   "rar": "SR",
+   "el": "physical",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1393,
+     "B": 26,
+     "maxlv": 7,
+     "cad": 27.0,
+     "anim": 3.0,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 230,
+     "B": 5,
+     "maxlv": 7,
+     "cad": 2.5,
+     "anim": 1.4,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 180,
+     "B": 4,
+     "maxlv": 7,
+     "cad": 3.4,
+     "anim": 3.4,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 380,
+     "B": 8,
+     "maxlv": 7,
+     "cad": 7,
+     "anim": 1.8,
+     "exec": false
+    }
+   ]
+  },
+  "W004": {
+   "cls": "Vanguard",
+   "rar": "SR",
+   "el": "magic",
+   "weak": "mental",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1306,
+     "B": 32,
+     "maxlv": 7,
+     "cad": 34.0,
+     "anim": 4.0,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 355,
+     "B": 9,
+     "maxlv": 7,
+     "cad": 15,
+     "anim": 3.034,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 280,
+     "B": 7,
+     "maxlv": 7,
+     "cad": 6.884,
+     "anim": 6.884,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 400,
+     "B": 10,
+     "maxlv": 7,
+     "cad": 12,
+     "anim": 2.25,
+     "exec": false
+    }
+   ]
+  },
+  "W005": {
+   "cls": "Supporter",
+   "rar": "SR",
+   "el": "magic",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "normal",
+     "A": 650,
+     "B": 15.0,
+     "maxlv": 7,
+     "cad": 6.9,
+     "anim": 6.9,
+     "exec": false
+    }
+   ]
+  },
+  "W006": {
+   "cls": "Arcanist",
+   "rar": "SR",
+   "el": "physical",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1500,
+     "B": 35.0,
+     "maxlv": 7,
+     "cad": 18.0,
+     "anim": 3.0,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 460,
+     "B": 12.0,
+     "maxlv": 7,
+     "cad": 12,
+     "anim": 4.084,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 282,
+     "B": 6.0,
+     "maxlv": 7,
+     "cad": 3.6,
+     "anim": 3.6,
+     "exec": false
+    }
+   ]
+  },
+  "W007": {
+   "cls": "Defender",
+   "rar": "SR",
+   "el": "magic",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1167,
+     "B": 27,
+     "maxlv": 7,
+     "cad": 32.0,
+     "anim": 2.0,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 228,
+     "B": 5,
+     "maxlv": 7,
+     "cad": 32.0,
+     "anim": 6.5,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 440,
+     "B": 10,
+     "maxlv": 7,
+     "cad": 5.784,
+     "anim": 5.784,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 225,
+     "B": 6,
+     "maxlv": 7,
+     "cad": 6,
+     "anim": 1.2,
+     "exec": false
+    }
+   ]
+  },
+  "W008": {
+   "cls": "Supporter",
+   "rar": "SR",
+   "el": "magic",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "normal",
+     "A": 280,
+     "B": 8,
+     "maxlv": 7,
+     "cad": 3.767,
+     "anim": 3.767,
+     "exec": false
+    }
+   ]
+  },
+  "W009": {
+   "cls": "Arcanist",
+   "rar": "SR",
+   "el": "physical",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1395,
+     "B": 27,
+     "maxlv": 7,
+     "cad": 16.0,
+     "anim": 2.0,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 730,
+     "B": 20,
+     "maxlv": 7,
+     "cad": 16,
+     "anim": 4.45,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 280,
+     "B": 8,
+     "maxlv": 7,
+     "cad": 3.317,
+     "anim": 3.317,
+     "exec": false
+    }
+   ]
+  },
+  "W010": {
+   "cls": "Vanguard",
+   "rar": "SSR",
+   "el": "physical",
+   "weak": "magic",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 2148,
+     "B": 51.0,
+     "maxlv": 10,
+     "cad": 35.0,
+     "anim": 3.5,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 400,
+     "B": 10.0,
+     "maxlv": 10,
+     "cad": 35.0,
+     "anim": 5.467,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 220,
+     "B": 8.0,
+     "maxlv": 10,
+     "cad": 6.95,
+     "anim": 6.95,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 310,
+     "B": 7.0,
+     "maxlv": 10,
+     "cad": 5,
+     "anim": 2.5,
+     "exec": false
+    }
+   ]
+  },
+  "W011": {
+   "cls": "Arcanist",
+   "rar": "SSR",
+   "el": "physical",
+   "weak": "physical",
+   "amp": 1.28,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 595,
+     "B": 14.0,
+     "maxlv": 10,
+     "cad": 34.0,
+     "anim": 2.5,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 150,
+     "B": 4.0,
+     "maxlv": 10,
+     "cad": 12,
+     "anim": 6.45,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 231,
+     "B": 6.0,
+     "maxlv": 10,
+     "cad": 4.6,
+     "anim": 4.6,
+     "exec": false
+    }
+   ]
+  },
+  "W012": {
+   "cls": "Defender",
+   "rar": "SSR",
+   "el": "mental",
+   "weak": "magic",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 150,
+     "B": 16.0,
+     "maxlv": 10,
+     "cad": 40.0,
+     "anim": 3.0,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 300,
+     "B": 6.0,
+     "maxlv": 10,
+     "cad": 4.534,
+     "anim": 4.534,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 215,
+     "B": 5.0,
+     "maxlv": 10,
+     "cad": 9,
+     "anim": 1.3,
+     "exec": false
+    }
+   ]
+  },
+  "W013": {
+   "cls": "Vanguard",
+   "rar": "SSR",
+   "el": "magic",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1550,
+     "B": 35.0,
+     "maxlv": 10,
+     "cad": 34.0,
+     "anim": 3.5,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 309,
+     "B": 9.0,
+     "maxlv": 10,
+     "cad": 6.324,
+     "anim": 1.5,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 228,
+     "B": 7.0,
+     "maxlv": 10,
+     "cad": 4.017,
+     "anim": 4.017,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 225,
+     "B": 6.0,
+     "maxlv": 10,
+     "cad": 8,
+     "anim": 1.7,
+     "exec": false
+    }
+   ]
+  },
+  "W014": {
+   "cls": "Defender",
+   "rar": "SSR",
+   "el": "physical",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1440,
+     "B": 36.0,
+     "maxlv": 10,
+     "cad": 40.0,
+     "anim": 3.5,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 470,
+     "B": 12.0,
+     "maxlv": 10,
+     "cad": 15,
+     "anim": 5.484,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 245,
+     "B": 6.0,
+     "maxlv": 10,
+     "cad": 4.367,
+     "anim": 4.367,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 258,
+     "B": 7.0,
+     "maxlv": 10,
+     "cad": 6,
+     "anim": 1.4,
+     "exec": false
+    }
+   ]
+  },
+  "W015": {
+   "cls": "Supporter",
+   "rar": "SSR",
+   "el": "mental",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "special",
+     "A": 606,
+     "B": 16.0,
+     "maxlv": 10,
+     "cad": 90.0,
+     "anim": 3.2,
+     "exec": true
+    },
+    {
+     "slot": "normal",
+     "A": 330,
+     "B": 9.0,
+     "maxlv": 10,
+     "cad": 5.534,
+     "anim": 5.534,
+     "exec": false
+    }
+   ]
+  },
+  "W016": {
+   "cls": "Arcanist",
+   "rar": "SSR",
+   "el": "magic",
+   "weak": "mental",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1390,
+     "B": 35,
+     "maxlv": 10,
+     "cad": 35.0,
+     "anim": 3.0,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 129,
+     "B": 3,
+     "maxlv": 10,
+     "cad": 6,
+     "anim": 3.1,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 163,
+     "B": 4,
+     "maxlv": 10,
+     "cad": 3.417,
+     "anim": 3.417,
+     "exec": false
+    }
+   ]
+  },
+  "W017": {
+   "cls": "Arcanist",
+   "rar": "SSR",
+   "el": "mental",
+   "weak": "magic",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 2320,
+     "B": 57.0,
+     "maxlv": 10,
+     "cad": 40.0,
+     "anim": 4.5,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 400,
+     "B": 12.0,
+     "maxlv": 10,
+     "cad": 90.0,
+     "anim": 3.517,
+     "exec": true
+    },
+    {
+     "slot": "normal",
+     "A": 415,
+     "B": 10.0,
+     "maxlv": 10,
+     "cad": 5.45,
+     "anim": 5.45,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 405,
+     "B": 10.0,
+     "maxlv": 10,
+     "cad": 20,
+     "anim": 4.834,
+     "exec": false
+    }
+   ]
+  },
+  "W018": {
+   "cls": "Vanguard",
+   "rar": "SSR",
+   "el": "physical",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 910,
+     "B": 24.0,
+     "maxlv": 10,
+     "cad": 24.0,
+     "anim": 3.2,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 188,
+     "B": 5.0,
+     "maxlv": 10,
+     "cad": 4,
+     "anim": 1.0,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 96,
+     "B": 5.0,
+     "maxlv": 10,
+     "cad": 3.184,
+     "anim": 3.184,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 210,
+     "B": 6.0,
+     "maxlv": 10,
+     "cad": 6,
+     "anim": 1.9,
+     "exec": false
+    }
+   ]
+  },
+  "W019": {
+   "cls": "Arcanist",
+   "rar": "SSR",
+   "el": "mental",
+   "weak": "magic",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1800,
+     "B": 45,
+     "maxlv": 10,
+     "cad": 38.0,
+     "anim": 3.5,
+     "exec": false
+    },
+    {
+     "slot": "special",
+     "A": 510,
+     "B": 13,
+     "maxlv": 10,
+     "cad": 90.0,
+     "anim": 3.034,
+     "exec": true
+    },
+    {
+     "slot": "normal",
+     "A": 220,
+     "B": 5,
+     "maxlv": 10,
+     "cad": 4.05,
+     "anim": 4.05,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 524,
+     "B": 13,
+     "maxlv": 10,
+     "cad": 90.0,
+     "anim": 4.634,
+     "exec": true
+    }
+   ]
+  },
+  "W020": {
+   "cls": "Arcanist",
+   "rar": "SSR",
+   "el": "physical",
+   "weak": "mental",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "special",
+     "A": 302,
+     "B": 7.0,
+     "maxlv": 10,
+     "cad": 5,
+     "anim": 2.0,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 195,
+     "B": 5.0,
+     "maxlv": 10,
+     "cad": 3.75,
+     "anim": 3.75,
+     "exec": false
+    }
+   ]
+  },
+  "W021": {
+   "cls": "Vanguard",
+   "rar": "SSR",
+   "el": "physical",
+   "weak": "mental",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "special",
+     "A": 308,
+     "B": 7.0,
+     "maxlv": 10,
+     "cad": 16,
+     "anim": 4.7,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 235,
+     "B": 5.0,
+     "maxlv": 10,
+     "cad": 5.067,
+     "anim": 5.067,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 282,
+     "B": 7.0,
+     "maxlv": 10,
+     "cad": 9,
+     "anim": 1.6,
+     "exec": false
+    }
+   ]
+  },
+  "W022": {
+   "cls": "Defender",
+   "rar": "SSR",
+   "el": "physical",
+   "weak": "mental",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "special",
+     "A": 300,
+     "B": 9.0,
+     "maxlv": 10,
+     "cad": 8,
+     "anim": 1.3,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 244,
+     "B": 4.0,
+     "maxlv": 10,
+     "cad": 4.3,
+     "anim": 4.3,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 250,
+     "B": 6.0,
+     "maxlv": 10,
+     "cad": 6,
+     "anim": 1.1,
+     "exec": false
+    }
+   ]
+  },
+  "W023": {
+   "cls": "Supporter",
+   "rar": "SSR",
+   "el": "physical",
+   "weak": "magic",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 388,
+     "B": 10.0,
+     "maxlv": 10,
+     "cad": 20.0,
+     "anim": 3.0,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 264,
+     "B": 6.0,
+     "maxlv": 10,
+     "cad": 4.884,
+     "anim": 4.884,
+     "exec": false
+    }
+   ]
+  },
+  "W024": {
+   "cls": "Defender",
+   "rar": "UR",
+   "el": "magic",
+   "weak": "physical",
+   "amp": 1.0,
+   "skills": [
+    {
+     "slot": "extreme",
+     "A": 1330,
+     "B": 32,
+     "maxlv": 10,
+     "cad": 40.0,
+     "anim": 3.5,
+     "exec": false
+    },
+    {
+     "slot": "normal",
+     "A": 283,
+     "B": 7,
+     "maxlv": 10,
+     "cad": 4.15,
+     "anim": 4.15,
+     "exec": false
+    },
+    {
+     "slot": "class",
+     "A": 230,
+     "B": 5,
+     "maxlv": 10,
+     "cad": 6,
+     "anim": 1.0,
+     "exec": false
+    }
+   ]
+  }
+ },
+ "fight_s": 180
+}

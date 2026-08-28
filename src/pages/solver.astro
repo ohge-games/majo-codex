@@ -1,23 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import witches from '../data/witches.json';
-import scores from '../data/skill_scores.json';
+import engine from '../data/solver_engine.json';
 const base = import.meta.env.BASE_URL;
 
-// ---- compact client payload (max-rank timeline scores + shares) ----
-const maxRank = o => Object.keys(o || {}).reduce((a, k) => Math.max(a, +k), 0);
-const W = witches.map(w => {
-  const ws = (scores.witches || {})[w.witch_id] || {};
-  const ov = ws.overall_by_rank || {};
-  return {
-    id: w.witch_id, name: w.name, cls: w.class, rar: w.rarity,
-    el: w.damage_type, weak: w.weakness_type,
-    overall: ov[String(maxRank(ov))] || 0,
-    share: ws.damage_share || { normal: 0, extreme: 0, special: 0, class: 0, exec: 0 },
-  };
-}).filter(w => w.overall > 0);
-
-// max per-class-rarity stats (the ceiling the K constant was built from)
+const NAME = Object.fromEntries(witches.map(w => [w.witch_id, w.name]));
 const MAX_STATS = {
   'Arcanist_SR': { atk: 2499, cr: 0.3698, cd: 1.8488, ed: 0.0174 },
   'Arcanist_SSR': { atk: 3483, cr: 0.3978, cd: 1.9888, ed: 0.0759 },
@@ -29,72 +16,57 @@ const MAX_STATS = {
   'Supporter_SR': { atk: 1637, cr: 0.20, cd: 1.00, ed: 0.0145 },
   'Supporter_SSR': { atk: 2300, cr: 0.20, cd: 1.00, ed: 0.0145 },
 };
-// which combos actually appear in the roster (only show those)
-const combos = [...new Set(W.map(w => `${w.cls}_${w.rar}`))].sort();
-
-// bosses (extend via guides later); knockdown uptime = windows*seconds/fight
+const W = Object.entries(engine.witches).map(([id, e]) => ({ id, name: NAME[id], ...e }));
+const carries = W.filter(w => w.cls === 'Arcanist' || w.cls === 'Vanguard')
+  .sort((a, b) => a.cls === b.cls ? a.name.localeCompare(b.name) : a.cls.localeCompare(b.cls));
 const BOSSES = [
   { id: 'venomfrill', name: 'Venomfrill', weak: 'physical', kd: 2.5 * 8 / 180 },
   { id: 'dummy', name: 'Test Dummy (no weakness / no knockdown)', weak: 'none', kd: 0 },
 ];
-
-// resonance value ladders (%)
-const RES = {
-  vanguard: [13, 19, 25], arcanist: [14, 17, 20],
-  mental: [20, 25, 30], physical: [4, 5, 6], magic: [4, 5, 6],
-};
-const payload = { W, MAX_STATS, combos, BOSSES, RES };
-const CLASS_LABEL = { Arcanist: 'Arcanist', Vanguard: 'Vanguard', Defender: 'Defender', Supporter: 'Supporter' };
+const RES = { vanguard: [13, 19, 25], arcanist: [14, 17, 20], mental: [20, 25, 30], physical: [4, 5, 6], magic: [4, 5, 6] };
+const payload = { W, carries: carries.map(c => c.id), MAX_STATS, BOSSES, RES };
 ---
-<Base title="DPS Solver — MAJO Codex" desc="Enter your account's stats and Astrolabe laws to rank teams for your roster.">
+<Base title="DPS Solver — MAJO Codex" desc="Enter your carries' stats and Astrolabe laws to rank teams for your account.">
   <a class="back mono" href={base}>&larr; All witches</a>
 
   <section class="solver wrap">
     <header class="sv-head">
       <span class="eyebrow">Astrolabe Solver</span>
       <h1 class="display">Rank teams for <em>your</em> account</h1>
-      <p class="sub">Everything defaults to the max-investment ceiling. Dial in your own class stats and the Astrolabe
-        (Law) nodes you've unlocked, and the board re-ranks live — carries, their best teammates, and why.
-        Your inputs save to this browser; use <b>Copy link</b> to back them up or move devices.</p>
+      <p class="sub">Enter the stats for the carries you've invested in — Arcanists and Vanguards, the only classes that
+        carry. Everything defaults to the max ceiling; Supporters and Defenders fill the healer/utility slots at max.
+        The board re-ranks live. Saved to this browser — use <b>Copy link</b> to back up or move devices.</p>
     </header>
 
+    <div class="lawbar panel">
+      <div class="lb-boss">
+        <span class="p-title mono">Boss</span>
+        <select id="boss" class="field"></select>
+      </div>
+      <div class="lb-laws">
+        <span class="p-title mono">Astrolabe laws</span>
+        <div class="laws">
+          <label class="law"><input type="checkbox" id="law_charge" checked><span>+20% charge <i class="mono">(S/A/V)</i></span></label>
+          <label class="law"><input type="checkbox" id="law_start120" checked><span>+120 start</span></label>
+          <span class="law-lv"><i>Vanguard</i><select id="law_van" class="field sm"></select></span>
+          <span class="law-lv"><i>Arcanist</i><select id="law_arc" class="field sm"></select></span>
+          <span class="law-lv"><i>Mental</i><select id="law_mental" class="field sm"></select></span>
+          <span class="law-lv"><i>Physical</i><select id="law_physical" class="field sm"></select></span>
+          <span class="law-lv"><i>Magic</i><select id="law_magic" class="field sm"></select></span>
+        </div>
+      </div>
+    </div>
+
     <div class="sv-grid">
-      <!-- ============ INPUTS ============ -->
-      <aside class="panel inputs">
-        <div class="p-block">
-          <div class="p-title mono">Boss</div>
-          <select id="boss" class="field"></select>
+      <aside class="roster">
+        <div class="roster-head">
+          <span class="p-title mono">Your carries</span>
+          <button id="reset" class="btn ghost sm" type="button">Reset to max</button>
         </div>
-
-        <div class="p-block">
-          <div class="p-title mono">Class stats <span class="hint">(per class · rarity)</span></div>
-          <table class="stats">
-            <thead><tr><th></th><th>ATK</th><th>Crit&nbsp;%</th><th>CritDmg&nbsp;%</th><th>Extra&nbsp;%</th></tr></thead>
-            <tbody id="statBody"></tbody>
-          </table>
-          <p class="rowhint mono">Fixed cells (crit for Defenders/Supporters, crit rate for Vanguards) aren't editable — the game locks them.</p>
-        </div>
-
-        <div class="p-block">
-          <div class="p-title mono">Astrolabe laws</div>
-          <div class="laws" id="laws">
-            <label class="law"><input type="checkbox" id="law_charge" checked><span>+20% Extreme charge speed <i class="mono">(1× S/A/V on team)</i></span></label>
-            <label class="law"><input type="checkbox" id="law_start120" checked><span>+120 Extreme charge at battle start</span></label>
-            <div class="law-lv"><span>Vanguard Resonance <i class="mono">(2× Vanguard · atk speed)</i></span><select id="law_van" class="field sm"></select></div>
-            <div class="law-lv"><span>Arcanist Resonance <i class="mono">(2× Arcanist · crit rate)</i></span><select id="law_arc" class="field sm"></select></div>
-            <div class="law-lv"><span>Mental Resonance <i class="mono">(4× Mental · execution)</i></span><select id="law_mental" class="field sm"></select></div>
-            <div class="law-lv"><span>Physical Resonance <i class="mono">(4× Physical · counter)</i></span><select id="law_physical" class="field sm"></select></div>
-            <div class="law-lv"><span>Magic Resonance <i class="mono">(4× Magic · extreme)</i></span><select id="law_magic" class="field sm"></select></div>
-          </div>
-        </div>
-
-        <div class="p-actions">
-          <button id="reset" class="btn ghost" type="button">Reset to max</button>
-          <button id="share" class="btn" type="button">Copy link</button>
-        </div>
+        <div id="cards" class="cards"></div>
+        <button id="share" class="btn" type="button">Copy shareable link</button>
       </aside>
 
-      <!-- ============ RESULTS ============ -->
       <div class="results">
         <div class="res-head">
           <span class="eyebrow">Recommended teams</span>
@@ -109,273 +81,286 @@ const CLASS_LABEL = { Arcanist: 'Arcanist', Vanguard: 'Vanguard', Defender: 'Def
 
   <script>
     const DATA = JSON.parse(document.getElementById('sv-data').textContent);
-    const { W, MAX_STATS, combos, BOSSES, RES } = DATA;
+    const { W, carries, MAX_STATS, BOSSES, RES } = DATA;
+    const CARRY = new Set(carries);
+    const WMAP = new Map(W.map(w => [w.id, w]));
+    const byId = id => WMAP.get(id);
     const CAP = s => s ? s[0].toUpperCase() + s.slice(1) : s;
     const $ = id => document.getElementById(id);
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-    // ---------- state ----------
-    const DEFAULT = () => {
-      const stats = {};
-      for (const c of combos) stats[c] = { ...MAX_STATS[c] };
-      return { boss: 'venomfrill', stats,
+    const defStats = w => ({ ...MAX_STATS[`${w.cls}_${w.rar}`] });
+    const defLevels = w => Object.fromEntries(w.skills.map(s => [s.slot, s.maxlv]));
+    function DEFAULT() {
+      const units = {};
+      for (const id of carries) { const w = byId(id); units[id] = { ...defStats(w), lv: defLevels(w) }; }
+      return { boss: 'venomfrill', units,
         laws: { charge: true, start120: true, van: 0, arc: 0, mental: 0, physical: 0, magic: 0 } };
-    };
+    }
     let S = load() || DEFAULT();
 
-    // ---------- K math (mirrors build_scores.py / comp_scorer.py) ----------
-    const Kn = s => s.atk * (1 + s.cr * s.cd) * (1 + s.ed);          // base-crit K
-    const Ke = s => s.atk * (1 + 1.0 * s.cd) * (1 + s.ed);          // guaranteed-crit K (executions)
-    const critMul = (s, add) => (1 + (s.cr + add) * s.cd) / (1 + s.cr * s.cd);
-    const RAMP10 = 0.7, RAMP3 = 0.5;
-
-    function witchBase(id) {                                        // rescale max score -> player stats
-      const w = byId(id), key = `${w.cls}_${w.rar}`;
-      const ps = S.stats[key], ms = MAX_STATS[key];
-      const es = w.share.exec || 0;
-      const ratio = (1 - es) * (Kn(ps) / Kn(ms)) + es * (Ke(ps) / Ke(ms));
-      return w.overall * ratio;
+    function statsFor(id) {
+      const w = byId(id);
+      if (CARRY.has(id) && S.units[id]) return S.units[id];
+      return { ...MAX_STATS[`${w.cls}_${w.rar}`], lv: defLevels(w) };
     }
 
-    function lawMult(carry, team, boss) {
-      const cw = byId(carry), ps = S.stats[`${cw.cls}_${cw.rar}`], why = [];
+    const T = 180;
+    function timeline(id) {
+      const w = byId(id), st = statsFor(id);
+      const kn = st.atk * (1 + st.cr * st.cd) * (1 + st.ed);
+      const ke = st.atk * (1 + 1.0 * st.cd) * (1 + st.ed);
+      let ext = [], rest = [], normal = null;
+      for (const s of w.skills) {
+        const lv = clamp((st.lv && st.lv[s.slot]) || s.maxlv, 1, s.maxlv);
+        const csum = (s.A + s.B * (lv - 1)) / 100;
+        const D = (s.exec ? ke : kn) * csum, n = T / s.cad;
+        if (s.slot === 'normal') normal = [D, s.anim];
+        else if (s.slot === 'extreme') ext.push([D, s.anim, n, s.exec]);
+        else rest.push([D, s.anim, n, s.exec]);
+      }
+      const eo = ext.reduce((a, x) => a + x[2] * x[1], 0);
+      let extDmg = 0, execDmg = 0;
+      for (const [D, an, n, e] of ext) { extDmg += n * D; if (e) execDmg += n * D; }
+      const R1 = Math.max(0, T - eo), rd = rest.reduce((a, x) => a + x[2] * x[1], 0);
+      const sc = rd ? Math.min(1, R1 / rd) : 1, restOcc = Math.min(rd, R1);
+      let restDmg = 0;
+      for (const [D, an, n, e] of rest) { const c = n * sc * D; restDmg += c; if (e) execDmg += c; }
+      const left = Math.max(0, T - eo - restOcc);
+      const nDmg = normal ? left / normal[1] * normal[0] : 0;
+      const amp = w.amp || 1;
+      const total = (extDmg + restDmg + nDmg) * amp;
+      return { total, extreme: total ? (extDmg * amp) / total : 0, normal: total ? (nDmg * amp) / total : 0, exec: total ? (execDmg * amp) / total : 0 };
+    }
+    const critMul = (st, add) => (1 + (st.cr + add) * st.cd) / (1 + st.cr * st.cd);
+    const RAMP10 = 0.7, RAMP3 = 0.5;
+
+    function lawMult(carry, team, boss, base) {
+      const cw = byId(carry), st = statsFor(carry), why = [];
+      const ex = base.exec;
       const cls = {}, el = {};
       for (const t of team) { const w = byId(t); cls[w.cls] = (cls[w.cls]||0)+1; el[w.el] = (el[w.el]||0)+1; }
       let mult = 1;
-
-      // 2+ Arcanist -> crit rate resonance (player level)
       if ((cls.Arcanist||0) >= 2 && S.laws.arc > 0) {
-        const add = RES.arcanist[S.laws.arc-1] / 100, m = critMul(ps, add);
-        mult *= m; why.push(`2× Arcanist: +${RES.arcanist[S.laws.arc-1]}% crit → ×${m.toFixed(2)}`);
+        const add = RES.arcanist[S.laws.arc-1]/100, m = 1 + (1-ex) * (critMul(st, add) - 1);
+        mult *= m; why.push(`2\u00d7 Arcanist crit \u2192 \u00d7${m.toFixed(2)}`);
       }
-      // attack-speed buffs (Vanguard resonance + mono-element) -> Normal portion
       let speed = 0;
-      if ((cls.Vanguard||0) >= 2 && S.laws.van > 0) speed += RES.vanguard[S.laws.van-1] / 100;
+      if ((cls.Vanguard||0) >= 2 && S.laws.van > 0) speed += RES.vanguard[S.laws.van-1]/100;
       if ((el[cw.el]||0) === 4) {
-        if (cw.el === 'physical' && S.laws.physical > 0) speed += (RES.physical[S.laws.physical-1]/100) * 10 * RAMP10;
-        if (cw.el === 'magic' && S.laws.magic > 0) speed += (RES.magic[S.laws.magic-1]/100) * 10 * RAMP10;
-        if (cw.el === 'mental' && S.laws.mental > 0) speed += (RES.mental[S.laws.mental-1]/100) * 3 * RAMP3;
+        if (cw.el==='physical' && S.laws.physical>0) speed += (RES.physical[S.laws.physical-1]/100)*10*RAMP10;
+        if (cw.el==='magic' && S.laws.magic>0) speed += (RES.magic[S.laws.magic-1]/100)*10*RAMP10;
+        if (cw.el==='mental' && S.laws.mental>0) speed += (RES.mental[S.laws.mental-1]/100)*3*RAMP3;
       }
-      if (speed > 0) {
-        const ns = carrShare(carry).normal, m = 1 + ns * speed;
-        mult *= m; why.push(`+${Math.round(speed*100)}% atk speed → ×${m.toFixed(2)} (Normal ${Math.round(ns*100)}%)`);
+      if (speed > 0) { const m = 1 + base.normal*speed; mult *= m; why.push(`+${Math.round(speed*100)}% atk speed \u2192 \u00d7${m.toFixed(2)}`); }
+      let cf = 0;
+      if (S.laws.charge && cls.Supporter && cls.Arcanist && cls.Vanguard) cf += 0.20;
+      if ((el.magic||0) >= 2) cf += 0.10;
+      if (cf > 0 || S.laws.start120) {
+        const rate = 10*(1+cf), start = S.laws.start120 ? 120 : 0, freq = (start + rate*180)/1800;
+        const m = 1 + base.extreme*(freq-1);
+        if (m > 1.001) { mult *= m; why.push(`charge \u2192 \u00d7${m.toFixed(2)}`); }
       }
-      // charge -> Extreme cadence (S/A/V resonance + 2 magic; +120 start folded into frequency)
-      let chargeFrac = 0;
-      if (S.laws.charge && cls.Supporter && cls.Arcanist && cls.Vanguard) chargeFrac += 0.20;
-      if ((el.magic||0) >= 2) chargeFrac += 0.10;
-      if (chargeFrac > 0 || S.laws.start120) {
-        const rate = 10 * (1 + chargeFrac), start = S.laws.start120 ? 120 : 0;
-        const freq = (start + rate * 180) / (10 * 180);
-        const es = carrShare(carry).extreme, m = 1 + es * (freq - 1);
-        if (m > 1.001) { mult *= m; why.push(`charge → ×${m.toFixed(2)} (Extreme ${Math.round(es*100)}%)`); }
-      }
-      // 2+ mental -> knockdown damage
-      if ((el.mental||0) >= 2 && boss.kd > 0) {
-        const m = 1 + 0.25 * boss.kd; mult *= m; why.push(`2× Mental: knockdown dmg → ×${m.toFixed(2)}`);
-      }
-      // guaranteed crits during knockdown windows (boss-dependent, all hits)
+      if ((el.mental||0) >= 2 && boss.kd > 0) { const m = 1 + 0.25*boss.kd; mult *= m; why.push(`2\u00d7 Mental knockdown dmg \u2192 \u00d7${m.toFixed(2)}`); }
       if (boss.kd > 0) {
-        const kd = (1 + 1.0*ps.cd) / (1 + ps.cr*ps.cd), m = (1 - boss.kd) + boss.kd * kd;
-        if (m > 1.001) { mult *= m; why.push(`knockdown guaranteed-crit → ×${m.toFixed(2)}`); }
+        const kd = (1 + 1.0*st.cd)/(1 + st.cr*st.cd), blend = (1-boss.kd) + boss.kd*kd, m = 1 + (1-ex)*(blend-1);
+        if (m > 1.001) { mult *= m; why.push(`knockdown guaranteed-crit \u2192 \u00d7${m.toFixed(2)}`); }
       }
       return { mult, why };
     }
 
-    const carrShare = id => byId(id).share;
-    const WMAP = new Map(W.map(w => [w.id, w]));
-    const byId = id => WMAP.get(id);
     const hasHealer = team => team.some(t => byId(t).cls === 'Supporter');
     let _t; const scheduleSolve = () => { clearTimeout(_t); _t = setTimeout(solve, 90); };
 
-    function scoreComp(carry, team, boss) {
-      const weak = byId(carry).el === boss.weak ? 1 : 0.75;
-      const { mult, why } = lawMult(carry, team, boss);
-      return { eff: witchBase(carry) * weak * mult, weak, mult, why };
-    }
-
-    function bestCompFor(carry, boss) {
-      const others = W.map(w => w.id).filter(x => x !== carry);
-      let best = null;
-      for (let i = 0; i < others.length; i++)
-        for (let j = i+1; j < others.length; j++)
-          for (let k = j+1; k < others.length; k++) {
-            const team = [carry, others[i], others[j], others[k]];
-            if (!hasHealer(team)) continue;
-            const r = scoreComp(carry, team, boss);
-            if (!best || r.eff > best.eff) best = { ...r, team };
-          }
-      return best;
-    }
-
     function solve() {
       const boss = BOSSES.find(b => b.id === S.boss);
+      const bases = new Map(W.map(w => [w.id, timeline(w.id)]));
+      const ids = W.map(w => w.id);
       const rows = [];
-      for (const w of W) {
-        const bc = bestCompFor(w.id, boss);
-        if (bc) rows.push({ carry: w.id, ...bc });
+      for (const carry of carries) {
+        const base = bases.get(carry), weak = byId(carry).el === boss.weak ? 1 : 0.75;
+        let best = null;
+        for (let i = 0; i < ids.length; i++) {
+          if (ids[i] === carry) continue;
+          for (let j = i+1; j < ids.length; j++) {
+            if (ids[j] === carry) continue;
+            for (let k = j+1; k < ids.length; k++) {
+              if (ids[k] === carry) continue;
+              const team = [carry, ids[i], ids[j], ids[k]];
+              if (!hasHealer(team)) continue;
+              const { mult, why } = lawMult(carry, team, boss, base);
+              const eff = base.total * weak * mult;
+              if (!best || eff > best.eff) best = { eff, team, why, weak };
+            }
+          }
+        }
+        if (best) rows.push({ carry, ...best });
       }
       rows.sort((a, b) => b.eff - a.eff);
       render(rows.slice(0, 10), boss);
     }
 
-    // ---------- render ----------
-    const elClass = e => `type-${e}`;
+    const elC = e => `type-${e}`;
     function render(rows, boss) {
       const top = rows[0]?.eff || 1;
-      $('resNote').textContent = `vs ${boss.name} · ${rows.length} teams · scores relative to top`;
+      $('resNote').textContent = `vs ${boss.name} \u00b7 relative to top`;
       $('board').innerHTML = rows.map((r, i) => {
         const cw = byId(r.carry);
         const mates = r.team.filter(t => t !== r.carry).map(t => {
           const m = byId(t);
-          return `<span class="mate"><b>${m.name}</b><i class="${elClass(m.el)}">${m.cls}</i></span>`;
+          return `<span class="mate"><b>${m.name}</b><i class="${elC(m.el)}">${m.cls}</i></span>`;
         }).join('');
         const why = r.why.map(x => `<li>${x}</li>`).join('');
         const pct = Math.round(r.eff / top * 100);
-        return `<article class="comp">
+        return `<article class="comp${i===0?' top':''}">
           <div class="comp-rank mono">#${i+1}</div>
           <div class="comp-body">
             <div class="comp-carry">
               <span class="c-name display">${cw.name}</span>
               <span class="rarity-chip is-${cw.rar}">${cw.rar}</span>
-              <span class="c-tag ${elClass(cw.el)} mono">${CAP(cw.el)} ${cw.cls}</span>
-              ${r.weak < 1 ? '<span class="offweak mono">off-weakness ×.75</span>' : ''}
+              <span class="c-tag ${elC(cw.el)} mono">${CAP(cw.el)} ${cw.cls}</span>
+              ${r.weak < 1 ? '<span class="offweak mono">off-weakness \u00d7.75</span>' : ''}
             </div>
             <div class="comp-team">${mates}</div>
             <ul class="comp-why mono">${why}</ul>
           </div>
-          <div class="comp-score">
-            <span class="s-val" style="--w:${pct}%">${r.eff.toFixed(0)}</span>
-            <span class="s-bar"><i style="width:${pct}%"></i></span>
-          </div>
+          <div class="comp-score"><span class="s-val">${pct}</span><span class="s-bar"><i style="width:${pct}%"></i></span></div>
         </article>`;
       }).join('');
     }
 
-    // ---------- form wiring ----------
-    function buildStatTable() {
-      const fixedCr = c => c.startsWith('Vanguard') || c.startsWith('Defender') || c.startsWith('Supporter');
-      const fixedCd = c => c.startsWith('Defender') || c.startsWith('Supporter');
-      $('statBody').innerHTML = combos.map(c => {
-        const [cls, rar] = c.split('_'); const s = S.stats[c];
-        const cell = (k, val, fixed, scale=1) => fixed
-          ? `<td class="fx">${(val*scale).toFixed(scale===100?0:0)}${scale===100?'%':''}</td>`
-          : `<td><input data-c="${c}" data-k="${k}" value="${k==='atk'?val:(val*100).toFixed(2)}" inputmode="decimal"></td>`;
-        return `<tr><th class="rowlbl"><span class="rarity-chip is-${rar}">${rar}</span> ${cls}</th>
-          ${cell('atk', s.atk, false)}
-          ${cell('cr', s.cr, fixedCr(c), 100)}
-          ${cell('cd', s.cd, fixedCd(c), 100)}
-          ${cell('ed', s.ed, false, 100)}</tr>`;
+    function buildCards() {
+      $('cards').innerHTML = carries.map(id => {
+        const w = byId(id), st = S.units[id], isArc = w.cls === 'Arcanist';
+        const num = (up, key, on, scale=1) => on
+          ? `<label class="f"><span>${up}</span><input data-id="${id}" data-k="${key}" value="${key==='atk'?st[key]:(st[key]*100).toFixed(2)}" inputmode="decimal"></label>`
+          : `<label class="f off"><span>${up}</span><span class="fixed">${(st[key]*scale).toFixed(0)}${scale===100?'%':''}</span></label>`;
+        const lvls = w.skills.map(s => `<label class="lv"><span>${s.slot[0].toUpperCase()}</span><input data-id="${id}" data-lv="${s.slot}" type="number" min="1" max="${s.maxlv}" value="${st.lv[s.slot]}"></label>`).join('');
+        return `<div class="card">
+          <div class="c-top"><span class="rarity-chip is-${w.rar}">${w.rar}</span><b class="${elC(w.el)}">${w.name}</b><span class="cls mono">${w.cls}</span></div>
+          <div class="c-stats">
+            ${num('ATK','atk',true)}
+            ${num('Crit%','cr',isArc,100)}
+            ${num('CDmg%','cd',true,100)}
+            ${num('Extra%','ed',true,100)}
+          </div>
+          <div class="c-lv"><span class="lv-lbl mono">Skill lv</span>${lvls}</div>
+        </div>`;
       }).join('');
-      $('statBody').querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => {
-        const c = inp.dataset.c, k = inp.dataset.k; let v = parseFloat(inp.value);
-        if (isNaN(v)) return;
-        S.stats[c][k] = (k === 'atk') ? v : v / 100;
-        save(); scheduleSolve();
+      $('cards').querySelectorAll('input[data-k]').forEach(inp => inp.addEventListener('input', () => {
+        const v = parseFloat(inp.value); if (isNaN(v)) return;
+        const k = inp.dataset.k; S.units[inp.dataset.id][k] = k === 'atk' ? v : v/100; save(); scheduleSolve();
+      }));
+      $('cards').querySelectorAll('input[data-lv]').forEach(inp => inp.addEventListener('input', () => {
+        const v = parseInt(inp.value); if (isNaN(v)) return;
+        S.units[inp.dataset.id].lv[inp.dataset.lv] = v; save(); scheduleSolve();
       }));
     }
     function fillSelects() {
-      const bs = $('boss'); bs.innerHTML = BOSSES.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
-      bs.value = S.boss;
-      const lvOpts = ladder => `<option value="0">—</option>` + ladder.map((v,i)=>`<option value="${i+1}">Lv ${i+1} (${v}%)</option>`).join('');
-      $('law_van').innerHTML = lvOpts(RES.vanguard); $('law_arc').innerHTML = lvOpts(RES.arcanist);
-      $('law_mental').innerHTML = lvOpts(RES.mental); $('law_physical').innerHTML = lvOpts(RES.physical);
-      $('law_magic').innerHTML = lvOpts(RES.magic);
+      $('boss').innerHTML = BOSSES.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+      $('boss').value = S.boss;
+      const opts = l => `<option value="0">off</option>` + l.map((v,i)=>`<option value="${i+1}">Lv${i+1} \u00b7 ${v}%</option>`).join('');
+      $('law_van').innerHTML = opts(RES.vanguard); $('law_arc').innerHTML = opts(RES.arcanist);
+      $('law_mental').innerHTML = opts(RES.mental); $('law_physical').innerHTML = opts(RES.physical); $('law_magic').innerHTML = opts(RES.magic);
       $('law_charge').checked = S.laws.charge; $('law_start120').checked = S.laws.start120;
       for (const k of ['van','arc','mental','physical','magic']) $('law_'+k).value = S.laws[k];
     }
-    function wireLaws() {
+    function wire() {
       $('boss').addEventListener('change', e => { S.boss = e.target.value; save(); solve(); });
       $('law_charge').addEventListener('change', e => { S.laws.charge = e.target.checked; save(); solve(); });
       $('law_start120').addEventListener('change', e => { S.laws.start120 = e.target.checked; save(); solve(); });
       for (const k of ['van','arc','mental','physical','magic'])
         $('law_'+k).addEventListener('change', e => { S.laws[k] = +e.target.value; save(); solve(); });
-      $('reset').addEventListener('click', () => { S = DEFAULT(); save(); refresh(); });
+      $('reset').addEventListener('click', () => { S = DEFAULT(); save(); buildCards(); fillSelects(); solve(); });
       $('share').addEventListener('click', () => {
-        const url = location.origin + location.pathname + '#' + btoa(JSON.stringify(S));
-        navigator.clipboard.writeText(url).then(() => {
-          const b = $('share'); const t = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => b.textContent = t, 1400);
-        });
+        const url = location.origin + location.pathname + '#' + btoa(encodeURIComponent(JSON.stringify(S)));
+        navigator.clipboard.writeText(url).then(() => { const b = $('share'), t = b.textContent; b.textContent = 'Copied \u2713'; setTimeout(() => b.textContent = t, 1400); });
       });
     }
-
-    // ---------- persistence ----------
-    function save() { try { localStorage.setItem('majo-solver', JSON.stringify(S)); } catch {} }
+    function save() { try { localStorage.setItem('majo-solver-v2', JSON.stringify(S)); } catch {} }
     function load() {
       try {
-        if (location.hash.length > 1) { const h = JSON.parse(atob(location.hash.slice(1))); if (h.stats) return h; }
-        const raw = localStorage.getItem('majo-solver'); return raw ? JSON.parse(raw) : null;
+        if (location.hash.length > 1) { const h = JSON.parse(decodeURIComponent(atob(location.hash.slice(1)))); if (h.units) return h; }
+        const raw = localStorage.getItem('majo-solver-v2'); return raw ? JSON.parse(raw) : null;
       } catch { return null; }
     }
-    function refresh() { buildStatTable(); fillSelects(); solve(); }
 
-    buildStatTable(); fillSelects(); wireLaws(); solve();
+    buildCards(); fillSelects(); wire(); solve();
   </script>
 
   <style>
     .back{display:inline-block;color:var(--ink-dim);margin:22px 0 6px;font-size:.8rem}
     .back:hover{color:var(--ink)}
     .solver{padding-bottom:60px}
-    .sv-head{max-width:760px;margin:6px 0 26px}
+    .sv-head{max-width:820px;margin:6px 0 22px}
     .sv-head h1{font-size:2.1rem;margin:.2em 0 .3em}
     .sv-head h1 em{color:var(--sigil);font-style:normal}
     .sv-head .sub{color:var(--ink-dim);font-size:.95rem}
     .sv-head .sub b{color:var(--ink)}
-
-    .sv-grid{display:grid;grid-template-columns:380px 1fr;gap:26px;align-items:start}
-    @media (max-width:860px){ .sv-grid{grid-template-columns:1fr} }
-
-    .panel{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:18px;position:sticky;top:80px}
-    @media (max-width:860px){ .panel{position:static} }
-    .p-block{margin-bottom:20px}
-    .p-title{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:9px}
-    .p-title .hint{color:var(--ink-faint);text-transform:none;letter-spacing:0}
-    .field{width:100%;background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font-family:"Inter",sans-serif}
-    .field.sm{width:130px;padding:5px 8px;font-size:.82rem}
+    .p-title{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
+    .field{background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-family:"Inter",sans-serif}
+    .field.sm{padding:5px 7px;font-size:.8rem}
     .field:focus{outline:none;border-color:var(--sigil)}
 
-    table.stats{width:100%;border-collapse:collapse;font-size:.8rem}
-    table.stats th{color:var(--ink-faint);font-weight:500;text-align:right;padding:4px 4px;font-family:"Space Mono",monospace;font-size:.68rem}
-    table.stats thead th:first-child{text-align:left}
-    table.stats td{padding:2px}
-    table.stats .rowlbl{text-align:left;white-space:nowrap;color:var(--ink-dim);font-family:"Inter",sans-serif;font-size:.78rem}
-    table.stats .rowlbl .rarity-chip{margin-right:4px;padding:1px 6px;font-size:.6rem}
-    table.stats input{width:66px;background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 6px;text-align:right;font-family:"Space Mono",monospace;font-size:.78rem}
-    table.stats input:focus{outline:none;border-color:var(--sigil)}
-    table.stats td.fx{text-align:right;color:var(--ink-faint);font-family:"Space Mono",monospace;padding-right:8px}
-    .rowhint,.rowhint.mono{color:var(--ink-faint);font-size:.66rem;margin:8px 0 0;line-height:1.4}
-
-    .laws{display:flex;flex-direction:column;gap:9px}
-    .law{display:flex;gap:9px;align-items:flex-start;font-size:.84rem;color:var(--ink-dim);cursor:pointer}
-    .law input{margin-top:3px;accent-color:var(--sigil)}
+    .panel{background:var(--veil);border:1px solid var(--line);border-radius:var(--r)}
+    .lawbar{display:flex;gap:26px;align-items:flex-start;padding:14px 18px;margin-bottom:20px;flex-wrap:wrap}
+    .lb-boss{display:flex;flex-direction:column;gap:7px}
+    .lb-laws{display:flex;flex-direction:column;gap:8px;flex:1;min-width:280px}
+    .laws{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+    .law{display:flex;gap:7px;align-items:center;font-size:.82rem;color:var(--ink-dim);cursor:pointer}
+    .law input{accent-color:var(--sigil)}
     .law i,.law-lv i{color:var(--ink-faint);font-style:normal;font-size:.72rem}
-    .law-lv{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.84rem;color:var(--ink-dim)}
+    .law-lv{display:flex;gap:6px;align-items:center;font-size:.8rem;color:var(--ink-dim)}
+    .law-lv .field.sm{width:112px}
 
-    .p-actions{display:flex;gap:10px;margin-top:6px}
-    .btn{flex:1;background:var(--sigil);color:#0c0a15;border:none;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;font-family:"Inter",sans-serif}
+    .sv-grid{display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start}
+    @media (max-width:900px){ .sv-grid{grid-template-columns:1fr} }
+    .roster{display:flex;flex-direction:column;gap:12px}
+    .roster-head{display:flex;justify-content:space-between;align-items:center}
+    .cards{display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 110px);overflow:auto;padding-right:4px}
+    @media (max-width:900px){ .cards{max-height:none} }
+    .card{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:11px 12px}
+    .c-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+    .c-top b{font-weight:600;font-size:.94rem}
+    .c-top .cls{color:var(--ink-faint);font-size:.62rem;margin-left:auto;letter-spacing:.1em;text-transform:uppercase}
+    .c-top .rarity-chip{padding:1px 6px;font-size:.6rem}
+    .c-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:9px}
+    .f{display:flex;flex-direction:column;gap:3px}
+    .f>span:first-child{font-family:"Space Mono",monospace;font-size:.56rem;color:var(--ink-faint);letter-spacing:.03em}
+    .f input{width:100%;background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 6px;text-align:right;font-family:"Space Mono",monospace;font-size:.75rem}
+    .f input:focus{outline:none;border-color:var(--sigil)}
+    .f.off .fixed{padding:5px 6px;text-align:right;color:var(--ink-faint);font-family:"Space Mono",monospace;font-size:.75rem}
+    .c-lv{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .lv-lbl{color:var(--ink-faint);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase}
+    .lv{display:flex;align-items:center;gap:3px}
+    .lv>span{font-family:"Space Mono",monospace;font-size:.64rem;color:var(--ink-dim)}
+    .lv input{width:38px;background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:4px;text-align:center;font-family:"Space Mono",monospace;font-size:.72rem}
+    .lv input:focus{outline:none;border-color:var(--sigil)}
+
+    .btn{background:var(--sigil);color:#0c0a15;border:none;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;font-family:"Inter",sans-serif}
     .btn:hover{filter:brightness(1.08)}
-    .btn.ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line)}
+    .btn.sm{padding:5px 10px;font-size:.74rem}
+    .btn.ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);font-weight:500}
     .btn.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
 
     .res-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
     .res-head .note{color:var(--ink-faint);font-size:.72rem}
-    .board{display:flex;flex-direction:column;gap:12px}
-
-    .comp{display:grid;grid-template-columns:34px 1fr 130px;gap:14px;align-items:center;
-      background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
-    .comp:first-child{border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
-    .comp-rank{color:var(--ink-faint);font-size:1rem;font-weight:700}
-    .comp-carry{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-    .c-name{font-size:1.1rem}
-    .c-tag{font-size:.66rem;letter-spacing:.08em}
-    .offweak{color:var(--physical);font-size:.64rem;border:1px solid currentColor;border-radius:999px;padding:1px 7px}
-    .comp-team{display:flex;gap:14px;flex-wrap:wrap;margin:7px 0 6px}
-    .mate{display:flex;flex-direction:column;line-height:1.2;font-size:.82rem}
+    .board{display:flex;flex-direction:column;gap:11px}
+    .comp{display:grid;grid-template-columns:32px 1fr 92px;gap:14px;align-items:center;background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px}
+    .comp.top{border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
+    .comp-rank{color:var(--ink-faint);font-size:.95rem;font-weight:700}
+    .comp-carry{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .c-name{font-size:1.08rem}
+    .c-tag{font-size:.64rem;letter-spacing:.06em}
+    .offweak{color:var(--physical);font-size:.62rem;border:1px solid currentColor;border-radius:999px;padding:1px 7px}
+    .comp-team{display:flex;gap:13px;flex-wrap:wrap;margin:7px 0 6px}
+    .mate{display:flex;flex-direction:column;line-height:1.2;font-size:.8rem}
     .mate b{color:var(--ink);font-weight:500}
-    .mate i{font-style:normal;font-size:.64rem;font-family:"Space Mono",monospace}
-    .comp-why{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:5px 12px}
-    .comp-why li{color:var(--ink-faint);font-size:.68rem}
+    .mate i{font-style:normal;font-size:.62rem;font-family:"Space Mono",monospace}
+    .comp-why{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 11px}
+    .comp-why li{color:var(--ink-faint);font-size:.67rem}
     .comp-score{text-align:right}
-    .s-val{font-family:"Cinzel",serif;font-size:1.5rem;color:var(--ssr)}
+    .s-val{font-family:"Cinzel",serif;font-size:1.45rem;color:var(--ssr)}
     .s-bar{display:block;height:3px;background:var(--line);border-radius:2px;margin-top:5px;overflow:hidden}
     .s-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sigil),var(--ssr))}
     .rarity-chip.is-SR{color:var(--sr)} .rarity-chip.is-SSR{color:var(--ssr)} .rarity-chip.is-UR{color:var(--ur)}
