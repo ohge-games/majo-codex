@@ -27,7 +27,8 @@
     "extreme": 0.342,
     "normal": 0.552,
     "special": 0.106,
-    "class": 0.0
+    "class": 0.0,
+    "exec": 0.106
    },
    "skills": {
     "W001_extreme": {
@@ -85,7 +86,8 @@
     "extreme": 0.328,
     "normal": 0.284,
     "special": 0.104,
-    "class": 0.283
+    "class": 0.283,
+    "exec": 0.104
    },
    "skills": {
     "W002_extreme": {
@@ -143,7 +145,8 @@
     "extreme": 0.253,
     "normal": 0.019,
     "special": 0.459,
-    "class": 0.27
+    "class": 0.27,
+    "exec": 0.0
    },
    "skills": {
     "W003_extreme": {
@@ -201,7 +204,8 @@
     "extreme": 0.332,
     "normal": 0.174,
     "special": 0.205,
-    "class": 0.289
+    "class": 0.289,
+    "exec": 0.0
    },
    "skills": {
     "W004_extreme": {
@@ -259,7 +263,8 @@
     "extreme": 0.0,
     "normal": 1.0,
     "special": 0.0,
-    "class": 0.0
+    "class": 0.0,
+    "exec": 0.0
    },
    "skills": {
     "W005_extreme": {
@@ -317,7 +322,8 @@
     "extreme": 0.519,
     "normal": 0.238,
     "special": 0.242,
-    "class": 0.0
+    "class": 0.0,
+    "exec": 0.0
    },
    "skills": {
     "W006_extreme": {
@@ -375,7 +381,8 @@
     "extreme": 0.298,
     "normal": 0.332,
     "special": 0.058,
-    "class": 0.312
+    "class": 0.312,
+    "exec": 0.0
    },
    "skills": {
     "W007_extreme": {
@@ -433,7 +440,8 @@
     "extreme": 0.0,
     "normal": 1.0,
     "special": 0.0,
-    "class": 0.0
+    "class": 0.0,
+    "exec": 0.0
    },
    "skills": {
     "W008_extreme": {
@@ -491,7 +499,8 @@
     "extreme": 0.465,
     "normal": 0.282,
     "special": 0.254,
-    "class": 0.0
+    "class": 0.0,
+    "exec": 0.0
    },
    "skills": {
     "W009_extreme": {
@@ -551,7 +560,8 @@
     "extreme": 0.43,
     "normal": 0.059,
     "special": 0.081,
-    "class": 0.43
+    "class": 0.43,
+    "exec": 0.0
    },
    "skills": {
     "W010_extreme": {
@@ -619,7 +629,8 @@
     "extreme": 0.403,
     "normal": 0.0,
     "special": 0.215,
-    "class": 0.383
+    "class": 0.383,
+    "exec": 0.0
    },
    "skills": {
     "W011_extreme": {
@@ -687,7 +698,8 @@
     "extreme": 0.076,
     "normal": 0.627,
     "special": 0.0,
-    "class": 0.297
+    "class": 0.297,
+    "exec": 0.0
    },
    "skills": {
     "W012_extreme": {
@@ -755,7 +767,8 @@
     "extreme": 0.298,
     "normal": 0.176,
     "special": 0.336,
-    "class": 0.19
+    "class": 0.19,
+    "exec": 0.0
    },
    "skills": {
     "W013_extreme": {
@@ -823,7 +836,8 @@
     "extreme": 0.28,
     "normal": 0.136,
     "special": 0.244,
-    "class": 0.339
+    "class": 0.339,
+    "exec": 0.0
    },
    "skills": {
     "W014_extreme": {
@@ -891,7 +905,8 @@
     "extreme": 0.0,
     "normal": 0.838,
     "special": 0.162,
-    "class": 0.0
+    "class": 0.0,
+    "exec": 0.162
    },
    "skills": {
     "W015_extreme": {
@@ -959,7 +974,8 @@
     "extreme": 0.498,
     "normal": 0.237,
     "special": 0.266,
-    "class": 0.0
+    "class": 0.0,
+    "exec": 0.0
    },
    "skills": {
     "W016_extreme": {
@@ -1027,7 +1043,8 @@
     "extreme": 0.439,
     "normal": 0.349,
     "special": 0.058,
-    "class": 0.154
+    "class": 0.154,
+    "exec": 0.058
    },
    "skills": {
     "W017_extreme": {
@@ -1095,7 +1112,8 @@
     "extreme": 0.289,
     "normal": 0.082,
     "special": 0.359,
-    "class": 0.271
+    "class": 0.271,
+    "exec": 0.0
    },
    "skills": {
     "W018_extreme": {
@@ -1163,7 +1181,8 @@
     "extreme": 0.429,
     "normal": 0.398,
     "special": 0.086,
-    "class": 0.088
+    "class": 0.088,
+    "exec": 0.174
    },
    "skills": {
     "W019_extreme": {
@@ -1231,7 +1250,8 @@
     "extreme": 0.0,
     "normal": 0.345,
     "special": 0.655,
-    "class": 0.0
+    "class": 0.0,
+    "exec": 0.0
    },
    "skills": {
     "W020_extreme": {
@@ -1299,7 +1319,8 @@
     "extreme": 0.0,
     "normal": 0.322,
     "special": 0.256,
-    "class": 0.423
+    "class": 0.423,
+    "exec": 0.0
    },
    "skills": {
     "W021_extreme": {
@@ -1367,7 +1388,8 @@
     "extreme": 0.0,
     "normal": 0.302,
     "special": 0.338,
-    "class": 0.36
+    "class": 0.36,
+    "exec": 0.0
    },
    "skills": {
     "W022_extreme": {
@@ -1435,7 +1457,8 @@
     "extreme": 0.302,
     "normal": 0.698,
     "special": 0.0,
-    "class": 0.0
+    "class": 0.0,
+    "exec": 0.0
    },
    "skills": {
     "W023_extreme": {
@@ -1502,7 +1525,8 @@
     "extreme": 0.272,
     "normal": 0.419,
     "special": 0.0,
-    "class": 0.309
+    "class": 0.309,
+    "exec": 0.0
    },
    "skills": {
     "W024_extreme": {
