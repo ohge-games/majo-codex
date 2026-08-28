@@ -13,7 +13,7 @@
       "mechanics": [
         {
           "name": "Extreme damage feeds his resistance",
-          "text": "Every Extreme-type hit he takes adds a stacking Extreme-resist buff — up to 4 stacks through Rank 4, up to 6 at Endless, each lasting ~20s. At Endless he also opens with a permanent Extreme-resist buff. Extreme-burst comps lose value the longer they hammer him, so build around his Physical weakness instead."
+          "text": "Every hit from an Extreme skill stacks an Extreme-resist buff on him — up to 4 stacks through Rank 4, 6 at Endless, ~20s each — and at Endless he opens with a permanent one. Since firing Extremes is your main input, that's a real tension: leaning on them for raw damage makes each one land softer. Let your units' auto-attacks carry the damage against his Physical weakness, and spend Extremes on timing and utility rather than as your damage engine."
         },
         {
           "name": "The kit unlocks by rank",
@@ -21,15 +21,15 @@
         },
         {
           "name": "Dash rush (Rank 2+)",
-          "text": "A four-hit dash combo (four ~2s lunges) that he banks charges for on roughly a 30-second cooldown. When he's dash-ready he'll close the gap fast — leave yourself room to reposition."
+          "text": "A four-hit dash combo (four ~2s lunges) that he banks charges for on roughly a 30-second cooldown. Your units won't sidestep it on their own, so it's a raw durability check — bring enough front-line survivability to eat the combo, and if you run a defensive or counter Extreme, the dash-ready window is when to spend it."
         },
         {
           "name": "Roar (Rank 3+)",
-          "text": "His longest move at about 10.5 seconds, so it's heavily telegraphed. Treat the windup as a free window to burst or reposition rather than something you need to interrupt."
+          "text": "His longest move at about 10.5 seconds, so it's heavily telegraphed. Since when you fire Extremes is the main thing you control, treat that long windup as a clean window to land a big Extreme."
         },
         {
           "name": "Endless revive (Rank 5)",
-          "text": "In Endless he revives after going down and returns with an extra-damage buff. Hold a cooldown or two for the second phase instead of dumping everything before the first kill."
+          "text": "In Endless he revives after going down and returns with an extra-damage buff. Save an Extreme for the second phase instead of dumping everything before the first knockdown."
         },
         {
           "name": "Hard to lock down",
@@ -37,7 +37,7 @@
         }
       ],
       "tips": [
-        "Weak to Physical — Physical dealers post the highest scores (auto-list below).",
+        "Weak to Physical — Physical dealers top the ranked list below.",
         "Very high knockback resistance and posture — far tougher to interrupt than the previous slime boss — so CC and stun-locks are unreliable; lean on sustained Physical damage and survivability instead.",
         "Beast race — relevant for any race-targeted effects."
       ],
