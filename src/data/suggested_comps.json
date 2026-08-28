@@ -1,0 +1,312 @@
+{
+ "_meta": {
+  "provisional": true,
+  "model": "effective = single_witch_damage x weakness(1.0 match / 0.75 off) x Law_resonances(maxed tree) x surv(0.9 if no Defender/Supporter). Global/flat Law effects omitted (constant across comps).",
+  "rigorous": [
+   "weakness -25%",
+   "2+Arcanist crit (from class_offense cr/cd)",
+   "2+Vanguard atk-speed on Normal",
+   "charge->Extreme cadence"
+  ],
+  "provisional_assumptions": [
+   "mono-element & Vanguard resonances are attack-SPEED on Normal only; normal timing uses the provisional s_per_hit(atk_spd) formula pending empirical animation-duration data",
+   "mono ramp factors: 10-stack=0.7, 3-stack=0.5 (sustained fraction of max stacks)",
+   "Venomfrill knockdown uptime=0.089"
+  ],
+  "note": "Damage-race ranking; a healer/tank slot may be worth more survivability than raw score implies."
+ },
+ "venomfrill": {
+  "name": "Venomfrill",
+  "weak": "physical",
+  "comps": [
+   {
+    "rank": 1,
+    "carry": "Lena",
+    "carry_id": "W010",
+    "carry_class": "Vanguard",
+    "carry_element": "physical",
+    "team": [
+     "Lena",
+     "Tomoe",
+     "Grina",
+     "Zhijie"
+    ],
+    "team_ids": [
+     "W010",
+     "W006",
+     "W009",
+     "W023"
+    ],
+    "effective_score": 270.8,
+    "base": 169.1,
+    "weakness_mult": 1.0,
+    "law_mult": 1.601,
+    "surv_mult": 1.0,
+    "resonances": [
+     "2+ Arcanist: +20% crit -> x1.37",
+     "+42% atk speed -> x1.09 (Normal only)",
+     "charge +20%: Extreme faster -> x1.07"
+    ]
+   },
+   {
+    "rank": 2,
+    "carry": "Grina",
+    "carry_id": "W009",
+    "carry_class": "Arcanist",
+    "carry_element": "physical",
+    "team": [
+     "Grina",
+     "Tomoe",
+     "Lena",
+     "Zhijie"
+    ],
+    "team_ids": [
+     "W009",
+     "W006",
+     "W010",
+     "W023"
+    ],
+    "effective_score": 255.7,
+    "base": 177.5,
+    "weakness_mult": 1.0,
+    "law_mult": 1.44,
+    "surv_mult": 1.0,
+    "resonances": [
+     "2+ Arcanist: +20% crit -> x1.15",
+     "+42% atk speed -> x1.17 (Normal only)",
+     "charge +20%: Extreme faster -> x1.08"
+    ]
+   },
+   {
+    "rank": 3,
+    "carry": "Xinzi",
+    "carry_id": "W018",
+    "carry_class": "Vanguard",
+    "carry_element": "physical",
+    "team": [
+     "Xinzi",
+     "Tomoe",
+     "Grina",
+     "Zhijie"
+    ],
+    "team_ids": [
+     "W018",
+     "W006",
+     "W009",
+     "W023"
+    ],
+    "effective_score": 253.7,
+    "base": 160.8,
+    "weakness_mult": 1.0,
+    "law_mult": 1.578,
+    "surv_mult": 1.0,
+    "resonances": [
+     "2+ Arcanist: +20% crit -> x1.37",
+     "+42% atk speed -> x1.10 (Normal only)",
+     "charge +20%: Extreme faster -> x1.05"
+    ]
+   },
+   {
+    "rank": 4,
+    "carry": "Tomoe",
+    "carry_id": "W006",
+    "carry_class": "Arcanist",
+    "carry_element": "physical",
+    "team": [
+     "Tomoe",
+     "Grina",
+     "Lena",
+     "Zhijie"
+    ],
+    "team_ids": [
+     "W006",
+     "W009",
+     "W010",
+     "W023"
+    ],
+    "effective_score": 233.9,
+    "base": 162.1,
+    "weakness_mult": 1.0,
+    "law_mult": 1.443,
+    "surv_mult": 1.0,
+    "resonances": [
+     "2+ Arcanist: +20% crit -> x1.15",
+     "+42% atk speed -> x1.16 (Normal only)",
+     "charge +20%: Extreme faster -> x1.08"
+    ]
+   },
+   {
+    "rank": 5,
+    "carry": "Jenny",
+    "carry_id": "W017",
+    "carry_class": "Arcanist",
+    "carry_element": "mental",
+    "team": [
+     "Jenny",
+     "Dusan",
+     "Leed",
+     "Maro"
+    ],
+    "team_ids": [
+     "W017",
+     "W001",
+     "W002",
+     "W015"
+    ],
+    "effective_score": 214.5,
+    "base": 209.2,
+    "weakness_mult": 0.75,
+    "law_mult": 1.367,
+    "surv_mult": 1.0,
+    "resonances": [
+     "2+ Arcanist: +20% crit -> x1.16",
+     "+15% atk speed -> x1.07 (Normal only)",
+     "charge +20%: Extreme faster -> x1.07",
+     "2+ mental: +25% knockdown dmg -> x1.02 (Venomfrill uptime)"
+    ]
+   },
+   {
+    "rank": 6,
+    "carry": "Huarui",
+    "carry_id": "W013",
+    "carry_class": "Vanguard",
+    "carry_element": "magic",
+    "team": [
+     "Huarui",
+     "Dusan",
+     "Peseshet",
+     "Jenny"
+    ],
+    "team_ids": [
+     "W013",
+     "W001",
+     "W005",
+     "W017"
+    ],
+    "effective_score": 213.9,
+    "base": 189.9,
+    "weakness_mult": 0.75,
+    "law_mult": 1.502,
+    "surv_mult": 1.0,
+    "resonances": [
+     "2+ Arcanist: +20% crit -> x1.37",
+     "charge +30%: Extreme faster -> x1.07",
+     "2+ mental: +25% knockdown dmg -> x1.02 (Venomfrill uptime)"
+    ]
+   },
+   {
+    "rank": 7,
+    "carry": "Lumi",
+    "carry_id": "W011",
+    "carry_class": "Arcanist",
+    "carry_element": "physical",
+    "team": [
+     "Lumi",
+     "Tomoe",
+     "Lena",
+     "Zhijie"
+    ],
+    "team_ids": [
+     "W011",
+     "W006",
+     "W010",
+     "W023"
+    ],
+    "effective_score": 197.6,
+    "base": 136.3,
+    "weakness_mult": 1.0,
+    "law_mult": 1.45,
+    "surv_mult": 1.0,
+    "resonances": [
+     "2+ Arcanist: +20% crit -> x1.16",
+     "+42% atk speed -> x1.21 (Normal only)",
+     "charge +20%: Extreme faster -> x1.03"
+    ]
+   },
+   {
+    "rank": 8,
+    "carry": "Yuhong",
+    "carry_id": "W020",
+    "carry_class": "Arcanist",
+    "carry_element": "physical",
+    "team": [
+     "Yuhong",
+     "Tomoe",
+     "Lena",
+     "Xinzi"
+    ],
+    "team_ids": [
+     "W020",
+     "W006",
+     "W010",
+     "W018"
+    ],
+    "effective_score": 172.3,
+    "base": 118.3,
+    "weakness_mult": 1.0,
+    "law_mult": 1.618,
+    "surv_mult": 0.9,
+    "resonances": [
+     "2+ Arcanist: +20% crit -> x1.16",
+     "+67% atk speed -> x1.39 (Normal only)"
+    ]
+   },
+   {
+    "rank": 9,
+    "carry": "Alice",
+    "carry_id": "W021",
+    "carry_class": "Vanguard",
+    "carry_element": "physical",
+    "team": [
+     "Alice",
+     "Budi",
+     "Tomoe",
+     "Grina"
+    ],
+    "team_ids": [
+     "W021",
+     "W003",
+     "W006",
+     "W009"
+    ],
+    "effective_score": 162.6,
+    "base": 99.1,
+    "weakness_mult": 1.0,
+    "law_mult": 1.641,
+    "surv_mult": 1.0,
+    "resonances": [
+     "2+ Arcanist: +20% crit -> x1.37",
+     "+42% atk speed -> x1.20 (Normal only)"
+    ]
+   },
+   {
+    "rank": 10,
+    "carry": "Patra",
+    "carry_id": "W016",
+    "carry_class": "Arcanist",
+    "carry_element": "magic",
+    "team": [
+     "Patra",
+     "Xini",
+     "Peseshet",
+     "Huarui"
+    ],
+    "team_ids": [
+     "W016",
+     "W004",
+     "W005",
+     "W013"
+    ],
+    "effective_score": 154.6,
+    "base": 143.6,
+    "weakness_mult": 0.75,
+    "law_mult": 1.436,
+    "surv_mult": 1.0,
+    "resonances": [
+     "+67% atk speed -> x1.29 (Normal only)",
+     "charge +30%: Extreme faster -> x1.11"
+    ]
+   }
+  ]
+ }
+}
