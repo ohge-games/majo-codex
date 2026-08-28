@@ -7,9 +7,8 @@ import fs from 'node:fs';
 const base = import.meta.env.BASE_URL;
 const lc = s => (s ?? '').toLowerCase();
 const hasImg = p => { try { return fs.existsSync(`${process.cwd()}/public${p}`); } catch { return false; } };
-const uiUrl = name => hasImg(`/img/ui/${name}.png`) ? `${base}img/ui/${name}.png` : null;
-const portraitOf = f => hasImg(`/img/card/${f}`) ? `${base}img/card/${f}`
-                    : hasImg(`/img/hero/${f}`) ? `${base}img/hero/${f}` : null;
+const uiUrl = n => hasImg(`/img/ui/${n}.png`) ? `${base}img/ui/${n}.png` : null;
+const portraitOf = f => hasImg(`/img/card/${f}`) ? `${base}img/card/${f}` : hasImg(`/img/hero/${f}`) ? `${base}img/hero/${f}` : null;
 const skillIco = (id, slot) => hasImg(`/img/skill/${lc(id)}_${slot}.png`) ? `${base}img/skill/${lc(id)}_${slot}.png` : null;
 
 const WMETA = Object.fromEntries(witches.map(w => [w.witch_id, w]));
@@ -30,7 +29,7 @@ const MAX_STATS = {
 const W = Object.entries(engine.witches).map(([id, e]) => {
   const m = WMETA[id] || {};
   return { id, name: m.name, title: m.title || '', cls: e.cls, rar: e.rar, el: e.el, weak: e.weak,
-    amp: e.amp, img: portraitOf(m.portrait_filename),
+    amp: e.amp, minrank: e.minrank, maxrank: e.maxrank, img: portraitOf(m.portrait_filename),
     skills: e.skills.map(s => ({ ...s, name: SKILLNAME[`${id}_${s.slot}`] || s.slot, ico: skillIco(id, s.slot) })) };
 });
 const carries = W.filter(w => w.cls === 'Arcanist' || w.cls === 'Vanguard').map(w => w.id);
@@ -53,9 +52,9 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     <header class="sv-head">
       <span class="eyebrow">Astrolabe Solver</span>
       <h1 class="display">Rank teams for <em>your</em> account</h1>
-      <p class="sub">Add the Arcanists and Vanguards you've invested in with their current stats and skill levels.
+      <p class="sub">Add the Arcanists and Vanguards you've invested in — their stats, star rank, and skill levels.
         Supporters and Defenders fill the healer and utility slots at max, so you only track your carries. The board
-        re-ranks live as you build your roster. Everything is saved to this browser — use <b>Copy link</b> to back up.</p>
+        re-ranks live and everything is saved to this browser.</p>
     </header>
 
     <div class="lawbar panel">
@@ -64,16 +63,8 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
         <select id="boss" class="field"></select>
       </div>
       <div class="lb-laws">
-        <span class="p-title mono">Astrolabe laws</span>
-        <div class="laws">
-          <label class="law"><input type="checkbox" id="law_charge" checked><span>+20% charge <i class="mono">(S/A/V)</i></span></label>
-          <label class="law"><input type="checkbox" id="law_start120" checked><span>+120 start</span></label>
-          <span class="law-lv"><i>Vanguard</i><select id="law_van" class="field sm"></select></span>
-          <span class="law-lv"><i>Arcanist</i><select id="law_arc" class="field sm"></select></span>
-          <span class="law-lv"><i>Mental</i><select id="law_mental" class="field sm"></select></span>
-          <span class="law-lv"><i>Physical</i><select id="law_physical" class="field sm"></select></span>
-          <span class="law-lv"><i>Magic</i><select id="law_magic" class="field sm"></select></span>
-        </div>
+        <span class="p-title mono">Astrolabe resonances</span>
+        <div class="resbar" id="resbar"></div>
       </div>
     </div>
 
@@ -97,7 +88,6 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     </div>
   </section>
 
-  <!-- add/edit modal -->
   <div id="modal" class="modal" hidden>
     <div class="modal-back" id="modalBack"></div>
     <div class="modal-card">
@@ -106,11 +96,16 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
         <button id="modalX" class="modal-x" type="button" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="m-row" id="mSelectRow">
-          <label class="m-lbl mono">Witch</label>
-          <select id="mWitch" class="field"></select>
+        <div class="m-top">
+          <div class="m-col">
+            <div class="m-row" id="mSelectRow"><label class="m-lbl mono">Witch</label><select id="mWitch" class="field"></select></div>
+            <div class="m-info" id="mInfo"></div>
+          </div>
+          <div class="m-col">
+            <label class="m-lbl mono">Star rank</label>
+            <div class="stars" id="mStars"></div>
+          </div>
         </div>
-        <div class="m-info" id="mInfo"></div>
         <div class="m-stats">
           <label class="mf"><span class="mono">ATK</span><input id="mAtk" inputmode="decimal"></label>
           <label class="mf" id="mCrWrap"><span class="mono">Crit %</span><input id="mCr" inputmode="decimal"></label>
@@ -140,33 +135,36 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     const lc = s => (s || '').toLowerCase();
     const $ = id => document.getElementById(id);
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const MAXLV = w => w.rar === 'SR' ? 7 : 10;
+    const lvCap = (w, R) => Math.min(MAXLV(w), R + 1);
     const lvLabel = v => v <= 7 ? `Lv ${v}` : `EX-${v - 7}`;
-    const lvShort = v => v <= 7 ? `${v}` : `EX${v - 7}`;
+    const rankLabel = r => r <= 6 ? `${r}\u2605` : `EX-${r - 6}`;
 
-    const defStats = w => ({ ...MAX_STATS[`${w.cls}_${w.rar}`] });
-    const defLevels = w => Object.fromEntries(w.skills.map(s => [s.slot, s.maxlv]));
+    const defUnit = w => {
+      const R = w.maxrank, lv = {};
+      for (const s of w.skills) lv[s.slot] = Math.min(s.maxlv, R + 1);
+      return { rank: R, ...MAX_STATS[`${w.cls}_${w.rar}`], lv };
+    };
     const DEFAULT = () => ({ boss: 'venomfrill', units: {},
       laws: { charge: true, start120: true, van: 0, arc: 0, mental: 0, physical: 0, magic: 0 } });
     let S = load() || DEFAULT();
-
-    function statsFor(id) {
-      const w = byId(id);
-      if (S.units[id]) return S.units[id];
-      return { ...MAX_STATS[`${w.cls}_${w.rar}`], lv: defLevels(w) };
-    }
+    function statsFor(id) { const w = byId(id); return S.units[id] || defUnit(w); }
     const owned = () => Object.keys(S.units).filter(id => CARRY.has(id));
     const teamPool = () => [...owned(), ...FILLERS];
 
-    // ---------- timeline recompute ----------
+    // ---------- rank-aware timeline ----------
     const T = 180;
     function timeline(id) {
-      const w = byId(id), st = statsFor(id);
+      const w = byId(id), st = statsFor(id), R = st.rank ?? w.maxrank;
       const kn = st.atk * (1 + st.cr * st.cd) * (1 + st.ed);
       const ke = st.atk * (1 + 1.0 * st.cd) * (1 + st.ed);
       let ext = [], rest = [], normal = null;
       for (const s of w.skills) {
-        const lv = clamp((st.lv && st.lv[s.slot]) || s.maxlv, 1, s.maxlv);
-        const csum = (s.A + s.B * (lv - 1)) / 100;
+        if (!s.score || R < s.req) continue;
+        const [A, B] = (s.plus_star && R >= s.plus_star) ? s.plus : s.base;
+        const L = clamp((st.lv && st.lv[s.slot]) || lvCap(w, R), 1, lvCap(w, R));
+        const csum = (A + B * (L - 1)) / 100;
+        if (csum <= 0) continue;
         const D = (s.exec ? ke : kn) * csum, n = T / s.cad;
         if (s.slot === 'normal') normal = [D, s.anim];
         else if (s.slot === 'extreme') ext.push([D, s.anim, n, s.exec]);
@@ -186,7 +184,6 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     }
     const critMul = (st, add) => (1 + (st.cr + add) * st.cd) / (1 + st.cr * st.cd);
     const RAMP10 = 0.7, RAMP3 = 0.5;
-
     function lawMult(carry, team, boss, base) {
       const cw = byId(carry), st = statsFor(carry), why = [];
       const ex = base.exec, cls = {}, el = {};
@@ -223,177 +220,179 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     let _t; const scheduleSolve = () => { clearTimeout(_t); _t = setTimeout(solve, 90); };
 
     function solve() {
-      const own = owned();
-      const boss = BOSSES.find(b => b.id === S.boss);
+      const own = owned(), boss = BOSSES.find(b => b.id === S.boss);
       if (!own.length) { renderEmpty(); return; }
-      const ids = teamPool();
-      const bases = new Map(ids.map(id => [id, timeline(id)]));
-      const rows = [];
+      const ids = teamPool(), bases = new Map(ids.map(id => [id, timeline(id)])), rows = [];
       for (const carry of own) {
         const base = bases.get(carry), weak = byId(carry).el === boss.weak ? 1 : 0.75;
         let best = null;
-        for (let i = 0; i < ids.length; i++) {
-          if (ids[i] === carry) continue;
-          for (let j = i+1; j < ids.length; j++) {
-            if (ids[j] === carry) continue;
-            for (let k = j+1; k < ids.length; k++) {
-              if (ids[k] === carry) continue;
+        for (let i = 0; i < ids.length; i++) { if (ids[i] === carry) continue;
+          for (let j = i+1; j < ids.length; j++) { if (ids[j] === carry) continue;
+            for (let k = j+1; k < ids.length; k++) { if (ids[k] === carry) continue;
               const team = [carry, ids[i], ids[j], ids[k]];
               if (!hasHealer(team)) continue;
               const { mult, why } = lawMult(carry, team, boss, base);
               const eff = base.total * weak * mult;
               if (!best || eff > best.eff) best = { eff, team, why, weak };
-            }
-          }
-        }
+            } } }
         if (best) rows.push({ carry, ...best });
       }
       rows.sort((a, b) => b.eff - a.eff);
       render(rows, boss);
     }
 
-    // ---------- render ----------
     const elC = e => `type-${e}`;
     function renderEmpty() {
       $('resNote').textContent = '';
-      $('board').innerHTML = `<div class="empty"><p>No carries yet.</p>
-        <p class="mono">Add an Arcanist or Vanguard to see the teams that rank best for your account.</p></div>`;
+      $('board').innerHTML = `<div class="empty"><p>No carries yet.</p><p class="mono">Add an Arcanist or Vanguard to see the teams that rank best for your account.</p></div>`;
     }
     function render(rows, boss) {
       const top = rows[0]?.eff || 1;
       $('resNote').textContent = `vs ${boss.name} \u00b7 relative to top`;
       $('board').innerHTML = rows.map((r, i) => {
         const cw = byId(r.carry);
-        const mates = r.team.filter(t => t !== r.carry).map(t => {
-          const m = byId(t);
-          return `<span class="mate"><b>${m.name}</b><i class="${elC(m.el)}">${m.cls}</i></span>`;
-        }).join('');
+        const mates = r.team.filter(t => t !== r.carry).map(t => { const m = byId(t);
+          return `<span class="mate"><b>${m.name}</b><i class="${elC(m.el)}">${m.cls}</i></span>`; }).join('');
         const why = r.why.map(x => `<li>${x}</li>`).join('');
         const pct = Math.round(r.eff / top * 100);
-        return `<article class="comp${i===0?' top':''}">
-          <div class="comp-rank mono">#${i+1}</div>
-          <div class="comp-body">
-            <div class="comp-carry"><span class="c-name display">${cw.name}</span>
-              <span class="rarity-chip is-${cw.rar}">${cw.rar}</span>
-              <span class="c-tag ${elC(cw.el)} mono">${CAP(cw.el)} ${cw.cls}</span>
-              ${r.weak < 1 ? '<span class="offweak mono">off-weakness \u00d7.75</span>' : ''}</div>
-            <div class="comp-team">${mates}</div>
-            <ul class="comp-why mono">${why}</ul></div>
-          <div class="comp-score"><span class="s-val">${pct}</span><span class="s-bar"><i style="width:${pct}%"></i></span></div>
-        </article>`;
+        return `<article class="comp${i===0?' top':''}"><div class="comp-rank mono">#${i+1}</div>
+          <div class="comp-body"><div class="comp-carry"><span class="c-name display">${cw.name}</span>
+            <span class="rarity-chip is-${cw.rar}">${cw.rar}</span><span class="c-tag ${elC(cw.el)} mono">${CAP(cw.el)} ${cw.cls}</span>
+            ${r.weak < 1 ? '<span class="offweak mono">off-weakness \u00d7.75</span>' : ''}</div>
+            <div class="comp-team">${mates}</div><ul class="comp-why mono">${why}</ul></div>
+          <div class="comp-score"><span class="s-val">${pct}</span><span class="s-bar"><i style="width:${pct}%"></i></span></div></article>`;
       }).join('');
     }
 
-    // ---------- pool tiles ----------
-    function typeIco(t, title) {
-      return UI['type_' + lc(t)]
-        ? `<img class="tico" src="${UI['type_'+lc(t)]}" alt="${title}" title="${title}" width="20" height="20">`
-        : `<span class="tico txt ${elC(lc(t))}" title="${title}">${CAP(t)[0]}</span>`;
+    // ---------- resonance bar (icon selectors) ----------
+    function iconFor(kind, key) {
+      const u = UI[`${kind}_${key}`];
+      return u ? `<img src="${u}" alt="${key}" width="22" height="22">` : `<span class="ic-fallback ${kind==='type'?elC(key):''}">${CAP(key)[0]}</span>`;
     }
+    const RESLIST = [
+      { k: 'van', label: 'Vanguard', tag: '2\u00d7', icon: ['cclass','vanguard'], ladder: RES.vanguard },
+      { k: 'arc', label: 'Arcanist', tag: '2\u00d7', icon: ['cclass','arcanist'], ladder: RES.arcanist },
+      { k: 'mental', label: 'Mental', tag: '4\u00d7', icon: ['type','mental'], ladder: RES.mental },
+      { k: 'physical', label: 'Physical', tag: '4\u00d7', icon: ['type','physical'], ladder: RES.physical },
+      { k: 'magic', label: 'Magic', tag: '4\u00d7', icon: ['type','magic'], ladder: RES.magic },
+    ];
+    function renderResbar() {
+      const charge = `<button class="restog${S.laws.charge?' on':''}" data-tog="charge" type="button" title="+20% Extreme charge with 1 Supporter, Arcanist & Vanguard on the team">+20% charge <i>S/A/V</i></button>`;
+      const start = `<button class="restog${S.laws.start120?' on':''}" data-tog="start120" type="button" title="+120 Extreme charge at battle start">+120 start</button>`;
+      const pills = RESLIST.map(r => {
+        const lvl = S.laws[r.k], dots = [1,2,3].map(n => `<span class="dot${lvl>=n?' f':''}" data-res="${r.k}" data-lv="${n}"></span>`).join('');
+        return `<div class="respill${lvl>0?' on':''}" title="${r.label} resonance">
+          <span class="ric">${iconFor(r.icon[0], r.icon[1])}</span><span class="rtag mono">${r.tag}</span>
+          <span class="rdots" data-clear="${r.k}">${dots}</span></div>`;
+      }).join('');
+      $('resbar').innerHTML = charge + start + pills;
+      $('resbar').querySelectorAll('[data-tog]').forEach(b => b.addEventListener('click', () => { S.laws[b.dataset.tog] = !S.laws[b.dataset.tog]; save(); renderResbar(); solve(); }));
+      $('resbar').querySelectorAll('.dot').forEach(d => d.addEventListener('click', () => {
+        const k = d.dataset.res, n = +d.dataset.lv; S.laws[k] = (S.laws[k] === n) ? n - 1 : n; save(); renderResbar(); solve();
+      }));
+    }
+
+    // ---------- pool tiles (condensed, single column) ----------
     function renderPool() {
       const ids = owned();
       $('poolCount').textContent = ids.length;
-      const add = `<button class="tile add" id="addTile" type="button">
-        <span class="plus">+</span><span class="mono">Add my Witch</span></button>`;
-      $('pool').innerHTML = ids.map(id => {
-        const w = byId(id), st = S.units[id];
-        const cls = UI['cclass_' + lc(w.cls)]
-          ? `<img class="cclass" src="${UI['cclass_'+lc(w.cls)]}" alt="${w.cls}" title="${w.cls}" width="30" height="30">`
-          : `<span class="cclass txt">${w.cls[0]}</span>`;
-        const rar = UI['rarity_' + lc(w.rar)]
-          ? `<img class="rar" src="${UI['rarity_'+lc(w.rar)]}" alt="${w.rar}" height="24">`
-          : `<span class="rarity-chip is-${w.rar}">${w.rar}</span>`;
-        const port = w.img
-          ? `<img class="portrait-img" src="${w.img}" alt="${w.name}" loading="lazy">`
-          : `<svg viewBox="0 0 24 24" class="sigil"><path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>`;
-        const crCell = w.cls === 'Arcanist' ? `<span><b>${(st.cr*100).toFixed(1)}</b>cr</span>` : '';
-        const stats = `<div class="tstats mono">
-          <span><b>${st.atk}</b>atk</span>${crCell}
-          <span><b>${(st.cd*100).toFixed(0)}</b>cd</span>
-          <span><b>${(st.ed*100).toFixed(1)}</b>ed</span></div>`;
+      const add = `<button class="tile add" id="addTile" type="button"><span class="plus">+</span><span class="mono">Add my Witch</span></button>`;
+      const tiles = ids.map(id => {
+        const w = byId(id), st = statsFor(id), R = st.rank ?? w.maxrank;
+        const port = w.img ? `<img class="portrait-img" src="${w.img}" alt="${w.name}" loading="lazy">`
+          : `<svg viewBox="0 0 24 24" class="sigil"><path d="M2 12 C6 5.5, 18 5.5, 22 12 C18 18.5, 6 18.5, 2 12 Z" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1"/></svg>`;
+        const cap = lvCap(w, R);
         const sk = w.skills.map(s => {
-          const v = st.lv[s.slot], ex = v > 7;
+          const locked = R < s.req, v = locked ? 0 : clamp((st.lv && st.lv[s.slot]) || cap, 1, cap), ex = v > 7;
           const face = s.ico ? `<img src="${s.ico}" alt="${s.slot}">` : `<i>${s.slot[0].toUpperCase()}</i>`;
-          return `<span class="sk${ex?' ex':''}" title="${s.name} \u00b7 ${lvLabel(v)}">${face}<b>${lvShort(v)}</b></span>`;
+          const num = locked ? `<b class="lock">\u{1F512}</b>` : `<b${ex?' class="ex"':''}>${v}</b>`;
+          return `<span class="sk${locked?' off':''}" title="${s.name}${locked?' (locked)':' \u00b7 '+lvLabel(v)}">${face}${num}</span>`;
         }).join('');
+        const cr = w.cls === 'Arcanist' ? `${(st.cr*100).toFixed(0)}%` : '\u2014';
         return `<div class="tile rar-${w.rar}" data-id="${id}">
-          <div class="tportrait">${cls}${port}
-            <div class="tbadges">${typeIco(w.el,CAP(w.el)+' damage')}${rar}${typeIco(w.weak,'Weak to '+CAP(w.weak))}</div></div>
-          <div class="tfoot">
-            <div class="tname"><span class="display">${w.name}</span>
-              <button class="edit mono" data-edit="${id}" type="button">Edit</button></div>
-            ${stats}<div class="tskills">${sk}</div>
-          </div></div>`;
-      }).join('') + add;
+          <div class="tportrait">${port}
+            <span class="trank mono">${rankLabel(R)}</span>
+            <button class="edit mono" data-edit="${id}" type="button">Edit</button>
+            <span class="tname display">${w.name}</span></div>
+          <div class="tskills">${sk}</div>
+          <div class="tstats mono">${st.atk} <span>/</span> ${cr} <span>/</span> ${(st.cd*100).toFixed(0)}%</div>
+        </div>`;
+      }).join('');
+      $('pool').innerHTML = add + tiles;
       $('addTile').addEventListener('click', () => openModal(null));
       $('pool').querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openModal(b.dataset.edit)));
     }
 
     // ---------- modal ----------
-    let editing = null;
+    let editing = null, mRank = null, mId = null;
     function openModal(id) {
       editing = id;
       $('modalTitle').textContent = id ? `Edit ${byId(id).name}` : 'Add a carry';
       $('mRemove').hidden = !id;
-      const sel = $('mWitch'), selRow = $('mSelectRow');
-      if (id) { selRow.hidden = true; buildModalBody(id, statsFor(id)); }
+      const sel = $('mWitch');
+      if (id) { $('mSelectRow').hidden = true; loadModal(id, statsFor(id)); }
       else {
-        selRow.hidden = false;
+        $('mSelectRow').hidden = false;
         const avail = carries.filter(c => !S.units[c]);
-        sel.innerHTML = avail.map(c => `<option value="${c}">${byId(c).name} \u00b7 ${byId(c).cls} ${byId(c).rar}</option>`).join('');
-        if (!avail.length) { sel.innerHTML = '<option>All carries added</option>'; }
-        const first = avail[0];
-        if (first) buildModalBody(first, { ...defStats(byId(first)), lv: defLevels(byId(first)) });
+        sel.innerHTML = avail.length ? avail.map(c => `<option value="${c}">${byId(c).name} \u00b7 ${byId(c).cls} ${byId(c).rar}</option>`).join('') : '<option>All carries added</option>';
+        if (avail[0]) loadModal(avail[0], defUnit(byId(avail[0])));
       }
       $('modal').hidden = false;
     }
-    function buildModalBody(id, st) {
+    function loadModal(id, st) {
+      mId = id; mRank = st.rank ?? byId(id).maxrank;
       const w = byId(id);
-      $('mInfo').innerHTML = `<span class="chip mono">${w.cls}</span>
-        <span class="chip mono ${elC(w.el)}">${CAP(w.el)} dmg</span>
-        <span class="chip mono ${elC(w.weak)}">Weak: ${CAP(w.weak)}</span>
-        <span class="rarity-chip is-${w.rar}">${w.rar}</span>`;
-      $('mAtk').value = st.atk;
-      $('mCr').value = (st.cr*100).toFixed(2); $('mCd').value = (st.cd*100).toFixed(2); $('mEd').value = (st.ed*100).toFixed(2);
+      $('mInfo').innerHTML = `<span class="chip mono">${w.cls}</span><span class="chip mono ${elC(w.el)}">${CAP(w.el)} dmg</span><span class="chip mono ${elC(w.weak)}">Weak: ${CAP(w.weak)}</span><span class="rarity-chip is-${w.rar}">${w.rar}</span>`;
+      $('mAtk').value = st.atk; $('mCr').value = (st.cr*100).toFixed(2); $('mCd').value = (st.cd*100).toFixed(2); $('mEd').value = (st.ed*100).toFixed(2);
       $('mCrWrap').style.display = w.cls === 'Arcanist' ? '' : 'none';
-      $('mSkills').innerHTML = w.skills.map(s => {
-        const v = (st.lv && st.lv[s.slot]) || s.maxlv;
-        const face = s.ico ? `<img class="ms-ico" src="${s.ico}" alt="">` : `<span class="ms-ico txt">${s.slot[0].toUpperCase()}</span>`;
-        return `<div class="mskill"><div class="ms-top">${face}<span class="ms-name">${s.name}</span>
-          <span class="ms-lv mono" id="lbl_${s.slot}">${lvLabel(v)}</span></div>
-          <input type="range" min="1" max="${s.maxlv}" value="${v}" data-slot="${s.slot}" class="slider"></div>`;
-      }).join('');
-      $('mSkills').querySelectorAll('.slider').forEach(sl => sl.addEventListener('input', () => {
-        $('lbl_' + sl.dataset.slot).textContent = lvLabel(+sl.value);
+      renderStars(); renderModalSkills(st.lv || {});
+    }
+    function renderStars() {
+      const w = byId(mId);
+      let html = '';
+      for (let r = 1; r <= w.maxrank; r++) {
+        const on = r <= mRank, ex = r > 6, disabled = r < w.minrank;
+        html += `<button class="star${on?' on':''}${ex?' ex':''}" data-rank="${r}" type="button" ${disabled?'disabled':''} title="${rankLabel(r)}">${ex?('EX'+(r-6)):'\u2605'}</button>`;
+      }
+      $('mStars').innerHTML = html;
+      $('mStars').querySelectorAll('.star').forEach(b => b.addEventListener('click', () => {
+        mRank = +b.dataset.rank; renderStars();
+        const lv = {}; $('mSkills').querySelectorAll('.slider').forEach(sl => lv[sl.dataset.slot] = +sl.value);
+        renderModalSkills(lv);
       }));
-      $('mWitch').onchange = () => { const nid = $('mWitch').value; buildModalBody(nid, { ...defStats(byId(nid)), lv: defLevels(byId(nid)) }); };
+    }
+    function renderModalSkills(curLv) {
+      const w = byId(mId), cap = lvCap(w, mRank);
+      $('mSkills').innerHTML = w.skills.map(s => {
+        const locked = mRank < s.req;
+        const face = s.ico ? `<img class="ms-ico" src="${s.ico}" alt="">` : `<span class="ms-ico txt">${s.slot[0].toUpperCase()}</span>`;
+        const note = !s.score && !s.amp ? '<span class="ms-note">not scored yet</span>' : s.amp ? '<span class="ms-note">amp</span>' : '';
+        if (locked) return `<div class="mskill locked"><div class="ms-ico-wrap">${face}</div><span class="ms-name">${s.name}</span><span class="ms-lv mono">locked \u00b7 ${rankLabel(s.req)}</span></div>`;
+        const v = clamp(curLv[s.slot] || cap, 1, cap);
+        const plus = s.plus_star && mRank >= s.plus_star ? '<span class="ms-plus">+</span>' : '';
+        return `<div class="mskill"><div class="ms-ico-wrap">${face}${plus}</div><span class="ms-name">${s.name}${note}</span>
+          <span class="ms-lv mono" id="lbl_${s.slot}">${lvLabel(v)}</span>
+          <input type="range" min="1" max="${cap}" value="${v}" data-slot="${s.slot}" class="slider"></div>`;
+      }).join('');
+      $('mSkills').querySelectorAll('.slider').forEach(sl => sl.addEventListener('input', () => { $('lbl_'+sl.dataset.slot).textContent = lvLabel(+sl.value); }));
     }
     function readModal() {
-      const id = editing || $('mWitch').value, w = byId(id);
+      const id = editing || mId, w = byId(id);
       const num = (el, d) => { const v = parseFloat($(el).value); return isNaN(v) ? d : v; };
-      const lv = {};
+      const cap = lvCap(w, mRank), lv = {};
+      w.skills.forEach(s => { lv[s.slot] = Math.min(s.maxlv, cap); });
       $('mSkills').querySelectorAll('.slider').forEach(sl => lv[sl.dataset.slot] = +sl.value);
       const cr = w.cls === 'Arcanist' ? num('mCr', 20)/100 : MAX_STATS[`${w.cls}_${w.rar}`].cr;
-      return { id, unit: { atk: num('mAtk', 0), cr, cd: num('mCd', 0)/100, ed: num('mEd', 0)/100, lv } };
+      return { id, unit: { rank: mRank, atk: num('mAtk', 0), cr, cd: num('mCd', 0)/100, ed: num('mEd', 0)/100, lv } };
     }
     const closeModal = () => { $('modal').hidden = true; editing = null; };
 
-    // ---------- selects / laws ----------
     function fillSelects() {
       $('boss').innerHTML = BOSSES.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
       $('boss').value = S.boss;
-      const opts = l => `<option value="0">off</option>` + l.map((v,i)=>`<option value="${i+1}">Lv${i+1} \u00b7 ${v}%</option>`).join('');
-      $('law_van').innerHTML = opts(RES.vanguard); $('law_arc').innerHTML = opts(RES.arcanist);
-      $('law_mental').innerHTML = opts(RES.mental); $('law_physical').innerHTML = opts(RES.physical); $('law_magic').innerHTML = opts(RES.magic);
-      $('law_charge').checked = S.laws.charge; $('law_start120').checked = S.laws.start120;
-      for (const k of ['van','arc','mental','physical','magic']) $('law_'+k).value = S.laws[k];
     }
     function wire() {
       $('boss').addEventListener('change', e => { S.boss = e.target.value; save(); solve(); });
-      $('law_charge').addEventListener('change', e => { S.laws.charge = e.target.checked; save(); solve(); });
-      $('law_start120').addEventListener('change', e => { S.laws.start120 = e.target.checked; save(); solve(); });
-      for (const k of ['van','arc','mental','physical','magic'])
-        $('law_'+k).addEventListener('change', e => { S.laws[k] = +e.target.value; save(); solve(); });
       $('reset').addEventListener('click', () => { if (confirm('Remove all carries?')) { S.units = {}; save(); renderPool(); solve(); } });
       $('share').addEventListener('click', () => {
         const url = location.origin + location.pathname + '#' + btoa(encodeURIComponent(JSON.stringify(S)));
@@ -404,16 +403,17 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       $('modalX').addEventListener('click', closeModal);
       $('modalBack').addEventListener('click', closeModal);
       $('mRemove').addEventListener('click', () => { if (editing) { delete S.units[editing]; save(); closeModal(); renderPool(); solve(); } });
+      $('mWitch').addEventListener('change', () => { const nid = $('mWitch').value; loadModal(nid, defUnit(byId(nid))); });
     }
-    function save() { try { localStorage.setItem('majo-solver-v3', JSON.stringify(S)); } catch {} }
+    function save() { try { localStorage.setItem('majo-solver-v4', JSON.stringify(S)); } catch {} }
     function load() {
       try {
         if (location.hash.length > 1) { const h = JSON.parse(decodeURIComponent(atob(location.hash.slice(1)))); if (h.units) return h; }
-        const raw = localStorage.getItem('majo-solver-v3'); return raw ? JSON.parse(raw) : null;
+        const raw = localStorage.getItem('majo-solver-v4'); return raw ? JSON.parse(raw) : null;
       } catch { return null; }
     }
 
-    fillSelects(); wire(); renderPool(); solve();
+    fillSelects(); renderResbar(); wire(); renderPool(); solve();
   </script>
 
   <style>
@@ -424,61 +424,59 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     .sv-head h1{font-size:2.1rem;margin:.2em 0 .3em}
     .sv-head h1 em{color:var(--sigil);font-style:normal}
     .sv-head .sub{color:var(--ink-dim);font-size:.95rem}
-    .sv-head .sub b{color:var(--ink)}
     .p-title{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
     .field{background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-family:"Inter",sans-serif}
-    .field.sm{padding:5px 7px;font-size:.8rem;width:112px}
     .field:focus{outline:none;border-color:var(--sigil)}
 
     .panel{background:var(--veil);border:1px solid var(--line);border-radius:var(--r)}
     .lawbar{display:flex;gap:26px;align-items:flex-start;padding:14px 18px;margin-bottom:20px;flex-wrap:wrap}
     .lb-boss{display:flex;flex-direction:column;gap:7px}
-    .lb-laws{display:flex;flex-direction:column;gap:8px;flex:1;min-width:280px}
-    .laws{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
-    .law{display:flex;gap:7px;align-items:center;font-size:.82rem;color:var(--ink-dim);cursor:pointer}
-    .law input{accent-color:var(--sigil)}
-    .law i,.law-lv i{color:var(--ink-faint);font-style:normal;font-size:.72rem}
-    .law-lv{display:flex;gap:6px;align-items:center;font-size:.8rem;color:var(--ink-dim)}
+    .lb-laws{display:flex;flex-direction:column;gap:9px;flex:1;min-width:300px}
+    .resbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .restog{display:flex;align-items:center;gap:5px;background:var(--veil-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;color:var(--ink-dim);font-size:.76rem;cursor:pointer;font-family:"Inter",sans-serif}
+    .restog i{font-style:normal;color:var(--ink-faint);font-size:.66rem}
+    .restog.on{border-color:var(--sigil);color:var(--ink);background:color-mix(in srgb,var(--sigil) 12%,var(--veil-2))}
+    .respill{display:flex;align-items:center;gap:7px;background:var(--veil-2);border:1px solid var(--line);border-radius:999px;padding:5px 10px 5px 6px}
+    .respill.on{border-color:var(--sigil)}
+    .ric{display:flex;width:22px;height:22px}.ric img{border-radius:4px}
+    .ic-fallback{width:22px;height:22px;display:grid;place-items:center;border:1px solid currentColor;border-radius:5px;font-size:.66rem;font-family:"Space Mono",monospace;color:var(--ink-faint)}
+    .rtag{font-size:.6rem;color:var(--ink-faint)}
+    .rdots{display:flex;gap:3px}
+    .dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--ink-faint);cursor:pointer;transition:.1s}
+    .dot.f{background:var(--sigil);border-color:var(--sigil)}
+    .dot:hover{border-color:var(--sigil)}
 
-    .sv-grid{display:grid;grid-template-columns:430px 1fr;gap:24px;align-items:start}
+    .sv-grid{display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start}
     @media (max-width:920px){ .sv-grid{grid-template-columns:1fr} }
     .roster{display:flex;flex-direction:column;gap:12px}
     .roster-head{display:flex;justify-content:space-between;align-items:center}
-    .pool{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+    .pool{display:flex;flex-direction:column;gap:12px}
 
-    .tile{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
-    .tile.rar-SSR{border-color:color-mix(in srgb,var(--ssr) 30%,var(--line))}
-    .tile.rar-UR{border-color:color-mix(in srgb,var(--ur) 30%,var(--line))}
-    .tportrait{position:relative;aspect-ratio:1/1;background:radial-gradient(120% 120% at 50% 0%,var(--veil-2),var(--nightshade));display:flex;align-items:center;justify-content:center;overflow:hidden}
-    .portrait-img{width:100%;height:100%;object-fit:cover}
-    .tportrait .sigil{width:44%;color:var(--line)}
-    .tportrait .cclass{position:absolute;top:6px;left:6px;z-index:2;filter:drop-shadow(0 1px 2px #000)}
-    .tportrait .cclass.txt{width:24px;height:24px;display:grid;place-items:center;background:rgba(12,10,21,.7);border:1px solid var(--line);border-radius:6px;font-family:"Space Mono",monospace;font-size:.7rem;color:var(--ink-dim)}
-    .tbadges{position:absolute;bottom:5px;right:5px;display:flex;align-items:center;gap:4px;z-index:2}
-    .tico{filter:drop-shadow(0 1px 2px #000)}
-    .tico.txt{width:18px;height:18px;display:grid;place-items:center;border:1px solid currentColor;border-radius:50%;font-size:.6rem;font-family:"Space Mono",monospace}
-    .tbadges .rar{filter:drop-shadow(0 1px 2px #000)}
-    .tbadges .rarity-chip{padding:1px 5px;font-size:.55rem;background:rgba(12,10,21,.7)}
-    .tfoot{padding:8px 9px 10px;display:flex;flex-direction:column;gap:6px}
-    .tname{display:flex;align-items:center;justify-content:space-between;gap:6px}
-    .tname .display{font-size:.92rem}
-    .edit{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:2px 7px;background:transparent;cursor:pointer}
+    .tile{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+    .tile.rar-SSR{border-color:color-mix(in srgb,var(--ssr) 26%,var(--line))}
+    .tile.rar-UR{border-color:color-mix(in srgb,var(--ur) 26%,var(--line))}
+    .tportrait{position:relative;aspect-ratio:4/3;background:radial-gradient(120% 120% at 50% 0%,var(--veil-2),var(--nightshade));display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .portrait-img{width:100%;height:100%;object-fit:cover;object-position:top center}
+    .tportrait .sigil{width:30%;color:var(--line)}
+    .trank{position:absolute;top:7px;left:8px;background:rgba(8,6,14,.72);border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:.68rem;color:var(--ssr);letter-spacing:.05em}
+    .edit{position:absolute;top:7px;right:8px;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:rgba(8,6,14,.72);cursor:pointer}
     .edit:hover{color:var(--ink);border-color:var(--sigil)}
-    .tstats{display:flex;flex-wrap:wrap;gap:2px 9px;font-size:.62rem;color:var(--ink-faint)}
-    .tstats b{color:var(--ink-dim);font-weight:700;margin-right:2px}
-    .tskills{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
-    .sk{position:relative;width:34px;height:34px;border-radius:7px;overflow:hidden;background:var(--veil-2);border:1px solid var(--line);display:grid;place-items:center}
+    .tname{position:absolute;left:10px;bottom:8px;font-size:1.1rem;text-shadow:0 2px 8px #000}
+    .tskills{display:flex;gap:5px;padding:9px 10px 4px;justify-content:space-between}
+    .sk{position:relative;flex:1;aspect-ratio:1/1;max-width:46px;border-radius:7px;overflow:hidden;background:var(--veil-2);border:1px solid var(--line);display:grid;place-items:center}
     .sk img{width:100%;height:100%;object-fit:cover}
     .sk i{font-style:normal;font-family:"Space Mono",monospace;font-size:.8rem;color:var(--ink-faint)}
-    .sk b{position:absolute;left:0;right:0;bottom:0;text-align:center;color:#fff;font-size:.62rem;font-weight:700;line-height:1;padding:5px 0 2px;
-      background:linear-gradient(transparent,rgba(8,6,14,.92));text-shadow:0 1px 2px #000}
-    .sk.ex{border-color:color-mix(in srgb,var(--ssr) 50%,var(--line))}
-    .sk.ex b{color:var(--ssr)}
+    .sk b{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:1rem;font-weight:800;text-shadow:0 1px 3px #000,0 0 8px #000}
+    .sk b.ex{color:var(--ssr)}
+    .sk b.lock{font-size:.8rem}
+    .sk.off{opacity:.5}
+    .tstats{padding:2px 11px 11px;font-size:.82rem;color:var(--ink);letter-spacing:.02em}
+    .tstats span{color:var(--ink-faint);margin:0 2px}
 
-    .tile.add{cursor:pointer;align-items:center;justify-content:center;gap:8px;border-style:dashed;color:var(--ink-faint);min-height:150px;background:transparent;transition:.15s}
+    .tile.add{cursor:pointer;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;border-style:dashed;color:var(--ink-faint);padding:16px;background:transparent;transition:.15s}
     .tile.add:hover{border-color:var(--sigil);color:var(--ink)}
-    .tile.add .plus{font-size:2rem;line-height:1;color:var(--sigil)}
-    .tile.add .mono{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
+    .tile.add .plus{font-size:1.6rem;line-height:1;color:var(--sigil)}
+    .tile.add .mono{font-size:.74rem;letter-spacing:.1em;text-transform:uppercase}
 
     .btn{background:var(--sigil);color:#0c0a15;border:none;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;font-family:"Inter",sans-serif}
     .btn:hover{filter:brightness(1.08)}
@@ -508,36 +506,45 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     .s-bar{display:block;height:3px;background:var(--line);border-radius:2px;margin-top:5px;overflow:hidden}
     .s-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sigil),var(--ssr))}
 
-    /* modal */
     .modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
     .modal[hidden]{display:none}
     .modal-back{position:absolute;inset:0;background:rgba(6,5,12,.72);backdrop-filter:blur(3px)}
-    .modal-card{position:relative;background:var(--veil);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);width:100%;max-width:440px;max-height:90vh;overflow:auto}
-    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
-    .modal-head .display{font-size:1.15rem}
-    .modal-x{background:none;border:none;color:var(--ink-faint);font-size:1.5rem;line-height:1;cursor:pointer}
-    .modal-x:hover{color:var(--ink)}
-    .modal-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
-    .m-row{display:flex;flex-direction:column;gap:6px}
-    .m-lbl{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+    .modal-card{position:relative;background:var(--veil);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);width:100%;max-width:960px;max-height:90vh;overflow:auto}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--line)}
+    .modal-head .display{font-size:1.2rem}
+    .modal-x{background:none;border:none;color:var(--ink-faint);font-size:1.5rem;line-height:1;cursor:pointer}.modal-x:hover{color:var(--ink)}
+    .modal-body{padding:18px 22px;display:flex;flex-direction:column;gap:16px}
+    .m-top{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+    .m-col{display:flex;flex-direction:column;gap:8px;flex:1;min-width:240px}
+    .m-lbl{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
     .m-info{display:flex;flex-wrap:wrap;gap:6px}
     .chip{padding:3px 9px;border:1px solid var(--line);border-radius:999px;font-size:.68rem;color:var(--ink-dim);background:var(--veil-2)}
-    .m-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .stars{display:flex;flex-wrap:wrap;gap:4px}
+    .star{width:30px;height:30px;border:1px solid var(--line);border-radius:7px;background:var(--veil-2);color:var(--ink-faint);cursor:pointer;font-size:.9rem;display:grid;place-items:center;font-family:"Space Mono",monospace}
+    .star.on{color:var(--ssr);border-color:color-mix(in srgb,var(--ssr) 45%,var(--line))}
+    .star.ex{font-size:.6rem}.star.ex.on{color:var(--ur);border-color:color-mix(in srgb,var(--ur) 45%,var(--line))}
+    .star:disabled{opacity:.25;cursor:not-allowed}
+    .m-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
     .mf{display:flex;flex-direction:column;gap:4px}
     .mf span{font-size:.62rem;color:var(--ink-faint);letter-spacing:.04em}
     .mf input{background:var(--veil-2);border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:8px 9px;font-family:"Space Mono",monospace;font-size:.82rem;text-align:right}
     .mf input:focus{outline:none;border-color:var(--sigil)}
-    .m-skills{display:flex;flex-direction:column;gap:11px;border-top:1px solid var(--line);padding-top:14px}
-    .mskill{display:flex;flex-direction:column;gap:5px}
-    .ms-top{display:flex;align-items:center;gap:8px}
-    .ms-ico{width:26px;height:26px;border-radius:6px;object-fit:cover;border:1px solid var(--line);flex:none}
-    .ms-ico.txt{display:grid;place-items:center;background:var(--veil-2);font-family:"Space Mono",monospace;font-size:.72rem;color:var(--ink-faint)}
-    .ms-name{font-size:.82rem;color:var(--ink)}
-    .ms-lv{font-size:.72rem;color:var(--sigil);margin-left:auto}
-    .slider{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--line);outline:none}
+    .m-skills{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;border-top:1px solid var(--line);padding-top:16px}
+    @media (max-width:720px){ .m-skills{grid-template-columns:repeat(2,1fr)} }
+    .mskill{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+    .ms-ico-wrap{position:relative}
+    .ms-ico{width:54px;height:54px;border-radius:9px;object-fit:cover;border:1px solid var(--line)}
+    .ms-ico.txt{display:grid;place-items:center;background:var(--veil-2);font-family:"Space Mono",monospace;color:var(--ink-faint)}
+    .ms-plus{position:absolute;top:-5px;right:-5px;background:var(--ssr);color:#0c0a15;font-weight:800;font-size:.72rem;width:18px;height:18px;border-radius:50%;display:grid;place-items:center}
+    .ms-name{font-size:.74rem;color:var(--ink);line-height:1.25;min-height:2.4em;display:flex;flex-direction:column;justify-content:center}
+    .ms-note{display:block;font-size:.58rem;color:var(--ink-faint);font-family:"Space Mono",monospace;margin-top:2px}
+    .ms-lv{font-size:.72rem;color:var(--sigil)}
+    .mskill.locked{opacity:.55}
+    .mskill.locked .ms-lv{color:var(--ink-faint)}
+    .slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--line);outline:none}
     .slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--sigil);cursor:pointer;border:2px solid var(--veil)}
     .slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--sigil);cursor:pointer;border:2px solid var(--veil)}
-    .modal-foot{display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
+    .modal-foot{display:flex;align-items:center;gap:10px;padding:14px 22px;border-top:1px solid var(--line)}
     .modal-foot .spacer{flex:1}
     .rarity-chip.is-SR{color:var(--sr)} .rarity-chip.is-SSR{color:var(--ssr)} .rarity-chip.is-UR{color:var(--ur)}
     .type-mental{color:var(--mental)} .type-physical{color:var(--physical)} .type-magic{color:var(--magic)}
