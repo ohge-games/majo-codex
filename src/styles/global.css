@@ -39,7 +39,7 @@ img{max-width:100%;display:block}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
 
 /* type */
-.display{font-family:"Cinzel",serif;font-weight:600;letter-spacing:.02em;line-height:1.1}
+.display{font-family:"Fraunces",serif;font-weight:600;letter-spacing:.005em;line-height:1.12}
 .mono{font-family:"Space Mono","JetBrains Mono",ui-monospace,monospace}
 .eyebrow{font-family:"Space Mono",monospace;font-size:.72rem;letter-spacing:.28em;
   text-transform:uppercase;color:var(--ink-faint)}
@@ -49,7 +49,7 @@ img{max-width:100%;display:block}
   background:rgba(12,10,21,.72);border-bottom:1px solid var(--line)}
 .masthead .wrap{display:flex;align-items:center;gap:14px;height:64px}
 .brand{display:flex;align-items:center;gap:12px}
-.brand .name{font-family:"Cinzel",serif;font-weight:700;font-size:1.15rem;letter-spacing:.16em}
+.brand .name{font-family:"Fraunces",serif;font-weight:700;font-size:1.18rem;letter-spacing:.08em}
 .brand .name b{color:var(--sigil)}
 .masthead nav{margin-left:auto;display:flex;gap:22px;font-size:.82rem;
   letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);font-family:"Space Mono",monospace}
