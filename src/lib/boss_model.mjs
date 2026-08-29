@@ -150,10 +150,22 @@ export function createModel(witches, opts = {}) {
       if (cw.el === 'mental' && laws.men4 > 0) { td = L('men4', laws.men4) * EFF3; trig = 'execution'; }
       if (td > 0) { const m = 1 + td; mult *= m; why.push(`4\u00d7 ${cap(cw.el)} dmg (${trig}) \u2192 \u00d7${m.toFixed(2)}`); }
     }
-    // 2x Physical law is OFFENSIVE for dodge-counter carries: +dodge -> more counters + ally dodges feed the passive
+    // 2x Physical law is OFFENSIVE for dodge-counter carries: +dodge -> more of the carry's OWN counters (self-boost)
     if (cw.dodgeCounter && (el.physical || 0) >= 2 && laws.phy2 > 0) {
-      const m = 1 + Math.min(0.15, L('phy2', laws.phy2));   // calibrated to the ~15% observed, capped
-      mult *= m; why.push(`2\u00d7 Physical dodge (counters + passive feed) \u2192 \u00d7${m.toFixed(2)}`);
+      const m = 1 + Math.min(0.15, L('phy2', laws.phy2));   // calibrated to the ~15% Yun-team read (self-dodge only)
+      mult *= m; why.push(`2\u00d7 Physical self-dodge \u2192 \u00d7${m.toFixed(2)}`);
+    }
+    // Yuhong/Alice passive: ally DODGES grant crit (+4%/stack, max 10). Fed by teammates' estimated dodge rates,
+    // so dodge-active teammates (Alice) feed hard while block-tanks (Budi/Yun) feed ~nothing. Magnitude is an
+    // estimate (K=4) pending a clean Alice+carry measurement.
+    if (cw.dodgeCounter) {
+      const aoe = boss.aoe || 0; let feed = 0;
+      for (const t of team) { if (t === carry) continue; const w = byId(t);
+        const exposure = aoe + (1 - aoe) * (w.engage ?? 0.5);
+        feed += (w.dodgeProp ?? 0.06) * exposure; }
+      const stacks = Math.min(10, 3 * feed);   // K=3 conservative default; raise once measured
+      if (stacks > 0.2) { const m = 1 + (1 - ex) * (critMul(st, stacks * 0.04) - 1);
+        mult *= m; why.push(`passive: ally dodges (~${stacks.toFixed(1)} stk crit) \u2192 \u00d7${m.toFixed(2)}`); }
     }
     let cf = 0;
     if (laws.charge && cls.Supporter && cls.Arcanist && cls.Vanguard) cf += 0.20;

@@ -8,100 +8,100 @@
  },
  "scores": {
   "W001": {
-   "overall": 32,
-   "boss": 24
+   "overall": 28,
+   "boss": 21
   },
   "W002": {
-   "overall": 45,
-   "boss": 31
+   "overall": 39,
+   "boss": 28
   },
   "W003": {
-   "overall": 18,
-   "boss": 18
+   "overall": 16,
+   "boss": 16
   },
   "W004": {
-   "overall": 30,
-   "boss": 20
+   "overall": 26,
+   "boss": 18
   },
   "W005": {
-   "overall": 13,
-   "boss": 8
+   "overall": 11,
+   "boss": 7
   },
   "W006": {
-   "overall": 61,
-   "boss": 51
+   "overall": 53,
+   "boss": 46
   },
   "W007": {
-   "overall": 11,
-   "boss": 7
+   "overall": 10,
+   "boss": 6
   },
   "W008": {
-   "overall": 11,
-   "boss": 7
+   "overall": 9,
+   "boss": 6
   },
   "W009": {
-   "overall": 69,
-   "boss": 58
+   "overall": 60,
+   "boss": 52
   },
   "W010": {
-   "overall": 59,
-   "boss": 54
+   "overall": 51,
+   "boss": 48
   },
   "W011": {
-   "overall": 55,
-   "boss": 47
+   "overall": 48,
+   "boss": 42
   },
   "W012": {
-   "overall": 13,
-   "boss": 10
-  },
-  "W013": {
-   "overall": 54,
-   "boss": 35
-  },
-  "W014": {
-   "overall": 17,
-   "boss": 17
-  },
-  "W015": {
-   "overall": 12,
+   "overall": 11,
    "boss": 9
   },
-  "W016": {
-   "overall": 50,
+  "W013": {
+   "overall": 47,
    "boss": 31
   },
+  "W014": {
+   "overall": 15,
+   "boss": 15
+  },
+  "W015": {
+   "overall": 10,
+   "boss": 8
+  },
+  "W016": {
+   "overall": 44,
+   "boss": 28
+  },
   "W017": {
-   "overall": 83,
-   "boss": 60
+   "overall": 73,
+   "boss": 54
   },
   "W018": {
-   "overall": 51,
-   "boss": 45
+   "overall": 45,
+   "boss": 40
   },
   "W019": {
-   "overall": 68,
-   "boss": 50
+   "overall": 60,
+   "boss": 44
   },
   "W020": {
    "overall": 100,
    "boss": 100
   },
   "W021": {
-   "overall": 30,
-   "boss": 32
+   "overall": 29,
+   "boss": 31
   },
   "W022": {
-   "overall": 15,
-   "boss": 16
-  },
-  "W023": {
    "overall": 13,
    "boss": 14
   },
+  "W023": {
+   "overall": 12,
+   "boss": 12
+  },
   "W024": {
-   "overall": 17,
-   "boss": 11
+   "overall": 15,
+   "boss": 9
   }
  }
 }
