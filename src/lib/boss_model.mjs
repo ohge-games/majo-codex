@@ -54,6 +54,8 @@ export function createModel(witches, opts = {}) {
     const w = byId(id), st = statsFor(id), R = st.rank ?? w.maxrank;
     const kn = st.atk * (1 + st.cr * st.cd) * (1 + st.ed);
     const ke = st.atk * (1 + 1.0 * st.cd) * (1 + st.ed);
+    const sb = w.selfbuff;
+    const spd = 1 + (sb?.speed || 0) * (sb?.uptime || 0);   // rotation-wide attack speed: shrinks all animations
     let ext = [], rest = [], normal = null;
     for (const s of w.skills) {
       if (!s.score || R < s.req) continue;
@@ -61,10 +63,10 @@ export function createModel(witches, opts = {}) {
       const lv = clamp((st.lv && st.lv[s.slot]) || lvCap(w, R), 1, lvCap(w, R));
       const csum = (A + B * (lv - 1)) / 100;
       if (csum <= 0) continue;
-      const D = (s.exec ? ke : kn) * csum, n = T / s.cad;
-      if (s.slot === 'normal') normal = [D, s.anim];
-      else if (s.slot === 'extreme') ext.push([D, s.anim, n, s.exec]);
-      else rest.push([D, s.anim, n, s.exec]);
+      const D = (s.exec ? ke : kn) * csum, n = T / s.cad, anim = s.anim / spd;
+      if (s.slot === 'normal') normal = [D, anim];
+      else if (s.slot === 'extreme') ext.push([D, anim, n, s.exec]);
+      else rest.push([D, anim, n, s.exec]);
     }
     const eo = ext.reduce((a, x) => a + x[2] * x[1], 0);
     let extDmg = 0, execDmg = 0;
@@ -74,18 +76,13 @@ export function createModel(witches, opts = {}) {
     let restDmg = 0;
     for (const [D, an, n, e] of rest) { const c = n * sc * D; restDmg += c; if (e) execDmg += c; }
     const left = Math.max(0, T - eo - restOcc);
-    const nDmg = normal ? left / normal[1] * normal[0] : 0;
+    const nDmg = normal ? left / normal[1] * normal[0] : 0;   // normal[1] already sped up
     const amp = w.amp || 1;
     const extA = extDmg * amp, nA = nDmg * amp, exA = execDmg * amp;
     const pre = (extDmg + restDmg + nDmg) * amp || 1;
     const shares = { extreme: extA / pre, normal: nA / pre, exec: exA / pre };
     let total = (extDmg + restDmg + nDmg) * amp;
-    const sb = w.selfbuff;
-    if (sb && total) {
-      const up = sb.uptime;
-      if (sb.speed) total += nA * sb.speed * up;
-      if (sb.crit) { const cm = (1 + (st.cr + sb.crit) * st.cd) / (1 + st.cr * st.cd); total += (pre - exA) * up * (cm - 1); }
-    }
+    if (sb && sb.crit && total) { const cm = (1 + (st.cr + sb.crit) * st.cd) / (1 + st.cr * st.cd); total += (pre - exA) * sb.uptime * (cm - 1); }
     return { total, ...shares };
   }
   const critMul = (st, add) => (1 + (st.cr + add) * st.cd) / (1 + st.cr * st.cd);
@@ -152,6 +149,11 @@ export function createModel(witches, opts = {}) {
       if (cw.el === 'magic' && laws.mag4 > 0) { td = L('mag4', laws.mag4) * EFF10; trig = 'extreme'; }
       if (cw.el === 'mental' && laws.men4 > 0) { td = L('men4', laws.men4) * EFF3; trig = 'execution'; }
       if (td > 0) { const m = 1 + td; mult *= m; why.push(`4\u00d7 ${cap(cw.el)} dmg (${trig}) \u2192 \u00d7${m.toFixed(2)}`); }
+    }
+    // 2x Physical law is OFFENSIVE for dodge-counter carries: +dodge -> more counters + ally dodges feed the passive
+    if (cw.dodgeCounter && (el.physical || 0) >= 2 && laws.phy2 > 0) {
+      const m = 1 + Math.min(0.15, L('phy2', laws.phy2));   // calibrated to the ~15% observed, capped
+      mult *= m; why.push(`2\u00d7 Physical dodge (counters + passive feed) \u2192 \u00d7${m.toFixed(2)}`);
     }
     let cf = 0;
     if (laws.charge && cls.Supporter && cls.Arcanist && cls.Vanguard) cf += 0.20;

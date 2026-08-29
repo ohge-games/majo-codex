@@ -8,100 +8,100 @@
  },
  "scores": {
   "W001": {
-   "overall": 35,
-   "boss": 35
+   "overall": 32,
+   "boss": 24
   },
   "W002": {
-   "overall": 54,
-   "boss": 52
+   "overall": 45,
+   "boss": 31
   },
   "W003": {
-   "overall": 22,
-   "boss": 29
+   "overall": 18,
+   "boss": 18
   },
   "W004": {
-   "overall": 36,
-   "boss": 34
+   "overall": 30,
+   "boss": 20
   },
   "W005": {
-   "overall": 16,
-   "boss": 14
+   "overall": 13,
+   "boss": 8
   },
   "W006": {
-   "overall": 74,
-   "boss": 85
+   "overall": 61,
+   "boss": 51
   },
   "W007": {
-   "overall": 14,
-   "boss": 12
+   "overall": 11,
+   "boss": 7
   },
   "W008": {
-   "overall": 13,
-   "boss": 11
+   "overall": 11,
+   "boss": 7
   },
   "W009": {
-   "overall": 83,
-   "boss": 96
+   "overall": 69,
+   "boss": 58
   },
   "W010": {
-   "overall": 71,
-   "boss": 89
+   "overall": 59,
+   "boss": 54
   },
   "W011": {
-   "overall": 42,
-   "boss": 49
+   "overall": 55,
+   "boss": 47
   },
   "W012": {
    "overall": 13,
-   "boss": 14
+   "boss": 10
   },
   "W013": {
-   "overall": 63,
-   "boss": 56
+   "overall": 54,
+   "boss": 35
   },
   "W014": {
-   "overall": 21,
-   "boss": 27
+   "overall": 17,
+   "boss": 17
   },
   "W015": {
-   "overall": 14,
-   "boss": 16
+   "overall": 12,
+   "boss": 9
   },
   "W016": {
-   "overall": 60,
-   "boss": 52
+   "overall": 50,
+   "boss": 31
   },
   "W017": {
+   "overall": 83,
+   "boss": 60
+  },
+  "W018": {
+   "overall": 51,
+   "boss": 45
+  },
+  "W019": {
+   "overall": 68,
+   "boss": 50
+  },
+  "W020": {
    "overall": 100,
    "boss": 100
   },
-  "W018": {
-   "overall": 62,
-   "boss": 75
-  },
-  "W019": {
-   "overall": 80,
-   "boss": 79
-  },
-  "W020": {
-   "overall": 60,
-   "boss": 81
-  },
   "W021": {
-   "overall": 32,
-   "boss": 46
+   "overall": 30,
+   "boss": 32
   },
   "W022": {
-   "overall": 19,
-   "boss": 27
+   "overall": 15,
+   "boss": 16
   },
   "W023": {
-   "overall": 16,
-   "boss": 23
+   "overall": 13,
+   "boss": 14
   },
   "W024": {
-   "overall": 20,
-   "boss": 18
+   "overall": 17,
+   "boss": 11
   }
  }
 }
