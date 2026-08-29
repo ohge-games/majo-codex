@@ -30,7 +30,7 @@ const W = Object.entries(engine.witches).map(([id, e]) => {
   const m = WMETA[id] || {};
   return { id, name: m.name, title: m.title || '', cls: e.cls, rar: e.rar, el: e.el, weak: e.weak,
     amp: e.amp, minrank: e.minrank, maxrank: e.maxrank, img: portraitOf(m.portrait_filename),
-    intf: e.intf || {}, venomTax: e.venomTax ?? 1,
+    intf: e.intf || {}, echarge: e.echarge || 0, ehits: e.ehits || 0,
     skills: e.skills.map(s => ({ ...s, name: SKILLNAME[`${id}_${s.slot}`] || s.slot, ico: skillIco(id, s.slot) })) };
 });
 const carries = W.filter(w => w.cls === 'Arcanist' || w.cls === 'Vanguard').map(w => w.id);
@@ -41,7 +41,7 @@ for (const c of ['arcanist','vanguard','defender','supporter']) UI['cclass_' + c
 for (const r of ['sr','ssr','ur']) UI['rarity_' + r] = uiUrl('rarity_' + r);
 for (const s of ['red','yellow','grey','ex1','ex2','ex3']) UI['star_' + s] = uiUrl('star_' + s);
 const BOSSES = [
-  { id: 'venomfrill', name: 'Venomfrill', weak: 'physical', kd: 2.5 * 8 / 180 },
+  { id: 'venomfrill', name: 'Venomfrill', weak: 'physical', kd: 2.5 * 8 / 180, stackCap: 6 },
   { id: 'dummy', name: 'Test Dummy (no weakness / no knockdown)', weak: 'none', kd: 0 },
 ];
 const RES = {
@@ -283,19 +283,31 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     const hasHealer = team => team.some(t => byId(t).cls === 'Supporter');
     let _t; const scheduleSolve = () => { clearTimeout(_t); _t = setTimeout(solve, 90); };
 
+    // ---------- Venomfrill damage-reduction: team-wide stacks from extreme hits ----------
+    // Each extreme HIT applies a stack (flat -6% ALL damage, 20s, cap by boss). A unit re-applies
+    // every P = echarge/chargeRate sec, so its time-avg contribution is ehits*(20/P). Sum, cap.
+    function chargeRate(cls, el) {
+      let cf = 0;
+      if (S.laws.charge && cls.Supporter && cls.Arcanist && cls.Vanguard) cf += 0.20;
+      if ((el.magic||0) >= 2 && S.laws.mag2 > 0) cf += RES.mag2[S.laws.mag2-1]/100;
+      return 10 * (1 + cf);
+    }
+    function teamStacks(team, boss) {
+      if (!boss.stackCap) return 0;
+      const cls = {}, el = {};
+      for (const t of team) { const w = byId(t); cls[w.cls]=(cls[w.cls]||0)+1; el[w.el]=(el[w.el]||0)+1; }
+      const rate = chargeRate(cls, el);
+      let s = 0;
+      for (const t of team) { const w = byId(t); if (w.ehits > 0 && w.echarge > 0) s += w.ehits * 20 * rate / w.echarge; }
+      return Math.min(boss.stackCap, s);
+    }
     function solve() {
       const own = owned(), boss = BOSSES.find(b => b.id === S.boss);
       if (!own.length) { renderEmpty(); return; }
       const ids = teamPool(), bases = new Map(ids.map(id => [id, timeline(id)])), rows = [];
       for (const carry of own) {
         const cw = byId(carry), st = statsFor(carry), weak = cw.el === boss.weak ? 1 : 0.75;
-        let base = bases.get(carry);
-        // Venomfrill: extreme-resistance stacks tax the carry's extreme share (amp carries untouched)
-        if (boss.id === 'venomfrill' && cw.venomTax < 1 && base.extreme > 0) {
-          const keep = 1 - base.extreme * (1 - cw.venomTax);
-          base = { total: base.total * keep, extreme: base.extreme * cw.venomTax / keep,
-                   normal: base.normal / keep, exec: base.exec / keep };
-        }
+        const base = bases.get(carry);
         // interference candidates = owned same-class carries; marginal mult is team-independent
         const prov = own.filter(id => id !== carry && byId(id).cls === cw.cls)
           .map(pid => ({ pid, m: intfMult(carry, st, base, boss, combineIntf([pid])),
@@ -315,8 +327,13 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
                 iMult = intfMult(carry, st, base, boss, combineIntf(avail.map(p => p.pid)));
                 if (iMult > 1.001) iWhy = `interference: ${avail.map(p => p.label).join(' + ')} \u2192 \u00d7${iMult.toFixed(2)}`;
               }
-              const eff = base.total * weak * mult * iMult;
-              if (!best || eff > best.eff) best = { eff, team, why: iWhy ? [...why, iWhy] : why, weak };
+              // team-wide damage reduction from Venomfrill's extreme-hit stacks
+              const stk = teamStacks(team, boss), redux = 1 - 0.06 * stk;
+              let sWhy = null;
+              if (stk > 0.05) sWhy = `boss dmg-reduction: ~${stk.toFixed(1)} stacks \u2192 \u00d7${redux.toFixed(2)}`;
+              const eff = base.total * weak * mult * iMult * redux;
+              const allWhy = [...why]; if (iWhy) allWhy.push(iWhy); if (sWhy) allWhy.push(sWhy);
+              if (!best || eff > best.eff) best = { eff, team, why: allWhy, weak };
             } } }
         if (best) rows.push({ carry, ...best });
       }
