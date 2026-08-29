@@ -30,7 +30,7 @@ const W = Object.entries(engine.witches).map(([id, e]) => {
   const m = WMETA[id] || {};
   return { id, name: m.name, title: m.title || '', cls: e.cls, rar: e.rar, el: e.el, weak: e.weak,
     amp: e.amp, minrank: e.minrank, maxrank: e.maxrank, img: portraitOf(m.portrait_filename),
-    intf: e.intf || {}, echarge: e.echarge || 0, ehits: e.ehits || 0,
+    intf: e.intf || {}, echarge: e.echarge || 0, ehits: e.ehits || 0, estacks: e.estacks || 0,
     skills: e.skills.map(s => ({ ...s, name: SKILLNAME[`${id}_${s.slot}`] || s.slot, ico: skillIco(id, s.slot) })) };
 });
 const carries = W.filter(w => w.cls === 'Arcanist' || w.cls === 'Vanguard').map(w => w.id);
@@ -298,7 +298,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       for (const t of team) { const w = byId(t); cls[w.cls]=(cls[w.cls]||0)+1; el[w.el]=(el[w.el]||0)+1; }
       const rate = chargeRate(cls, el);
       let s = 0;
-      for (const t of team) { const w = byId(t); if (w.ehits > 0 && w.echarge > 0) s += w.ehits * 20 * rate / w.echarge; }
+      for (const t of team) { const w = byId(t); if (w.estacks > 0 && w.echarge > 0) s += w.estacks * 20 * rate / w.echarge; }
       return Math.min(boss.stackCap, s);
     }
     function solve() {
