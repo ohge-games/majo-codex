@@ -8,19 +8,19 @@
  },
  "scores": {
   "W001": {
-   "overall": 28,
+   "overall": 27,
    "boss": 21
   },
   "W002": {
-   "overall": 39,
-   "boss": 28
+   "overall": 38,
+   "boss": 27
   },
   "W003": {
-   "overall": 16,
+   "overall": 15,
    "boss": 16
   },
   "W004": {
-   "overall": 26,
+   "overall": 25,
    "boss": 18
   },
   "W005": {
@@ -28,11 +28,11 @@
    "boss": 7
   },
   "W006": {
-   "overall": 53,
-   "boss": 46
+   "overall": 52,
+   "boss": 45
   },
   "W007": {
-   "overall": 10,
+   "overall": 9,
    "boss": 6
   },
   "W008": {
@@ -40,27 +40,27 @@
    "boss": 6
   },
   "W009": {
-   "overall": 60,
-   "boss": 52
+   "overall": 58,
+   "boss": 51
   },
   "W010": {
-   "overall": 51,
-   "boss": 48
+   "overall": 50,
+   "boss": 47
   },
   "W011": {
-   "overall": 48,
-   "boss": 42
+   "overall": 47,
+   "boss": 41
   },
   "W012": {
    "overall": 11,
    "boss": 9
   },
   "W013": {
-   "overall": 47,
+   "overall": 46,
    "boss": 31
   },
   "W014": {
-   "overall": 15,
+   "overall": 14,
    "boss": 15
   },
   "W015": {
@@ -68,19 +68,19 @@
    "boss": 8
   },
   "W016": {
-   "overall": 44,
+   "overall": 42,
    "boss": 28
   },
   "W017": {
-   "overall": 73,
-   "boss": 54
+   "overall": 70,
+   "boss": 53
   },
   "W018": {
-   "overall": 45,
-   "boss": 40
+   "overall": 44,
+   "boss": 39
   },
   "W019": {
-   "overall": 60,
+   "overall": 58,
    "boss": 44
   },
   "W020": {
@@ -88,7 +88,7 @@
    "boss": 100
   },
   "W021": {
-   "overall": 29,
+   "overall": 30,
    "boss": 31
   },
   "W022": {
@@ -96,11 +96,11 @@
    "boss": 14
   },
   "W023": {
-   "overall": 12,
+   "overall": 11,
    "boss": 12
   },
   "W024": {
-   "overall": 15,
+   "overall": 14,
    "boss": 9
   }
  }
