@@ -1,0 +1,107 @@
+{
+ "_meta": {
+  "overall": "Best-team effective damage vs a neutral target (no weakness/knockdown/stacks), maxed resonances. Boss-agnostic power.",
+  "boss": "Best-team effective damage vs the current Training Boss, maxed resonances. Updates each rotation.",
+  "boss_id": "venomfrill",
+  "normalized": "each 0-100 to its own top unit",
+  "source": "src/lib/boss_model.mjs board() — regenerate with scripts/build-dps-scores.mjs"
+ },
+ "scores": {
+  "W001": {
+   "overall": 35,
+   "boss": 35
+  },
+  "W002": {
+   "overall": 54,
+   "boss": 52
+  },
+  "W003": {
+   "overall": 22,
+   "boss": 29
+  },
+  "W004": {
+   "overall": 36,
+   "boss": 34
+  },
+  "W005": {
+   "overall": 16,
+   "boss": 14
+  },
+  "W006": {
+   "overall": 74,
+   "boss": 85
+  },
+  "W007": {
+   "overall": 14,
+   "boss": 12
+  },
+  "W008": {
+   "overall": 13,
+   "boss": 11
+  },
+  "W009": {
+   "overall": 83,
+   "boss": 96
+  },
+  "W010": {
+   "overall": 71,
+   "boss": 89
+  },
+  "W011": {
+   "overall": 42,
+   "boss": 49
+  },
+  "W012": {
+   "overall": 13,
+   "boss": 14
+  },
+  "W013": {
+   "overall": 63,
+   "boss": 56
+  },
+  "W014": {
+   "overall": 21,
+   "boss": 27
+  },
+  "W015": {
+   "overall": 14,
+   "boss": 16
+  },
+  "W016": {
+   "overall": 60,
+   "boss": 52
+  },
+  "W017": {
+   "overall": 100,
+   "boss": 100
+  },
+  "W018": {
+   "overall": 62,
+   "boss": 75
+  },
+  "W019": {
+   "overall": 80,
+   "boss": 79
+  },
+  "W020": {
+   "overall": 60,
+   "boss": 81
+  },
+  "W021": {
+   "overall": 32,
+   "boss": 46
+  },
+  "W022": {
+   "overall": 19,
+   "boss": 27
+  },
+  "W023": {
+   "overall": 16,
+   "boss": 23
+  },
+  "W024": {
+   "overall": 20,
+   "boss": 18
+  }
+ }
+}

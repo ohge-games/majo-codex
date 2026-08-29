@@ -12,8 +12,8 @@
       "source": "Stats and full kit current as of the live version; per-hit damage values pending.",
       "mechanics": [
         {
-          "name": "Extreme damage feeds his resistance",
-          "text": "Every hit from an Extreme skill stacks an Extreme-resist buff on him — up to 4 stacks through Rank 4, 6 at Endless, ~20s each — and at Endless he opens with a permanent one. Since firing Extremes is your main input, that's a real tension: leaning on them for raw damage makes each one land softer. Let your units' auto-attacks carry the damage against his Physical weakness, and spend Extremes on timing and utility rather than as your damage engine."
+          "name": "His damage-reduction stacks from Extremes",
+          "text": "Every hit from a witch's OWN Extreme skill puts a stack on him — a flat 6% cut to ALL incoming damage, not just Extreme damage. Each stack lasts ~20s on its own timer (no refresh) and they cap at 4 through Rank 4, 6 at Endless. Ground-zone ticks don't count; only hits tagged as the character's Extreme do. The catch: a big multi-hit Extreme can slam him to the cap in one cast and then suppress your entire team's damage for the next 20 seconds. So leaning on Extremes for raw damage makes everything you do land softer. Let auto-attacks carry the damage against his Physical weakness, spend Extremes on timing and utility, and favor carries whose Extreme is a buff (those build no stacks) over big multi-hit nukes."
         },
         {
           "name": "The kit unlocks by rank",
@@ -28,8 +28,8 @@
           "text": "His longest move at about 10.5 seconds, so it's heavily telegraphed. Since when you fire Extremes is the main thing you control, treat that long windup as a clean window to land a big Extreme."
         },
         {
-          "name": "Endless revive (Rank 5)",
-          "text": "In Endless he revives after going down and returns with an extra-damage buff. Save an Extreme for the second phase instead of dumping everything before the first knockdown."
+          "name": "Second phase (Endless)",
+          "text": "He returns from his first knockdown with an extra-damage buff, so don't dump everything before it — hold an Extreme for the second phase."
         },
         {
           "name": "Hard to lock down",

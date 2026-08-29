@@ -9,6 +9,7 @@ import constants from '../../data/constants.json';
 import tiers from '../../data/tier_synergy.json';
 import scores from '../../data/skill_scores.json';
 import statOverrides from '../../data/stat_overrides.json';
+import dpsScores from '../../data/dps_scores.json';
 import classBaseStats from '../../data/class_base_stats.json';
 import fs from 'node:fs';
 
@@ -35,6 +36,8 @@ const mains = ['Special', 'Normal', 'Class', 'Passive'].map(sl => bySlot[sl]).fi
 const interference = bySlot['Interference'];
 const tip = (tiers.witches || []).find(t => t.witch_id === witch.witch_id) || null;
 const ws = (scores.witches || {})[witch.witch_id] || { overall_by_rank: {}, skills: {} };
+const dps = (dpsScores.scores || {})[witch.witch_id] || { overall: null, boss: null };
+const dpsMeta = dpsScores._meta || {};
 const scoreFor = sk => ((ws.skills || {})[`${witch.witch_id}_${sk.slot.toLowerCase()}`] || {}).by_rank || null;
 const sigTraits = (statOverrides || []).filter(o => o.witch_id === witch.witch_id && o.highlight === 'yes' && o.tooltip_note).map(o => o.tooltip_note);
 const baseStat = attr => { const e = (classBaseStats || []).find(x => x.class === witch.class && x.attribute_id === attr); return e ? e.base_value : null; };
@@ -103,10 +106,16 @@ const heroVideo = heroStem ? (['mp4','webm'].map(e => hasImg(`/img/hero/${heroSt
             ))}
           </div>
           <p class="rank-hint mono">Click stars to set rank · plus skills unlock as you promote</p>
-          <div class="dps-overall" data-overall={JSON.stringify(ws.overall_by_rank || {})}>
-            <span class="dps-label mono">Est. DPS score</span>
-            <span class="dps-val">{(ws.overall_by_rank || {})[String(baseStars)] ?? '—'}</span>
-            <span class="dps-note mono">provisional · damage only</span>
+          <div class="dps-scores">
+            <div class="dps-badge" data-tip="Overall power at max investment — best team versus a neutral target, with no boss-specific weakness, knockdown, or debuffs. A stable ranking that doesn't shift when the boss rotates.">
+              <span class="dps-label mono">Overall DPS</span>
+              <span class="dps-val">{dps.overall ?? '—'}</span>
+            </div>
+            <div class="dps-badge is-boss" data-tip="Performance versus the current Training Boss — includes its weakness, knockdown window, and stacking damage-reduction. Updates each rotation.">
+              <span class="dps-label mono">Training Boss</span>
+              <span class="dps-val">{dps.boss ?? '—'}</span>
+            </div>
+            <span class="dps-note mono">at max · best-team · hover for detail</span>
           </div>
           {defLine && <div class="def-line mono">{defLine}</div>}
       </aside>
@@ -219,12 +228,20 @@ const heroVideo = heroStem ? (['mp4','webm'].map(e => hasImg(`/img/hero/${heroSt
                radial-gradient(720px 340px at 15% -10%, color-mix(in srgb,var(--rc) 22%,transparent), transparent 70%)}
   .witch-layout{position:relative;z-index:1;display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:start;padding-top:24px;padding-bottom:56px}
   .rail{position:sticky;top:76px;align-self:start;display:flex;flex-direction:column;gap:12px}
-  .dps-overall{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 12px;
+  .dps-scores{display:flex;flex-direction:column;gap:7px}
+  .dps-badge{position:relative;display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 12px;
     background:linear-gradient(180deg,color-mix(in srgb,var(--ssr) 10%,var(--veil)),var(--veil));
-    border:1px solid color-mix(in srgb,var(--ssr) 34%,var(--line));border-radius:var(--r)}
-  .dps-overall .dps-label{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
-  .dps-overall .dps-val{font-size:1.8rem;font-weight:800;color:var(--ssr);line-height:1}
-  .dps-overall .dps-note{font-size:.56rem;color:var(--ink-faint);letter-spacing:.04em}
+    border:1px solid color-mix(in srgb,var(--ssr) 34%,var(--line));border-radius:var(--r);cursor:help}
+  .dps-badge.is-boss{background:linear-gradient(180deg,color-mix(in srgb,var(--physical) 12%,var(--veil)),var(--veil));
+    border-color:color-mix(in srgb,var(--physical) 34%,var(--line))}
+  .dps-badge .dps-label{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+  .dps-badge .dps-val{font-size:1.5rem;font-weight:800;color:var(--ssr);line-height:1}
+  .dps-badge.is-boss .dps-val{color:var(--physical)}
+  .dps-badge[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:0;top:calc(100% + 6px);z-index:20;
+    width:max(220px,100%);background:var(--nightshade);border:1px solid var(--line);border-radius:8px;
+    padding:8px 10px;font-size:.68rem;line-height:1.45;color:var(--ink-dim);letter-spacing:.01em;
+    box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .dps-scores .dps-note{font-size:.56rem;color:var(--ink-faint);letter-spacing:.04em;text-align:center}
   .def-line{font-size:.72rem;color:var(--ink-dim);background:var(--nightshade);border:1px solid var(--line);
     border-radius:8px;padding:6px 10px;text-align:center}
   .main{min-width:0}
@@ -342,8 +359,6 @@ const heroVideo = heroStem ? (['mp4','webm'].map(e => hasImg(`/img/hero/${heroSt
       exs.forEach(btn => btn.classList.toggle('on', rank >= +btn.dataset.pos));
       plusBlocks.forEach(pb => { const need = parseInt(pb.dataset.unlock) || 6; pb.classList.toggle('locked', rank < need); });
       evoBadges.forEach(b => { const need = parseInt(b.dataset.unlock) || 6; const on = rank >= need; b.classList.toggle('locked', !on); const box = b.closest('.skill-box'); if (box) box.classList.toggle('evolved', on); });
-      const dpsEl = document.querySelector('.dps-overall');
-      if (dpsEl) { const m = JSON.parse(dpsEl.dataset.overall || '{}'); const v = m[String(rank)]; const t = dpsEl.querySelector('.dps-val'); if (t) t.textContent = (v == null ? '—' : v); }
       let topBox = null, topVal = -1;
       document.querySelectorAll('.sk-score').forEach(sc => {
         const m = JSON.parse(sc.dataset.scores || '{}'); const v = m[String(rank)];

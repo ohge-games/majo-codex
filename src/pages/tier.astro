@@ -7,6 +7,8 @@ import skillScores from '../data/skill_scores.json';
 import tierSynergy from '../data/tier_synergy.json';
 import suggestedComps from '../data/suggested_comps.json';
 import fs from 'node:fs';
+import engine from '../data/solver_engine.json';
+import dpsScores from '../data/dps_scores.json';
 
 const base = import.meta.env.BASE_URL;
 const lc = s => (s ?? '').toLowerCase();
@@ -20,15 +22,16 @@ const dealersByType = t => witches.filter(w => w.damage_type === t)
   .sort((a, b) => (a.rarity === 'SSR' ? 0 : 1) - (b.rarity === 'SSR' ? 0 : 1) || a.name.localeCompare(b.name));
 const synById = Object.fromEntries((tierSynergy.witches || []).map(sy => [sy.witch_id, sy]));
 const HEALER_IDS = new Set((tierSynergy.witches || []).filter(sy => (sy.role_tags || []).includes('healer')).map(sy => sy.witch_id));
-const scoreOf = wid => { const ob = skillScores.witches?.[wid]?.overall_by_rank; return ob ? Math.max(...Object.values(ob)) : 0; };
 const TEAM_TAGS = new Set(['team-buff-aura','counter-enabler','charge-amp','extreme-battery','extreme-charger']);
-const rankedDealers = (weak) => {
-  const list = witches.filter(w => w.damage_type === weak).map(w => {
-    const sy = synById[w.witch_id] || {};
-    const wx = (sy.debuffs || []).includes('weakness-exploit');
-    const teamBuff = wx || (sy.role_tags || []).some(t => TEAM_TAGS.has(t));
-    return { w, score: scoreOf(w.witch_id), teamBuff, wx };
-  }).sort((a, b) => b.score - a.score);
+// Canonical Training-Boss score per unit from dps_scores.json (single source of truth, shared with detail cards).
+const rankedDealers = (bossId, weak) => {
+  const list = witches.filter(w => w.damage_type === weak && dpsScores.scores?.[w.witch_id])
+    .map(w => {
+      const sy = synById[w.witch_id] || {};
+      const wx = (sy.debuffs || []).includes('weakness-exploit');
+      const teamBuff = wx || (sy.role_tags || []).some(t => TEAM_TAGS.has(t));
+      return { w, score: dpsScores.scores[w.witch_id].boss, teamBuff, wx };
+    }).sort((a, b) => b.score - a.score);
   const max = Math.max(1, ...list.map(d => d.score));
   return list.map(d => ({ ...d, pct: Math.round(100 * d.score / max) }));
 };
@@ -143,9 +146,9 @@ const bossMedia = (b) => {
                 </>
               )}
               <span class="dl mono" style="margin-top:16px">{cap(b.weak)} dealers, ranked <span class="auto-note">(weak to {cap(b.weak)})</span></span>
-              <p class="rank-cap mono">By single-unit damage · team-law weighting in progress</p>
+              <p class="rank-cap mono">Best-team effective damage · all resonances maxed · <a class="rank-link" href={`${base}solver`}>tune for your roster →</a></p>
               <div class="drank">
-                {rankedDealers(b.weak).map((d, i) => (
+                {rankedDealers(b.id, b.weak).map((d, i) => (
                   <a class={`drow is-${d.w.rarity}`} href={`${base}witch/${d.w.witch_id.toLowerCase()}`}>
                     <span class="dr-rank mono">{i + 1}</span>
                     <span class="dr-main">
@@ -302,6 +305,7 @@ const bossMedia = (b) => {
   .dc-r{font-size:.6rem;color:var(--ink-faint)}
   .tower-empty .hint{color:var(--ink-faint);font-size:.78rem;margin-bottom:0}
   .rank-cap{font-size:.6rem;color:var(--ink-faint);letter-spacing:.04em;margin:-4px 0 10px}
+  .rank-link{color:var(--sigil);text-decoration:none}.rank-link:hover{text-decoration:underline}
   .drank{display:flex;flex-direction:column;gap:7px}
   .drow{display:grid;grid-template-columns:20px 1fr auto;align-items:center;gap:11px;text-decoration:none;
     background:var(--nightshade);border:1px solid var(--line);border-radius:9px;padding:9px 12px}

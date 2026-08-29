@@ -133,6 +133,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
   <script type="application/json" id="sv-data" set:html={JSON.stringify(payload)}></script>
 
   <script>
+    import { createModel } from '../lib/boss_model.mjs';
     const DATA = JSON.parse(document.getElementById('sv-data').textContent);
     const { W, carries, fillers, MAX_STATS, UI, BOSSES, RES } = DATA;
     const CARRY = new Set(carries), FILLERS = fillers;
@@ -161,183 +162,13 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     const owned = () => Object.keys(S.units).filter(id => CARRY.has(id));
     const teamPool = () => [...owned(), ...FILLERS];
 
-    // ---------- rank-aware timeline ----------
-    const T = 180;
-    function timeline(id) {
-      const w = byId(id), st = statsFor(id), R = st.rank ?? w.maxrank;
-      const kn = st.atk * (1 + st.cr * st.cd) * (1 + st.ed);
-      const ke = st.atk * (1 + 1.0 * st.cd) * (1 + st.ed);
-      let ext = [], rest = [], normal = null;
-      for (const s of w.skills) {
-        if (!s.score || R < s.req) continue;
-        const [A, B] = (s.plus_star && R >= s.plus_star) ? s.plus : s.base;
-        const L = clamp((st.lv && st.lv[s.slot]) || lvCap(w, R), 1, lvCap(w, R));
-        const csum = (A + B * (L - 1)) / 100;
-        if (csum <= 0) continue;
-        const D = (s.exec ? ke : kn) * csum, n = T / s.cad;
-        if (s.slot === 'normal') normal = [D, s.anim];
-        else if (s.slot === 'extreme') ext.push([D, s.anim, n, s.exec]);
-        else rest.push([D, s.anim, n, s.exec]);
-      }
-      const eo = ext.reduce((a, x) => a + x[2] * x[1], 0);
-      let extDmg = 0, execDmg = 0;
-      for (const [D, an, n, e] of ext) { extDmg += n * D; if (e) execDmg += n * D; }
-      const R1 = Math.max(0, T - eo), rd = rest.reduce((a, x) => a + x[2] * x[1], 0);
-      const sc = rd ? Math.min(1, R1 / rd) : 1, restOcc = Math.min(rd, R1);
-      let restDmg = 0;
-      for (const [D, an, n, e] of rest) { const c = n * sc * D; restDmg += c; if (e) execDmg += c; }
-      const left = Math.max(0, T - eo - restOcc);
-      const nDmg = normal ? left / normal[1] * normal[0] : 0;
-      const amp = w.amp || 1;
-      const extA = extDmg*amp, nA = nDmg*amp, exA = execDmg*amp;
-      const pre = (extDmg + restDmg + nDmg) * amp || 1;
-      const shares = { extreme: extA/pre, normal: nA/pre, exec: exA/pre };
-      let total = (extDmg + restDmg + nDmg) * amp;
-      const sb = w.selfbuff;                                        // caster's own damage buffs (speed/crit)
-      if (sb && total) {
-        const up = sb.uptime;
-        if (sb.speed) total += nA * sb.speed * up;                  // faster normals
-        if (sb.crit) { const cm = (1 + (st.cr + sb.crit) * st.cd) / (1 + st.cr * st.cd); total += (pre - exA) * up * (cm - 1); }
-      }
-      return { total, ...shares };
-    }
-    const critMul = (st, add) => (1 + (st.cr + add) * st.cd) / (1 + st.cr * st.cd);
-
-    // ---------- interference: same-class off-field supports fold into the carry ----------
-    const INTF_KEYS = ['cr','cd','crEx','atk','spd','ex','nrm','glob','mental','physweak'];
-    function combineIntf(providerIds) {
-      const d = Object.fromEntries(INTF_KEYS.map(k => [k, 0]));
-      for (const pid of providerIds) { const I = byId(pid).intf || {};
-        for (const k of INTF_KEYS) d[k] += I[k] || 0; }
-      return d;
-    }
-    function intfMult(carry, st, base, boss, d) {
-      const cw = byId(carry); let m = 1;
-      if (d.atk)  m *= 1 + d.atk / 100;                                              // ATK scales all
-      if (d.cr)   m *= 1 + (1 - base.exec) * (critMul(st, d.cr / 100) - 1);          // crit rate (not exec)
-      if (d.crEx) m *= 1 + base.extreme * (critMul(st, d.crEx / 100) - 1);           // extreme-only crit rate
-      if (d.cd) { const cd2 = st.cd + d.cd / 100;
-        const nonEx = (1 + st.cr * cd2) / (1 + st.cr * st.cd), exF = (1 + cd2) / (1 + st.cd);
-        m *= (1 - base.exec) * nonEx + base.exec * exF; }                            // crit dmg (both buckets)
-      if (d.spd)  m *= 1 + base.normal * (d.spd / 100);                              // atk speed -> normals
-      if (d.ex)   m *= 1 + base.extreme * (d.ex / 100);                              // extreme-dmg
-      if (d.nrm)  m *= 1 + base.normal * (d.nrm / 100);                              // normal-dmg
-      let glob = d.glob;
-      if (d.mental && cw.el === 'mental') glob += d.mental;                          // typed, only if it applies
-      if (d.physweak && boss.weak === 'physical' && cw.el === 'physical') glob += d.physweak * 0.6;
-      if (glob) m *= 1 + glob / 100;
-      return m;
-    }
-    // avg-stack fraction for stacking 4x resonances (10-stack ramps hot, 3-stack ramps cold)
-    const EFF10 = 7, EFF3 = 1.5;   // effective stacks out of max (10 / 3)
-    const L = (k, lvl) => RES[k][lvl - 1] / 100;   // ladder value at law level
-    function lawMult(carry, team, boss, base) {
-      const cw = byId(carry), st = statsFor(carry), why = [];
-      const ex = base.exec, cls = {}, el = {};
-      for (const t of team) { const w = byId(t); cls[w.cls] = (cls[w.cls]||0)+1; el[w.el] = (el[w.el]||0)+1; }
-      let mult = 1;
-
-      // 2x Arcanist -> crit rate (team-wide; applies to carry's non-exec damage)
-      if ((cls.Arcanist||0) >= 2 && S.laws.arc > 0) {
-        const m = 1 + (1-ex) * (critMul(st, L('arc', S.laws.arc)) - 1);
-        mult *= m; why.push(`2\u00d7 Arcanist crit \u2192 \u00d7${m.toFixed(2)}`);
-      }
-      // 2x Vanguard -> attack speed (applies to normals)
-      if ((cls.Vanguard||0) >= 2 && S.laws.van > 0) {
-        const m = 1 + base.normal * L('van', S.laws.van);
-        mult *= m; why.push(`2\u00d7 Vanguard speed \u2192 \u00d7${m.toFixed(2)}`);
-      }
-      // 2x Mental -> +damage vs knocked-down targets (only while target is down)
-      if ((el.mental||0) >= 2 && S.laws.men2 > 0 && boss.kd > 0) {
-        const m = 1 + L('men2', S.laws.men2) * boss.kd;
-        mult *= m; why.push(`2\u00d7 Mental KD-dmg \u2192 \u00d7${m.toFixed(2)}`);
-      }
-      // 4x element -> stacking TYPED damage (physical/counter, magic/extreme, mental/execution)
-      if ((el[cw.el]||0) === 4) {
-        let td = 0, trig = '';
-        if (cw.el === 'physical' && S.laws.phy4 > 0) { td = L('phy4', S.laws.phy4) * EFF10; trig = 'counter'; }
-        if (cw.el === 'magic'    && S.laws.mag4 > 0) { td = L('mag4', S.laws.mag4) * EFF10; trig = 'extreme'; }
-        if (cw.el === 'mental'   && S.laws.men4 > 0) { td = L('men4', S.laws.men4) * EFF3;  trig = 'execution'; }
-        if (td > 0) { const m = 1 + td; mult *= m; why.push(`4\u00d7 ${CAP(cw.el)} dmg (${trig}) \u2192 \u00d7${m.toFixed(2)}`); }
-      }
-      // Extreme charge -> more Extremes. Sources: S/A/V combo (+20%), 2x Magic (ladder), +120 start.
-      let cf = 0;
-      if (S.laws.charge && cls.Supporter && cls.Arcanist && cls.Vanguard) cf += 0.20;
-      if ((el.magic||0) >= 2 && S.laws.mag2 > 0) cf += L('mag2', S.laws.mag2);
-      if (cf > 0 || S.laws.start120) {
-        const rate = 10*(1+cf), start = S.laws.start120 ? 120 : 0, freq = (start + rate*180)/1800;
-        const m = 1 + base.extreme*(freq-1);
-        if (m > 1.001) { mult *= m; why.push(`charge \u2192 \u00d7${m.toFixed(2)}`); }
-      }
-      // Peseshet team-presence Extreme buff (measured, separate from resonances)
-      if (team.includes('W005')) { const m = 1 + base.extreme*0.15; if (m>1.001){ mult *= m; why.push(`Peseshet +Extreme dmg \u2192 \u00d7${m.toFixed(2)}`); } }
-      // boss knockdown guaranteed-crit window
-      if (boss.kd > 0) {
-        const kd = (1 + 1.0*st.cd)/(1 + st.cr*st.cd), blend = (1-boss.kd) + boss.kd*kd, m = 1 + (1-ex)*(blend-1);
-        if (m > 1.001) { mult *= m; why.push(`knockdown guaranteed-crit \u2192 \u00d7${m.toFixed(2)}`); }
-      }
-      // Note: 2x Physical (block/dodge rate), 2x Supporter (healing) and the S/A/V/S stagger law
-      // are survivability/enabler resonances \u2014 tracked as toggles but not direct carry-DPS multipliers.
-      return { mult, why };
-    }
-    const hasHealer = team => team.some(t => byId(t).cls === 'Supporter');
     let _t; const scheduleSolve = () => { clearTimeout(_t); _t = setTimeout(solve, 90); };
-
-    // ---------- Venomfrill damage-reduction: team-wide stacks from extreme hits ----------
-    // Each extreme HIT applies a stack (flat -6% ALL damage, 20s, cap by boss). A unit re-applies
-    // every P = echarge/chargeRate sec, so its time-avg contribution is ehits*(20/P). Sum, cap.
-    function chargeRate(cls, el) {
-      let cf = 0;
-      if (S.laws.charge && cls.Supporter && cls.Arcanist && cls.Vanguard) cf += 0.20;
-      if ((el.magic||0) >= 2 && S.laws.mag2 > 0) cf += RES.mag2[S.laws.mag2-1]/100;
-      return 10 * (1 + cf);
-    }
-    function teamStacks(team, boss) {
-      if (!boss.stackCap) return 0;
-      const cls = {}, el = {};
-      for (const t of team) { const w = byId(t); cls[w.cls]=(cls[w.cls]||0)+1; el[w.el]=(el[w.el]||0)+1; }
-      const rate = chargeRate(cls, el);
-      let s = 0;
-      for (const t of team) { const w = byId(t); if (w.estacks > 0 && w.echarge > 0) s += w.estacks * 20 * rate / w.echarge; }
-      return Math.min(boss.stackCap, s);
-    }
+    const modelWitches = () => Object.fromEntries(W.map(w => [w.id, w]));
     function solve() {
       const own = owned(), boss = BOSSES.find(b => b.id === S.boss);
       if (!own.length) { renderEmpty(); return; }
-      const ids = teamPool(), bases = new Map(ids.map(id => [id, timeline(id)])), rows = [];
-      for (const carry of own) {
-        const cw = byId(carry), st = statsFor(carry), weak = cw.el === boss.weak ? 1 : 0.75;
-        const base = bases.get(carry);
-        // interference candidates = owned same-class carries; marginal mult is team-independent
-        const prov = own.filter(id => id !== carry && byId(id).cls === cw.cls)
-          .map(pid => ({ pid, m: intfMult(carry, st, base, boss, combineIntf([pid])),
-                         label: byId(pid).intf?.label || byId(pid).name }))
-          .sort((a, b) => b.m - a.m);
-        let best = null;
-        for (let i = 0; i < ids.length; i++) { if (ids[i] === carry) continue;
-          for (let j = i+1; j < ids.length; j++) { if (ids[j] === carry) continue;
-            for (let k = j+1; k < ids.length; k++) { if (ids[k] === carry) continue;
-              const team = [carry, ids[i], ids[j], ids[k]];
-              if (!hasHealer(team)) continue;
-              const { mult, why } = lawMult(carry, team, boss, base);
-              // best 2 same-class providers NOT sitting as cores on this team
-              const avail = prov.filter(p => !team.includes(p.pid)).slice(0, 2);
-              let iMult = 1, iWhy = null;
-              if (avail.length) {
-                iMult = intfMult(carry, st, base, boss, combineIntf(avail.map(p => p.pid)));
-                if (iMult > 1.001) iWhy = `interference: ${avail.map(p => p.label).join(' + ')} \u2192 \u00d7${iMult.toFixed(2)}`;
-              }
-              // team-wide damage reduction from Venomfrill's extreme-hit stacks
-              const stk = teamStacks(team, boss), redux = 1 - 0.06 * stk;
-              let sWhy = null;
-              if (stk > 0.05) sWhy = `boss dmg-reduction: ~${stk.toFixed(1)} stacks \u2192 \u00d7${redux.toFixed(2)}`;
-              const eff = base.total * weak * mult * iMult * redux;
-              const allWhy = [...why]; if (iWhy) allWhy.push(iWhy); if (sWhy) allWhy.push(sWhy);
-              if (!best || eff > best.eff) best = { eff, team, why: allWhy, weak };
-            } } }
-        if (best) rows.push({ carry, ...best });
-      }
-      rows.sort((a, b) => b.eff - a.eff);
+      const model = createModel(modelWitches(), { units: S.units });
+      const rows = model.board({ boss, laws: S.laws, carriesToRank: own, pool: teamPool() });
       render(rows, boss);
     }
 
