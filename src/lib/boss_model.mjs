@@ -208,7 +208,7 @@ export function createModel(witches, opts = {}) {
     for (const carry of carriesToRank) {
       const cw = byId(carry), st = statsFor(carry), weak = cw.el === boss.weak ? 1 : 0.75;
       const base = bases.get(carry) || timeline(carry);
-      const prov = Object.keys(witches).filter(id => id !== carry && byId(id).cls === cw.cls)
+      const prov = pool.filter(id => id !== carry && byId(id).cls === cw.cls)
         .map(pid => ({ pid, m: intfMult(carry, st, base, boss, combineIntf([pid])), label: byId(pid).intf?.label || pid }))
         .sort((a, b) => b.m - a.m);
       let best = null;

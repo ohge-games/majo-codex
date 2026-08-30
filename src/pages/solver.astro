@@ -91,6 +91,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
           <span class="eyebrow">Recommended teams</span>
           <span id="resNote" class="mono note"></span>
         </div>
+        <button id="genBtn" class="btn gen" type="button">Generate my top teams</button>
         <div id="board" class="board"></div>
       </div>
     </div>
@@ -163,11 +164,13 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     const owned = () => Object.keys(S.units).filter(id => CARRY.has(id));
     const teamPool = () => [...owned(), ...FILLERS];
 
-    let _t; const scheduleSolve = () => { clearTimeout(_t); _t = setTimeout(solve, 90); };
+    const markStale = () => { if (generated) { const n = $('resNote'); if (n) n.textContent = 'Pool changed \u2014 click Generate to update'; } };
     const modelWitches = () => Object.fromEntries(W.map(w => [w.id, w]));
+    let generated = false;
     function solve() {
       const own = owned(), boss = BOSSES.find(b => b.id === S.boss);
-      if (!own.length) { renderEmpty(); return; }
+      if (!own.length) { generated = false; renderEmpty(); return; }
+      generated = true;
       const model = createModel(modelWitches(), { units: S.units });
       const rows = model.board({ boss, laws: S.laws, carriesToRank: own, pool: teamPool() });
       render(rows, boss);
@@ -182,7 +185,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       for (const t of team) {
         if (t === carry) continue;
         const w = byId(t);
-        const cands = W.filter(u => u.cls === w.cls && !team.includes(u.id) && !used.has(u.id)).map(u => u.id).slice(0, 2);
+        const cands = teamPool().filter(id => byId(id).cls === w.cls && !team.includes(id) && !used.has(id)).slice(0, 2);
         cands.forEach(id => used.add(id));
         map[t] = cands;
       }
@@ -206,7 +209,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     }
     function renderEmpty() {
       $('resNote').textContent = '';
-      $('board').innerHTML = `<div class="empty"><p>No carries yet.</p><p class="mono">Add an Arcanist or Vanguard to see the teams that rank best for your account.</p></div>`;
+      $('board').innerHTML = `<div class="empty"><p>Add every Arcanist and Vanguard you own.</p><p class="mono">Then hit <b>Generate my top teams</b> \u2014 the solver only builds from the carries in your pool, so add them all first for accurate rankings.</p></div>`;
     }
     function render(rows, boss) {
       const top = rows[0]?.eff || 1;
@@ -224,8 +227,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
         const lead = (weakLine ? [weakLine] : []).concat(carryLine).map(x => `<li>${x}</li>`).join('');
         return `<article class="team${i === 0 ? ' top' : ''}">
           <div class="team-head"><span class="team-rank mono">#${i + 1}</span>
-            <span class="team-lead display">${cw.name}</span>
-            <span class="c-tag ${elC(cw.el)} mono">${CAP(cw.el)} ${cw.cls}</span>
+            <span class="team-lead display">${cw.name} Carry Team</span>
             ${r.weak < 1 ? '<span class="offweak mono">off-weakness \u00d7.75</span>' : ''}
             <span class="team-score"><b>${pct}</b><i class="s-bar"><i style="width:${pct}%"></i></i></span></div>
           <div class="team-view">${cards}</div>
@@ -265,9 +267,9 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
         return `<div class="respill${lvl>0?' on':''}" title="${r.desc} (\u2013 = off)"><span class="ric">${iconFor(r.icon[0], r.icon[1])}</span><span class="rtag mono">${r.tag}</span><span class="rlv">${off}${pips}</span></div>`;
       }).join('');
       $('resbar').innerHTML = togs + pills;
-      $('resbar').querySelectorAll('[data-tog]').forEach(b => b.addEventListener('click', () => { S.laws[b.dataset.tog] = !S.laws[b.dataset.tog]; save(); renderResbar(); solve(); }));
+      $('resbar').querySelectorAll('[data-tog]').forEach(b => b.addEventListener('click', () => { S.laws[b.dataset.tog] = !S.laws[b.dataset.tog]; save(); renderResbar(); if (generated) solve(); }));
       $('resbar').querySelectorAll('.lvb').forEach(p => p.addEventListener('click', () => {
-        const k = p.dataset.res, n = +p.dataset.lv; S.laws[k] = (S.laws[k] === n) ? 0 : n; save(); renderResbar(); solve();
+        const k = p.dataset.res, n = +p.dataset.lv; S.laws[k] = (S.laws[k] === n) ? 0 : n; save(); renderResbar(); if (generated) solve();
       }));
     }
 
@@ -382,17 +384,18 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       $('boss').value = S.boss;
     }
     function wire() {
-      $('boss').addEventListener('change', e => { S.boss = e.target.value; save(); solve(); });
-      $('reset').addEventListener('click', () => { if (confirm('Remove all carries?')) { S.units = {}; save(); renderPool(); solve(); } });
+      $('boss').addEventListener('change', e => { S.boss = e.target.value; save(); if (generated) solve(); });
+      $('genBtn').addEventListener('click', solve);
+      $('reset').addEventListener('click', () => { if (confirm('Remove all carries?')) { S.units = {}; save(); renderPool(); generated = false; renderEmpty(); } });
       $('share').addEventListener('click', () => {
         const url = location.origin + location.pathname + '#' + btoa(encodeURIComponent(JSON.stringify(S)));
         navigator.clipboard.writeText(url).then(() => { const b=$('share'),t=b.textContent; b.textContent='Copied \u2713'; setTimeout(()=>b.textContent=t,1400); });
       });
-      $('mSave').addEventListener('click', () => { const { id, unit } = readModal(); S.units[id] = unit; save(); closeModal(); renderPool(); solve(); });
+      $('mSave').addEventListener('click', () => { const { id, unit } = readModal(); S.units[id] = unit; save(); closeModal(); renderPool(); markStale(); });
       $('mCancel').addEventListener('click', closeModal);
       $('modalX').addEventListener('click', closeModal);
       $('modalBack').addEventListener('click', closeModal);
-      $('mRemove').addEventListener('click', () => { if (editing) { delete S.units[editing]; save(); closeModal(); renderPool(); solve(); } });
+      $('mRemove').addEventListener('click', () => { if (editing) { delete S.units[editing]; save(); closeModal(); renderPool(); markStale(); } });
       $('mWitch').addEventListener('change', () => { const nid = $('mWitch').value; loadModal(nid, defUnit(byId(nid))); });
     }
     function save() { try { localStorage.setItem('majo-solver-v4', JSON.stringify(S)); } catch {} }
@@ -403,7 +406,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       } catch { return null; }
     }
 
-    fillSelects(); renderResbar(); wire(); renderPool(); solve();
+    fillSelects(); renderResbar(); wire(); renderPool(); renderEmpty();
   </script>
 
   <style is:global>
@@ -473,7 +476,11 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     #svapp .btn.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
     #svapp .btn.danger:hover{color:var(--physical);border-color:var(--physical)}
 
-    #svapp .res-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+    #svapp .res-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+    #svapp .btn.gen{width:100%;margin:0 0 14px;padding:12px;font-size:.9rem;font-weight:600;letter-spacing:.02em;
+      background:linear-gradient(90deg,color-mix(in srgb,var(--sigil) 30%,var(--veil)),color-mix(in srgb,var(--ssr) 22%,var(--veil)));
+      border:1px solid color-mix(in srgb,var(--sigil) 50%,var(--line));color:var(--ink);border-radius:var(--r);cursor:pointer}
+    #svapp .btn.gen:hover{border-color:var(--ssr);background:linear-gradient(90deg,color-mix(in srgb,var(--sigil) 40%,var(--veil)),color-mix(in srgb,var(--ssr) 32%,var(--veil)))}
     #svapp .res-head .note{color:var(--ink-faint);font-size:.72rem}
     #svapp .board{display:flex;flex-direction:column;gap:16px}
     #svapp .empty{border:1px dashed var(--line);border-radius:var(--r);padding:40px 24px;text-align:center;color:var(--ink-dim)}
