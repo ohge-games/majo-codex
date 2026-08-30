@@ -128,46 +128,47 @@ export function createModel(witches, opts = {}) {
   }
   function lawMult(carry, team, boss, base, laws) {
     const cw = byId(carry), st = statsFor(carry), why = [];
+    const nm = cw.name || 'the carry';
     const ex = base.exec, cls = {}, el = {};
     const kdFrac = deriveKd(team, boss);   // team-stagger-derived knockdown fraction
+    const P = m => (m >= 1 ? '+' : '\u2212') + Math.round(Math.abs(m - 1) * 100) + '%';
     for (const t of team) { const w = byId(t); cls[w.cls] = (cls[w.cls] || 0) + 1; el[w.el] = (el[w.el] || 0) + 1; }
     let mult = 1;
     if ((cls.Arcanist || 0) >= 2 && laws.arc > 0) {
       const m = 1 + (1 - ex) * (critMul(st, L('arc', laws.arc)) - 1);
-      mult *= m; why.push(`2\u00d7 Arcanist crit \u2192 \u00d7${m.toFixed(2)}`);
+      mult *= m; why.push(`Two Arcanists share the crit-rate resonance (${P(m)} damage).`);
     }
     if ((cls.Vanguard || 0) >= 2 && laws.van > 0) {
       const m = 1 + base.normal * L('van', laws.van);
-      mult *= m; why.push(`2\u00d7 Vanguard speed \u2192 \u00d7${m.toFixed(2)}`);
+      mult *= m; why.push(`Two Vanguards add team attack speed (${P(m)}).`);
     }
     if ((el.mental || 0) >= 2 && laws.men2 > 0 && kdFrac > 0) {
       const m = 1 + L('men2', laws.men2) * kdFrac;
-      mult *= m; why.push(`2\u00d7 Mental KD-dmg \u2192 \u00d7${m.toFixed(2)}`);
+      mult *= m; why.push(`The Mental resonance boosts damage while the boss is knocked down (${P(m)}).`);
     }
     if ((el[cw.el] || 0) === 4) {
-      let td = 0, trig = '';
-      if (cw.el === 'physical' && laws.phy4 > 0) { td = L('phy4', laws.phy4) * EFF10; trig = 'counter'; }
-      if (cw.el === 'magic' && laws.mag4 > 0) { td = L('mag4', laws.mag4) * EFF10; trig = 'extreme'; }
-      if (cw.el === 'mental' && laws.men4 > 0) { td = L('men4', laws.men4) * EFF3; trig = 'execution'; }
-      if (td > 0) { const m = 1 + td; mult *= m; why.push(`4\u00d7 ${cap(cw.el)} dmg (${trig}) \u2192 \u00d7${m.toFixed(2)}`); }
+      let td = 0, trig = '', held = '';
+      if (cw.el === 'physical' && laws.phy4 > 0) { td = L('phy4', laws.phy4) * EFF10; trig = 'counters'; held = '~7 of 10'; }
+      if (cw.el === 'magic' && laws.mag4 > 0) { td = L('mag4', laws.mag4) * EFF10; trig = 'Extremes'; held = '~7 of 10'; }
+      if (cw.el === 'mental' && laws.men4 > 0) { td = L('men4', laws.men4) * EFF3; trig = 'executions'; held = '~2 of 3'; }
+      if (td > 0) { const m = 1 + td; mult *= m;
+        why.push(`All four units are ${cap(cw.el)}: modeling the full fight, the 4-${cap(cw.el)} resonance holds ${held} stacks (built on ${trig}), adding ${P(m)} ${cw.el} damage.`); }
     }
     // 2x Physical law is OFFENSIVE for dodge-counter carries: +dodge -> more of the carry's OWN counters (self-boost)
     if (cw.dodgeCounter && (el.physical || 0) >= 2 && laws.phy2 > 0) {
-      const m = 1 + L('phy2', laws.phy2) / 3;   // ~1/3 dodge->dmg; Yun's +15% was mostly his damage, not this
-      mult *= m; why.push(`2\u00d7 Physical self-dodge \u2192 \u00d7${m.toFixed(2)}`);
+      const m = 1 + L('phy2', laws.phy2) / 3;
+      mult *= m; why.push(`The 2-Physical dodge bonus lets ${nm} dodge and counter more often (${P(m)}).`);
     }
-    // Yuhong/Alice passive: ally DODGES grant crit (+4%/stack, max 10). Fed by teammates' real dodge rates —
-    // dodgePot = (dodgeVal/100)/dodgeCd (validated stats), scaled by exposure. Blockers (dodgeVal 0) feed nothing.
-    // Magnitude K is still an estimate pending a clean Alice+carry measurement.
+    // Yuhong/Alice passive: ally dodges feed crit. Fed by teammates' real dodge rates (blockers feed nothing).
     if (cw.dodgeCounter) {
       const aoe = boss.aoe || 0; let feed = 0;
       for (const t of team) { if (t === carry) continue; const w = byId(t);
         const dodgePot = (w.dodgeVal || 0) / 100 / (w.dodgeCd || 4);
         const exposure = aoe + (1 - aoe) * (w.engage ?? 0.5);
         feed += dodgePot * exposure; }
-      const stacks = Math.min(10, 3 * feed);    // K=3: single-dodger feed measured small (Zhijie test); revisit with multi-dodger data
+      const stacks = Math.min(10, 3 * feed);
       if (stacks > 0.2) { const m = 1 + (1 - ex) * (critMul(st, stacks * 0.04) - 1);
-        mult *= m; why.push(`passive: ally dodges (~${stacks.toFixed(1)} stk crit) \u2192 \u00d7${m.toFixed(2)}`); }
+        mult *= m; why.push(`Dodging teammates feed ${nm}'s crit passive (~${stacks.toFixed(1)} of 10 stacks, ${P(m)}).`); }
     }
     let cf = 0;
     if (laws.charge && cls.Supporter && cls.Arcanist && cls.Vanguard) cf += 0.20;
@@ -175,12 +176,12 @@ export function createModel(witches, opts = {}) {
     if (cf > 0 || laws.start120) {
       const rate = 10 * (1 + cf), start = laws.start120 ? 120 : 0, freq = (start + rate * 180) / 1800;
       const m = 1 + base.extreme * (freq - 1);
-      if (m > 1.001) { mult *= m; why.push(`charge \u2192 \u00d7${m.toFixed(2)}`); }
+      if (m > 1.001) { mult *= m; why.push(`Faster Extreme charge lets ${nm} fire her Extreme more often (${P(m)}).`); }
     }
-    if (team.includes('W005')) { const m = 1 + base.extreme * 0.15; if (m > 1.001) { mult *= m; why.push(`Peseshet +Extreme dmg \u2192 \u00d7${m.toFixed(2)}`); } }
+    if (team.includes('W005')) { const m = 1 + base.extreme * 0.15; if (m > 1.001) { mult *= m; why.push(`Peseshet's team Extreme-damage buff adds ${P(m)}.`); } }
     if (kdFrac > 0) {
       const kd = (1 + 1.0 * st.cd) / (1 + st.cr * st.cd), blend = (1 - kdFrac) + kdFrac * kd, m = 1 + (1 - ex) * (blend - 1);
-      if (m > 1.001) { mult *= m; why.push(`knockdown guaranteed-crit \u2192 \u00d7${m.toFixed(2)}`); }
+      if (m > 1.001) { mult *= m; why.push(`This team staggers the boss down ~${Math.round(kdFrac * 100)}% of the fight; guaranteed crits in that window add ${P(m)}.`); }
     }
     return { mult, why };
   }
@@ -221,11 +222,11 @@ export function createModel(witches, opts = {}) {
             let iMult = 1, iWhy = null;
             if (avail.length) {
               iMult = intfMult(carry, st, base, boss, combineIntf(avail.map(p => p.pid)));
-              if (iMult > 1.001) iWhy = `interference: ${avail.map(p => p.label).join(' + ')} \u2192 \u00d7${iMult.toFixed(2)}`;
+              if (iMult > 1.001) iWhy = `The two off-field ${cw.cls} interference units add +${Math.round((iMult - 1) * 100)}% to ${cw.name || 'the carry'}.`;
             }
             const stk = teamStacks(team, boss, laws), redux = 1 - 0.06 * stk;
             let sWhy = null;
-            if (stk > 0.05) sWhy = `boss dmg-reduction: ~${stk.toFixed(1)} stacks \u2192 \u00d7${redux.toFixed(2)}`;
+            if (stk > 0.05) sWhy = `Firing Extremes raises the boss's stacking damage-reduction to ~${stk.toFixed(1)} of ${boss.stackCap} stacks here (\u2212${Math.round((1 - redux) * 100)}%); a cleaner rotation would keep it lower.`;
             const eff = base.total * weak * mult * iMult * redux;
             const allWhy = [...why]; if (iWhy) allWhy.push(iWhy); if (sWhy) allWhy.push(sWhy);
             if (!best || eff > best.eff) best = { eff, team, why: allWhy, weak, stk, intf: avail.map(p => p.pid) };

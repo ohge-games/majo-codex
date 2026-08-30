@@ -198,8 +198,6 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
           <span class="uc-corner" title="${w.cls}">${iconFor('cclass', w.cls.toLowerCase())}</span>
           ${isCarry ? '<span class="uc-lead mono">CARRY</span>' : ''}
           ${port}
-          <div class="uc-foot"><div class="uc-stars">${starStr(w)}</div>
-            <div class="uc-atk mono">ATK: ${CAP(w.el)} ${iconFor('type', w.el)}</div></div>
         </div>
         <div class="intf-tiles">${tiles}</div>
         <div class="uc-name mono">${w.name}</div>
@@ -219,6 +217,10 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
         const cards = order.map(id => unitCard(id, id === r.carry, intfMap[id] || [])).join('');
         const why = r.why.map(x => `<li>${x}</li>`).join('');
         const pct = Math.round(r.eff / top * 100);
+        const weakLine = (r.weak === 1 && boss.weak && boss.weak !== 'none')
+          ? `Every unit is ${CAP(boss.weak)}, matching ${boss.name}'s weakness \u2014 they deal full damage where off-element units would lose about 25%.` : null;
+        const carryLine = `${cw.name} is this team's damage core, scoring ${pct}/100 against your strongest team. The other three raise her output through resonances, interference, and survivability rather than dealing the damage themselves.`;
+        const lead = (weakLine ? [weakLine] : []).concat(carryLine).map(x => `<li>${x}</li>`).join('');
         return `<article class="team${i === 0 ? ' top' : ''}">
           <div class="team-head"><span class="team-rank mono">#${i + 1}</span>
             <span class="team-lead display">${cw.name}</span>
@@ -226,8 +228,8 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
             ${r.weak < 1 ? '<span class="offweak mono">off-weakness \u00d7.75</span>' : ''}
             <span class="team-score"><b>${pct}</b><i class="s-bar"><i style="width:${pct}%"></i></i></span></div>
           <div class="team-view">${cards}</div>
-          <details class="why-team"><summary class="mono">Why this team? \u2014 breakdown</summary>
-            <ul class="why-list mono">${why}<li class="why-foot">Interference beneath the carry is scored; the other columns show suggested same-class fills.</li></ul>
+          <details class="why-team"><summary class="mono">Why this team?</summary>
+            <ul class="why-list">${lead}${why}<li class="why-foot">Only the carry's interference is scored; the other columns show suggested same-class fills.</li></ul>
           </details></article>`;
       }).join('');
     }
@@ -512,10 +514,11 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     #svapp .why-team{margin-top:11px;border-top:1px solid var(--line);padding-top:9px}
     #svapp .why-team summary{cursor:pointer;color:var(--sigil);font-size:.72rem;letter-spacing:.03em;list-style:none}
     #svapp .why-team summary::-webkit-details-marker{display:none}
-    #svapp .why-team summary::before{content:"\u25b8 ";font-size:.65rem}
-    #svapp .why-team[open] summary::before{content:"\u25be "}
-    #svapp .why-list{list-style:none;margin:9px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:5px 14px}
-    #svapp .why-list li{color:var(--ink-faint);font-size:.68rem}
+    #svapp .why-team summary::before{content:"▸  ";font-size:.6rem;color:var(--ink-faint)}
+    #svapp .why-team[open] summary::before{content:"▾  ";color:var(--ink-faint)}
+    #svapp .why-list{list-style:none;margin:9px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-width:70ch}
+    #svapp .why-list li{color:var(--ink-dim);font-size:.74rem;line-height:1.5;padding-left:13px;position:relative}
+    #svapp .why-list li::before{content:"•";position:absolute;left:0;color:var(--sigil)}
     #svapp .why-list .why-foot{flex-basis:100%;color:var(--ink-dim);font-style:italic;margin-top:3px}
     @media(max-width:640px){#svapp .team-view{grid-template-columns:repeat(2,1fr)}}
 
