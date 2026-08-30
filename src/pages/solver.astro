@@ -60,9 +60,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     <header class="sv-head">
       <span class="eyebrow">Astrolabe Solver</span>
       <h1 class="display">Rank teams for <em>your</em> account</h1>
-      <p class="sub">Add the Arcanists and Vanguards you've invested in — their stats, star rank, and skill levels.
-        Supporters and Defenders fill the healer and utility slots at max, so you only track your carries. The board
-        re-ranks live and everything is saved to this browser.</p>
+      <p class="sub">Add <b>all</b> of your current Arcanists and Vanguards — each with its stats, star rank, and skill levels. Then hit <b>Generate My Boss Team</b>. The solver only builds from the carries in your pool, and everything is saved to this browser.</p>
     </header>
 
     <div class="lawbar panel">
@@ -91,7 +89,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
           <span class="eyebrow">Recommended teams</span>
           <span id="resNote" class="mono note"></span>
         </div>
-        <button id="genBtn" class="btn gen" type="button">Generate my top teams</button>
+        <button id="genBtn" class="btn gen" type="button">Generate My Boss Team</button>
         <div id="board" class="board"></div>
       </div>
     </div>
@@ -213,8 +211,10 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     }
     function render(rows, boss) {
       const top = rows[0]?.eff || 1;
-      $('resNote').textContent = `vs ${boss.name} \u00b7 relative to top`;
-      $('board').innerHTML = rows.map((r, i) => {
+      const shown = rows.filter(r => r.eff / top >= 0.95);   // top team, plus any within 5%
+      const hidden = rows[shown.length];                     // best team not shown
+      $('resNote').textContent = `vs ${boss.name}`;
+      const teamsHtml = shown.map((r, i) => {
         const cw = byId(r.carry);
         const order = [r.carry, ...r.team.filter(t => t !== r.carry)];
         const intfMap = assignIntf(r.team, r.carry, r.intf);
@@ -223,7 +223,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
         const pct = Math.round(r.eff / top * 100);
         const weakLine = (r.weak === 1 && boss.weak && boss.weak !== 'none')
           ? `Every unit is ${CAP(boss.weak)}, matching ${boss.name}'s weakness \u2014 they deal full damage where off-element units would lose about 25%.` : null;
-        const carryLine = `${cw.name} is this team's damage core, scoring ${pct}/100 against your strongest team. The other three raise her output through resonances, interference, and survivability rather than dealing the damage themselves.`;
+        const carryLine = `${cw.name} carries this team's damage. The other three raise her output through resonances, interference, and survivability rather than dealing the damage themselves.`;
         const lead = (weakLine ? [weakLine] : []).concat(carryLine).map(x => `<li>${x}</li>`).join('');
         return `<article class="team${i === 0 ? ' top' : ''}">
           <div class="team-head"><span class="team-rank mono">#${i + 1}</span>
@@ -235,6 +235,12 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
             <ul class="why-list">${lead}${why}<li class="why-foot">Only the carry's interference is scored; the other columns show suggested same-class fills.</li></ul>
           </details></article>`;
       }).join('');
+      let hiddenNote = '';
+      if (hidden) {
+        const hn = byId(hidden.carry).name, hp = Math.round(hidden.eff / top * 100);
+        hiddenNote = `<p class="hidden-note mono">Your next-best option \u2014 a ${hn} Carry Team \u2014 scored ${hp}/100, more than 5% behind, so it isn't shown.</p>`;
+      }
+      $('board').innerHTML = teamsHtml + hiddenNote;
     }
 
     // ---------- resonance bar (icon selectors) ----------
@@ -462,7 +468,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     #svapp .msg{font-size:13px;line-height:1}#svapp .msg.red{color:#e0574b}#svapp .msg.yellow{color:var(--ssr)}#svapp .msg.grey{color:var(--ink-faint)}
     #svapp .trank{font-size:.82rem;color:var(--ssr);letter-spacing:.03em}
     #svapp .tstat{font-size:.86rem;color:var(--ink-dim);letter-spacing:.02em}
-    #svapp .tlv{padding:0 11px 12px;font-size:.94rem;color:var(--ink);letter-spacing:.07em}
+    #svapp .tlv{padding:0 11px 12px;font-size:.72rem;color:var(--ink);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
     #svapp .tile.add{cursor:pointer;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;border-style:dashed;color:var(--ink-faint);padding:16px;background:transparent;transition:.15s}
     #svapp .tile.add:hover{border-color:var(--sigil);color:var(--ink)}
@@ -563,7 +569,7 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     #svapp .ms-ico{width:54px;height:54px;border-radius:9px;object-fit:cover;border:1px solid var(--line)}
     #svapp .ms-ico.txt{display:grid;place-items:center;background:var(--veil-2);font-family:"Space Mono",monospace;color:var(--ink-faint)}
     #svapp .ms-plus{position:absolute;top:-5px;right:-5px;background:var(--ssr);color:#0c0a15;font-weight:800;font-size:.72rem;width:18px;height:18px;border-radius:50%;display:grid;place-items:center}
-    #svapp .ms-name{font-size:.82rem;color:var(--ink);line-height:1.3;min-height:2.5em;display:flex;flex-direction:column;justify-content:center}
+    #svapp .ms-name{font-size:.7rem;color:var(--ink);line-height:1.2;min-height:2.4em;display:flex;flex-direction:column;justify-content:center}
     #svapp .ms-note{display:block;font-size:.58rem;color:var(--ink-faint);font-family:"Space Mono",monospace;margin-top:2px}
     #svapp .ms-lv{font-size:.72rem;color:var(--sigil)}
     #svapp .mskill.locked{opacity:.55}
