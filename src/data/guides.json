@@ -71,7 +71,13 @@
           "endless": true
         }
       ],
-      "video": "boss_venomfrill_lobby"
+      "video": "boss_venomfrill_lobby",
+      "model": {
+        "stackCap": 6,
+        "aoe": 0.23,
+        "staggerThreshold": 255,
+        "kdDur": 8
+      }
     }
   ],
   "tower": {
@@ -146,5 +152,6 @@
       "media": "boss_slime",
       "source": "Community-observed."
     }
-  ]
+  ],
+  "_boss_model_note": "Each bosses[] entry drives the DPS model via its 'weak' + 'model' block. bosses[0] is the ACTIVE boss (also shown on the Training Boss page). To score a new boss: add its entry (name/deals/weak/ranks/mechanics + model{stackCap,aoe,staggerThreshold,kdDur}) at the top of bosses[], move the old one to past_bosses[]. stackCap 0 = no stacking-debuff mechanic; staggerThreshold 0 = falls back to a flat kd; aoe = screen-wide attack share (from a fight map)."
 }

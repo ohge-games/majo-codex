@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import witches from '../data/witches.json';
 import skills from '../data/skills.json';
 import engine from '../data/solver_engine.json';
+import guides from '../data/guides.json';
 import fs from 'node:fs';
 const base = import.meta.env.BASE_URL;
 const lc = s => (s ?? '').toLowerCase();
@@ -41,7 +42,7 @@ for (const c of ['arcanist','vanguard','defender','supporter']) UI['cclass_' + c
 for (const r of ['sr','ssr','ur']) UI['rarity_' + r] = uiUrl('rarity_' + r);
 for (const s of ['red','yellow','grey','ex1','ex2','ex3']) UI['star_' + s] = uiUrl('star_' + s);
 const BOSSES = [
-  { id: 'venomfrill', name: 'Venomfrill', weak: 'physical', staggerThreshold: 255, kdDur: 8, stackCap: 6, aoe: 0.23 },
+  ...guides.bosses.map(b => ({ id: b.id, name: b.name, weak: b.weak, ...(b.model || {}) })),
   { id: 'dummy', name: 'Test Dummy (no weakness / no knockdown)', weak: 'none', kd: 0.1, aoe: 0.1 },
 ];
 const RES = {

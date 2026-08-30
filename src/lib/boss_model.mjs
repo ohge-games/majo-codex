@@ -208,7 +208,7 @@ export function createModel(witches, opts = {}) {
     for (const carry of carriesToRank) {
       const cw = byId(carry), st = statsFor(carry), weak = cw.el === boss.weak ? 1 : 0.75;
       const base = bases.get(carry) || timeline(carry);
-      const prov = pool.filter(id => id !== carry && byId(id).cls === cw.cls)
+      const prov = Object.keys(witches).filter(id => id !== carry && byId(id).cls === cw.cls)
         .map(pid => ({ pid, m: intfMult(carry, st, base, boss, combineIntf([pid])), label: byId(pid).intf?.label || pid }))
         .sort((a, b) => b.m - a.m);
       let best = null;
@@ -222,7 +222,7 @@ export function createModel(witches, opts = {}) {
             let iMult = 1, iWhy = null;
             if (avail.length) {
               iMult = intfMult(carry, st, base, boss, combineIntf(avail.map(p => p.pid)));
-              if (iMult > 1.001) iWhy = `The two off-field ${cw.cls} interference units add +${Math.round((iMult - 1) * 100)}% to ${cw.name || 'the carry'}.`;
+              if (iMult > 1.001) { const nP = avail.length; iWhy = `${nP === 1 ? 'One' : 'Two'} off-field ${cw.cls} interference ${nP === 1 ? 'unit adds' : 'units add'} +${Math.round((iMult - 1) * 100)}% to ${cw.name || 'the carry'}.`; }
             }
             const stk = teamStacks(team, boss, laws), redux = 1 - 0.06 * stk;
             let sWhy = null;
