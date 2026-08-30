@@ -153,7 +153,7 @@ export function createModel(witches, opts = {}) {
     }
     // 2x Physical law is OFFENSIVE for dodge-counter carries: +dodge -> more of the carry's OWN counters (self-boost)
     if (cw.dodgeCounter && (el.physical || 0) >= 2 && laws.phy2 > 0) {
-      const m = 1 + Math.min(0.15, L('phy2', laws.phy2));   // calibrated to the ~15% Yun-team read (self-dodge only)
+      const m = 1 + L('phy2', laws.phy2) / 3;   // ~1/3 dodge->dmg; Yun's +15% was mostly his damage, not this
       mult *= m; why.push(`2\u00d7 Physical self-dodge \u2192 \u00d7${m.toFixed(2)}`);
     }
     // Yuhong/Alice passive: ally DODGES grant crit (+4%/stack, max 10). Fed by teammates' real dodge rates —
@@ -165,7 +165,7 @@ export function createModel(witches, opts = {}) {
         const dodgePot = (w.dodgeVal || 0) / 100 / (w.dodgeCd || 4);
         const exposure = aoe + (1 - aoe) * (w.engage ?? 0.5);
         feed += dodgePot * exposure; }
-      const stacks = Math.min(10, 10 * feed);   // K=10 for the real-stat scale; raise once measured
+      const stacks = Math.min(10, 3 * feed);    // K=3: single-dodger feed measured small (Zhijie test); revisit with multi-dodger data
       if (stacks > 0.2) { const m = 1 + (1 - ex) * (critMul(st, stacks * 0.04) - 1);
         mult *= m; why.push(`passive: ally dodges (~${stacks.toFixed(1)} stk crit) \u2192 \u00d7${m.toFixed(2)}`); }
     }
@@ -228,7 +228,7 @@ export function createModel(witches, opts = {}) {
             if (stk > 0.05) sWhy = `boss dmg-reduction: ~${stk.toFixed(1)} stacks \u2192 \u00d7${redux.toFixed(2)}`;
             const eff = base.total * weak * mult * iMult * redux;
             const allWhy = [...why]; if (iWhy) allWhy.push(iWhy); if (sWhy) allWhy.push(sWhy);
-            if (!best || eff > best.eff) best = { eff, team, why: allWhy, weak, stk };
+            if (!best || eff > best.eff) best = { eff, team, why: allWhy, weak, stk, intf: avail.map(p => p.pid) };
           } } }
       if (best) rows.push({ carry, ...best });
     }

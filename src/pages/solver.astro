@@ -173,6 +173,38 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
     }
 
     const elC = e => `type-${e}`;
+    const starStr = w => '\u2605'.repeat(Math.min(6, w.maxrank)) + (w.maxrank > 6 ? ' EX' + (w.maxrank - 6) : '');
+    // Assign 2 same-class off-field interference units per on-field witch (carry gets the scored picks), no reuse.
+    function assignIntf(team, carry, carryIntf) {
+      const used = new Set([...team, ...(carryIntf || [])]);
+      const map = { [carry]: (carryIntf || []).slice(0, 2) };
+      for (const t of team) {
+        if (t === carry) continue;
+        const w = byId(t);
+        const cands = W.filter(u => u.cls === w.cls && !team.includes(u.id) && !used.has(u.id)).map(u => u.id).slice(0, 2);
+        cands.forEach(id => used.add(id));
+        map[t] = cands;
+      }
+      return map;
+    }
+    function unitCard(id, isCarry, intfIds) {
+      const w = byId(id);
+      const port = w.img ? `<img class="uc-port" src="${w.img}" alt="${w.name}" loading="lazy">` : `<div class="uc-port ph">${w.name[0]}</div>`;
+      const tiles = [0, 1].map(k => { const pid = intfIds[k]; if (!pid) return `<div class="intf-tile empty"></div>`;
+        const iw = byId(pid); const ip = iw.img ? `<img src="${iw.img}" alt="${iw.name}">` : `<span>${iw.name[0]}</span>`;
+        return `<div class="intf-tile cls-${iw.cls.toLowerCase()}" title="${iw.name} \u00b7 ${iw.cls} interference">${ip}</div>`; }).join('');
+      return `<div class="unit-col">
+        <div class="unit-card cls-${w.cls.toLowerCase()}${isCarry ? ' is-carry' : ''}">
+          <span class="uc-corner" title="${w.cls}">${iconFor('cclass', w.cls.toLowerCase())}</span>
+          ${isCarry ? '<span class="uc-lead mono">CARRY</span>' : ''}
+          ${port}
+          <div class="uc-foot"><div class="uc-stars">${starStr(w)}</div>
+            <div class="uc-atk mono">ATK: ${CAP(w.el)} ${iconFor('type', w.el)}</div></div>
+        </div>
+        <div class="intf-tiles">${tiles}</div>
+        <div class="uc-name mono">${w.name}</div>
+      </div>`;
+    }
     function renderEmpty() {
       $('resNote').textContent = '';
       $('board').innerHTML = `<div class="empty"><p>No carries yet.</p><p class="mono">Add an Arcanist or Vanguard to see the teams that rank best for your account.</p></div>`;
@@ -182,16 +214,21 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
       $('resNote').textContent = `vs ${boss.name} \u00b7 relative to top`;
       $('board').innerHTML = rows.map((r, i) => {
         const cw = byId(r.carry);
-        const mates = r.team.filter(t => t !== r.carry).map(t => { const m = byId(t);
-          return `<span class="mate"><b>${m.name}</b><i class="${elC(m.el)}">${m.cls}</i></span>`; }).join('');
+        const order = [r.carry, ...r.team.filter(t => t !== r.carry)];
+        const intfMap = assignIntf(r.team, r.carry, r.intf);
+        const cards = order.map(id => unitCard(id, id === r.carry, intfMap[id] || [])).join('');
         const why = r.why.map(x => `<li>${x}</li>`).join('');
         const pct = Math.round(r.eff / top * 100);
-        return `<article class="comp${i===0?' top':''}"><div class="comp-rank mono">#${i+1}</div>
-          <div class="comp-body"><div class="comp-carry"><span class="c-name display">${cw.name}</span>
-            <span class="rarity-chip is-${cw.rar}">${cw.rar}</span><span class="c-tag ${elC(cw.el)} mono">${CAP(cw.el)} ${cw.cls}</span>
-            ${r.weak < 1 ? '<span class="offweak mono">off-weakness \u00d7.75</span>' : ''}</div>
-            <div class="comp-team">${mates}</div><ul class="comp-why mono">${why}</ul></div>
-          <div class="comp-score"><span class="s-val">${pct}</span><span class="s-bar"><i style="width:${pct}%"></i></span></div></article>`;
+        return `<article class="team${i === 0 ? ' top' : ''}">
+          <div class="team-head"><span class="team-rank mono">#${i + 1}</span>
+            <span class="team-lead display">${cw.name}</span>
+            <span class="c-tag ${elC(cw.el)} mono">${CAP(cw.el)} ${cw.cls}</span>
+            ${r.weak < 1 ? '<span class="offweak mono">off-weakness \u00d7.75</span>' : ''}
+            <span class="team-score"><b>${pct}</b><i class="s-bar"><i style="width:${pct}%"></i></i></span></div>
+          <div class="team-view">${cards}</div>
+          <details class="why-team"><summary class="mono">Why this team? \u2014 breakdown</summary>
+            <ul class="why-list mono">${why}<li class="why-foot">Interference beneath the carry is scored; the other columns show suggested same-class fills.</li></ul>
+          </details></article>`;
       }).join('');
     }
 
@@ -435,24 +472,52 @@ const payload = { W, carries, fillers, MAX_STATS, UI, BOSSES, RES };
 
     #svapp .res-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
     #svapp .res-head .note{color:var(--ink-faint);font-size:.72rem}
-    #svapp .board{display:flex;flex-direction:column;gap:11px}
+    #svapp .board{display:flex;flex-direction:column;gap:16px}
     #svapp .empty{border:1px dashed var(--line);border-radius:var(--r);padding:40px 24px;text-align:center;color:var(--ink-dim)}
     #svapp .empty p{margin:.2em 0}#svapp .empty .mono{font-size:.78rem;color:var(--ink-faint)}
-    #svapp .comp{display:grid;grid-template-columns:32px 1fr 92px;gap:14px;align-items:center;background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px}
-    #svapp .comp.top{border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
-    #svapp .comp-rank{color:var(--ink-faint);font-size:.95rem;font-weight:700}
-    #svapp .comp-carry{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    #svapp .c-name{font-size:1.08rem}#svapp .c-tag{font-size:.64rem;letter-spacing:.06em}
-    #svapp .offweak{color:var(--physical);font-size:.62rem;border:1px solid currentColor;border-radius:999px;padding:1px 7px}
-    #svapp .comp-team{display:flex;gap:13px;flex-wrap:wrap;margin:7px 0 6px}
-    #svapp .mate{display:flex;flex-direction:column;line-height:1.2;font-size:.8rem}
-    #svapp .mate b{color:var(--ink);font-weight:500}#svapp .mate i{font-style:normal;font-size:.62rem;font-family:"Space Mono",monospace}
-    #svapp .comp-why{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 11px}
-    #svapp .comp-why li{color:var(--ink-faint);font-size:.67rem}
-    #svapp .comp-score{text-align:right}
-    #svapp .s-val{font-family:"Fraunces",serif;font-weight:600;font-size:1.5rem;color:var(--ssr)}
-    #svapp .s-bar{display:block;height:3px;background:var(--line);border-radius:2px;margin-top:5px;overflow:hidden}
+    #svapp .team{background:var(--veil);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px 12px}
+    #svapp .team.top{border-color:color-mix(in srgb,var(--sigil) 45%,var(--line))}
+    #svapp .team-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+    #svapp .team-rank{color:var(--ink-faint);font-size:.9rem;font-weight:700}
+    #svapp .team-lead{font-size:1.05rem}
+    #svapp .c-tag{font-size:.62rem;letter-spacing:.06em}
+    #svapp .offweak{color:var(--physical);font-size:.6rem;border:1px solid currentColor;border-radius:999px;padding:1px 7px}
+    #svapp .team-score{margin-left:auto;display:flex;align-items:center;gap:8px}
+    #svapp .team-score b{font-family:"Fraunces",serif;font-weight:600;font-size:1.5rem;color:var(--ssr)}
+    #svapp .team-score .s-bar{width:90px}
+    #svapp .s-bar{display:block;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
     #svapp .s-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sigil),var(--ssr))}
+    /* team view: 4 columns of tall card + interference tiles */
+    #svapp .team-view{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    #svapp .unit-col{display:flex;flex-direction:column;gap:6px;min-width:0}
+    #svapp .unit-card{position:relative;aspect-ratio:5/8;border-radius:9px;overflow:hidden;border:2px solid var(--line);background:var(--nightshade)}
+    #svapp .unit-card.is-carry{border-color:var(--ssr);box-shadow:0 0 0 1px color-mix(in srgb,var(--ssr) 40%,transparent)}
+    #svapp .cls-arcanist{--cls:#5b7fc4} #svapp .cls-vanguard{--cls:#c0574a} #svapp .cls-defender{--cls:#8a5bb8} #svapp .cls-supporter{--cls:#5a9a56}
+    #svapp .unit-card{border-color:color-mix(in srgb,var(--cls,var(--line)) 55%,var(--line))}
+    #svapp .uc-port{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
+    #svapp .uc-port.ph{display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:2rem;color:var(--ink-faint);background:var(--nightshade)}
+    #svapp .uc-corner{position:absolute;top:0;left:0;width:34px;height:34px;background:linear-gradient(135deg,var(--cls,#555) 55%,transparent 55%);display:flex;align-items:flex-start;justify-content:flex-start;padding:3px}
+    #svapp .uc-corner img{width:15px;height:15px;filter:brightness(0) invert(1)}
+    #svapp .uc-lead{position:absolute;top:5px;right:5px;font-size:.5rem;letter-spacing:.1em;color:#1a1420;background:var(--ssr);border-radius:3px;padding:1px 5px;font-weight:700}
+    #svapp .uc-foot{position:absolute;left:0;right:0;bottom:0;padding:16px 7px 6px;background:linear-gradient(0deg,rgba(10,8,14,.94),transparent)}
+    #svapp .uc-stars{color:#f2c14e;font-size:.62rem;letter-spacing:1px;line-height:1;margin-bottom:3px}
+    #svapp .uc-atk{display:flex;align-items:center;gap:4px;font-size:.58rem;color:var(--ink);background:rgba(0,0,0,.4);border-radius:4px;padding:2px 5px;width:fit-content}
+    #svapp .uc-atk img{width:13px;height:13px}
+    #svapp .intf-tiles{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+    #svapp .intf-tile{aspect-ratio:1;border-radius:6px;overflow:hidden;background:var(--nightshade);border:1px solid var(--line);border-bottom:2px solid color-mix(in srgb,var(--cls,var(--sigil)) 60%,var(--line));display:flex;align-items:center;justify-content:center}
+    #svapp .intf-tile img{width:100%;height:100%;object-fit:cover;object-position:top center}
+    #svapp .intf-tile span{font-family:"Fraunces",serif;color:var(--ink-faint);font-size:.9rem}
+    #svapp .intf-tile.empty{border-style:dashed;border-bottom-style:dashed;opacity:.5}
+    #svapp .uc-name{font-size:.66rem;text-align:center;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #svapp .why-team{margin-top:11px;border-top:1px solid var(--line);padding-top:9px}
+    #svapp .why-team summary{cursor:pointer;color:var(--sigil);font-size:.72rem;letter-spacing:.03em;list-style:none}
+    #svapp .why-team summary::-webkit-details-marker{display:none}
+    #svapp .why-team summary::before{content:"\u25b8 ";font-size:.65rem}
+    #svapp .why-team[open] summary::before{content:"\u25be "}
+    #svapp .why-list{list-style:none;margin:9px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:5px 14px}
+    #svapp .why-list li{color:var(--ink-faint);font-size:.68rem}
+    #svapp .why-list .why-foot{flex-basis:100%;color:var(--ink-dim);font-style:italic;margin-top:3px}
+    @media(max-width:640px){#svapp .team-view{grid-template-columns:repeat(2,1fr)}}
 
     #svapp .modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
     #svapp .modal[hidden]{display:none}
