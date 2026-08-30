@@ -129,6 +129,7 @@ export function createModel(witches, opts = {}) {
   function lawMult(carry, team, boss, base, laws) {
     const cw = byId(carry), st = statsFor(carry), why = [];
     const ex = base.exec, cls = {}, el = {};
+    const kdFrac = deriveKd(team, boss);   // team-stagger-derived knockdown fraction
     for (const t of team) { const w = byId(t); cls[w.cls] = (cls[w.cls] || 0) + 1; el[w.el] = (el[w.el] || 0) + 1; }
     let mult = 1;
     if ((cls.Arcanist || 0) >= 2 && laws.arc > 0) {
@@ -139,8 +140,8 @@ export function createModel(witches, opts = {}) {
       const m = 1 + base.normal * L('van', laws.van);
       mult *= m; why.push(`2\u00d7 Vanguard speed \u2192 \u00d7${m.toFixed(2)}`);
     }
-    if ((el.mental || 0) >= 2 && laws.men2 > 0 && boss.kd > 0) {
-      const m = 1 + L('men2', laws.men2) * boss.kd;
+    if ((el.mental || 0) >= 2 && laws.men2 > 0 && kdFrac > 0) {
+      const m = 1 + L('men2', laws.men2) * kdFrac;
       mult *= m; why.push(`2\u00d7 Mental KD-dmg \u2192 \u00d7${m.toFixed(2)}`);
     }
     if ((el[cw.el] || 0) === 4) {
@@ -177,13 +178,27 @@ export function createModel(witches, opts = {}) {
       if (m > 1.001) { mult *= m; why.push(`charge \u2192 \u00d7${m.toFixed(2)}`); }
     }
     if (team.includes('W005')) { const m = 1 + base.extreme * 0.15; if (m > 1.001) { mult *= m; why.push(`Peseshet +Extreme dmg \u2192 \u00d7${m.toFixed(2)}`); } }
-    if (boss.kd > 0) {
-      const kd = (1 + 1.0 * st.cd) / (1 + st.cr * st.cd), blend = (1 - boss.kd) + boss.kd * kd, m = 1 + (1 - ex) * (blend - 1);
+    if (kdFrac > 0) {
+      const kd = (1 + 1.0 * st.cd) / (1 + st.cr * st.cd), blend = (1 - kdFrac) + kdFrac * kd, m = 1 + (1 - ex) * (blend - 1);
       if (m > 1.001) { mult *= m; why.push(`knockdown guaranteed-crit \u2192 \u00d7${m.toFixed(2)}`); }
     }
     return { mult, why };
   }
   const hasHealer = team => team.some(t => byId(t).cls === 'Supporter');
+
+  // Team knockdown fraction: derived from the team's stagger output vs the boss's stagger wall.
+  // Stagger-heavy comps knock the boss down more; a comp with no staggerers barely dents a resistant boss.
+  function deriveKd(team, boss) {
+    if (!boss.staggerThreshold) return boss.kd || 0;   // fallback: flat kd (e.g. neutral dummy)
+    const cls = {}; for (const t of team) { const w = byId(t); cls[w.cls] = (cls[w.cls] || 0) + 1; }
+    const savLaw = ((cls.Supporter || 0) + (cls.Arcanist || 0) + (cls.Vanguard || 0)) >= 2 ? 1.5 : 1;
+    let rate = 0; for (const t of team) rate += byId(t).staggerRate || 0;
+    rate *= savLaw;
+    if (rate <= 0) return 0;
+    const dur = boss.kdDur || 8, fill = boss.staggerThreshold / rate;
+    const knockdowns = 180 / (fill + dur);
+    return Math.min(0.9, knockdowns * dur / 180);
+  }
 
   // Rank each carry in `carriesToRank` by its best legal team drawn from `pool`.
   function board({ boss, laws, carriesToRank, pool }) {

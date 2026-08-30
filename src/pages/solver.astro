@@ -41,8 +41,8 @@ for (const c of ['arcanist','vanguard','defender','supporter']) UI['cclass_' + c
 for (const r of ['sr','ssr','ur']) UI['rarity_' + r] = uiUrl('rarity_' + r);
 for (const s of ['red','yellow','grey','ex1','ex2','ex3']) UI['star_' + s] = uiUrl('star_' + s);
 const BOSSES = [
-  { id: 'venomfrill', name: 'Venomfrill', weak: 'physical', kd: 0.089, stackCap: 6, aoe: 0.23 },
-  { id: 'dummy', name: 'Test Dummy (no weakness / no knockdown)', weak: 'none', kd: 0, aoe: 0.1 },
+  { id: 'venomfrill', name: 'Venomfrill', weak: 'physical', staggerThreshold: 255, kdDur: 8, stackCap: 6, aoe: 0.23 },
+  { id: 'dummy', name: 'Test Dummy (no weakness / no knockdown)', weak: 'none', kd: 0.1, aoe: 0.1 },
 ];
 const RES = {
   arc: [14, 17, 20], van: [13, 19, 25],           // 2x class
